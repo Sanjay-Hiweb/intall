@@ -1,0 +1,107 @@
+{
+  "currency": "USD",
+  "currencySymbol": "$",
+  "rateTier": "Standard Premium",
+  "flooring": {
+    "vitrified_tile": {
+      "name": "Vitrified Porcelain Tile (600×600mm)",
+      "unit": "sqft",
+      "materialRate": 4.50,
+      "laborRate": 2.25,
+      "wastagePct": 8,
+      "applicableRoomTypes": ["hall", "living", "dining", "passage"]
+    },
+    "hardwood_oak": {
+      "name": "Engineered White Oak Hardwood",
+      "unit": "sqft",
+      "materialRate": 9.50,
+      "laborRate": 3.75,
+      "wastagePct": 10,
+      "applicableRoomTypes": ["bedroom", "study"]
+    },
+    "anti_skid_tile": {
+      "name": "Anti-Skid Matte Ceramic Tile",
+      "unit": "sqft",
+      "materialRate": 3.80,
+      "laborRate": 2.50,
+      "wastagePct": 10,
+      "applicableRoomTypes": ["bathroom", "balcony"]
+    },
+    "granite_slab": {
+      "name": "Polished Jet Black Granite Counter & Floor",
+      "unit": "sqft",
+      "materialRate": 8.00,
+      "laborRate": 4.00,
+      "wastagePct": 8,
+      "applicableRoomTypes": ["kitchen", "pooja"]
+    },
+    "paved_pavers": {
+      "name": "Interlocking Heavy-Duty Concrete Pavers",
+      "unit": "sqft",
+      "materialRate": 3.20,
+      "laborRate": 1.80,
+      "wastagePct": 5,
+      "applicableRoomTypes": ["parking"]
+    }
+  },
+  "masonryAndWalls": {
+    "brickWall9in": {
+      "name": "9-inch External Load-Bearing Masonry Wall",
+      "unit": "sqft_surface",
+      "wallHeightFt": 9.5,
+      "bricksPerSqft": 9.0,
+      "brickUnitCost": 0.65,
+      "mortarCostPerSqft": 1.20,
+      "laborCostPerSqft": 2.80
+    },
+    "partitionWall4in": {
+      "name": "4.5-inch Internal Partition Wall",
+      "unit": "sqft_surface",
+      "wallHeightFt": 9.5,
+      "bricksPerSqft": 4.5,
+      "brickUnitCost": 0.65,
+      "mortarCostPerSqft": 0.80,
+      "laborCostPerSqft": 2.10
+    },
+    "interiorPlasterAndPaint": {
+      "name": "Double-Coat Putty + Low-VOC Acrylic Emulsion",
+      "unit": "sqft_surface",
+      "ratePerSqft": 1.45
+    },
+    "exteriorWeatherShield": {
+      "name": "Siliconized Exterior Weathercoat Finish",
+      "unit": "sqft_surface",
+      "ratePerSqft": 1.85
+    }
+  },
+  "openings": {
+    "mainEntryDoor": {
+      "name": "Pre-Hung Solid Teak Wood Entry Door with Digital Lock",
+      "unitPrice": 650.00
+    },
+    "roomInternalDoor": {
+      "name": "Engineered Flush Core Door with Stainless Steel Hardware",
+      "unitPrice": 220.00
+    },
+    "bathroomWaterproofDoor": {
+      "name": "FRP/WPC Waterproof Bathroom Door",
+      "unitPrice": 160.00
+    },
+    "casementWindow": {
+      "name": "Double-Glazed UPVC Casement Window with Mosquito Mesh",
+      "ratePerSqft": 38.00
+    }
+  },
+  "structuralConcreteAndSteel": {
+    "rccSlabFooting": {
+      "name": "Reinforced Cement Concrete (RCC M25 Grade) Slab & Beams",
+      "unit": "sqft_builtup",
+      "ratePerSqft": 32.00
+    },
+    "electricalAndPlumbing": {
+      "name": "Concealed Conduit Wiring, Sanitary Lines & PEX Water Supply",
+      "unit": "sqft_builtup",
+      "ratePerSqft": 18.50
+    }
+  }
+}

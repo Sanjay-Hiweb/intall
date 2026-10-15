@@ -1,0 +1,43 @@
+{
+  "standard_residential": {
+    "name": "Unified Model Residential Building Code (R-3 Typology)",
+    "description": "Standard municipal guidelines for detached and semi-detached single-family residences",
+    "setbacks": {
+      "front_min_ft": 5.0,
+      "rear_min_ft": 3.0,
+      "left_min_ft": 3.0,
+      "right_min_ft": 3.0
+    },
+    "coverage": {
+      "max_ground_coverage_pct": 70.0,
+      "max_far": 1.75
+    },
+    "dimensions": {
+      "min_ceiling_height_ft": 9.0,
+      "min_corridor_width_ft": 3.0,
+      "min_room_areas_sqft": {
+        "bedroom": 90.0,
+        "master_bedroom": 120.0,
+        "living": 140.0,
+        "hall": 140.0,
+        "kitchen": 50.0,
+        "bathroom": 25.0,
+        "dining": 80.0,
+        "parking": 120.0,
+        "pooja": 15.0,
+        "study": 60.0
+      },
+      "min_room_widths_ft": {
+        "bedroom": 9.0,
+        "living": 10.0,
+        "hall": 10.0,
+        "kitchen": 5.0,
+        "bathroom": 4.0
+      }
+    },
+    "lightAndVentilation": {
+      "min_habitable_window_ratio": 0.10,
+      "min_bathroom_vent_sqft": 3.0
+    }
+  }
+}

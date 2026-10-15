@@ -1,0 +1,3604 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AETHER DESIGN — Modern Architectural Floor Plan & 3D Spatial Studio</title>
+  <meta name="description"
+    content="Parametric 2D architectural blueprints and interactive 3D spatial models engineered in real-time. Zero installation, 100% in-browser precision.">
+
+  <!-- World-Class Typography: DM Serif Display + Plus Jakarta Sans + Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Three.js & OrbitControls for Live 3D Spatial Studio -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <!-- GSAP for High-Performance Shader & Particle Animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <!-- Curated Templates Library -->
+  <script src="templates.js"></script>
+
+  <style>
+    /* ==========================================================================
+       DRAFTED.AI EDITORIAL WARM LINEN ARCHITECTURAL SYSTEM
+       ========================================================================== */
+    :root {
+      /* Drafted.ai Signature Warm Linen & Alabaster Palette */
+      --bg-canvas: #FAF8F2;
+      --bg-surface: #FFFFFF;
+      --bg-subtle: #F4F1EA;
+      --bg-vellum: #EFEBE1;
+
+      /* Authoritative Monochromes & Architectural Accents */
+      --obsidian: #1C1917;
+      --obsidian-hover: #292524;
+      --charcoal: #44403C;
+      --slate: #57534E;
+      --muted: #78716C;
+      --faint: #A8A29E;
+
+      --accent-spruce: #1E3A2B;
+      --accent-spruce-soft: rgba(30, 58, 43, 0.08);
+      --accent-spruce-glow: rgba(30, 58, 43, 0.18);
+      --accent-sand: #C2A782;
+      --accent-terracotta: #C85A32;
+
+      /* Subtle Hairline Borders */
+      --border-hairline: #E7E5E4;
+      --border-subtle: #D6D3D1;
+      --border-focus: #1C1917;
+
+      /* Luxury Squircle Curves */
+      --radius-xs: 8px;
+      --radius-sm: 12px;
+      --radius-md: 18px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
+      --radius-pill: 9999px;
+
+      /* Multi-Layer Ambient Atmospheric Shadows */
+      --shadow-ambient: 0 4px 20px -2px rgba(28, 25, 23, 0.04), 0 2px 6px -1px rgba(28, 25, 23, 0.02);
+      --shadow-elevated: 0 24px 60px -15px rgba(28, 25, 23, 0.07), 0 6px 16px -4px rgba(28, 25, 23, 0.03);
+      --shadow-floating: 0 30px 80px -20px rgba(28, 25, 23, 0.14), 0 8px 24px -4px rgba(28, 25, 23, 0.05);
+      --shadow-glow: 0 16px 40px rgba(30, 58, 43, 0.18);
+
+      /* Typography */
+      --font-serif: 'DM Serif Display', Georgia, serif;
+      --font-display: 'DM Serif Display', Georgia, serif;
+      --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Space Grotesk', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-canvas);
+    }
+
+    body {
+      font-family: var(--font-ui);
+      background-color: var(--bg-canvas);
+      color: var(--slate);
+      min-height: 100vh;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      selection-background-color: var(--obsidian);
+      selection-color: #FFFFFF;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    /* Typography */
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-family: var(--font-display);
+      color: var(--obsidian);
+      letter-spacing: -0.03em;
+      line-height: 1.18;
+      font-weight: 700;
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent-spruce);
+      margin-bottom: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--accent-spruce);
+    }
+
+    /* Luxury Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: var(--font-ui);
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: var(--radius-pill);
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .btn-obsidian {
+      background: var(--obsidian);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(17, 20, 24, 0.12);
+    }
+
+    .btn-obsidian:hover {
+      background: var(--obsidian-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(17, 20, 24, 0.22);
+    }
+
+    .btn-outline {
+      background: #FFFFFF;
+      color: var(--obsidian);
+      border-color: var(--border-subtle);
+      box-shadow: var(--shadow-ambient);
+    }
+
+    .btn-outline:hover {
+      background: #FAFAFA;
+      border-color: rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-elevated);
+    }
+
+    .btn-large {
+      padding: 15px 32px;
+      font-size: 0.98rem;
+    }
+
+    /* SVGs */
+    .icon-svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ==========================================================================
+       FLOATING ISLAND NAVIGATION BAR
+       ========================================================================== */
+    .navbar-wrapper {
+      position: fixed;
+      top: 24px;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+      padding: 0 24px;
+    }
+
+    .navbar {
+      width: 100%;
+      max-width: 1160px;
+      height: 64px;
+      border-radius: var(--radius-pill);
+      background: rgba(255, 255, 255, 0.84);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border: 1px solid rgba(0, 0, 0, 0.07);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px 0 24px;
+      pointer-events: auto;
+      transition: all 0.3s ease;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--obsidian);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark svg {
+      width: 18px;
+      height: 18px;
+      stroke: #FFFFFF;
+    }
+
+    .brand-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: var(--obsidian);
+      line-height: 1.1;
+    }
+
+    .brand-caption {
+      font-family: var(--font-mono);
+      font-size: 0.64rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--slate);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: color 0.15s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--obsidian);
+    }
+
+    /* ==========================================================================
+       CINEMATIC SCROLLYTELLING STAGE (FULL-BLEED ARCHITECTURAL REEL)
+       ========================================================================== */
+    .hero-scrollstory {
+      position: relative;
+      height: 440vh;
+      background: #E8E5DF;
+    }
+
+    .hero-sticky-stage {
+      position: sticky;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Full-Screen 50-Frame Background Canvas (Crystal Clear & Bright) */
+    #heroSequenceCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+      filter: brightness(1.04) contrast(1.02) saturate(1.03);
+    }
+
+    /* Minimal Top Gradient to ensure Nav contrast, Zero Fog over the Image */
+    .hero-stage-scrim {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.22) 0%, transparent 14%, transparent 90%, rgba(0, 0, 0, 0.1) 100%);
+      pointer-events: none;
+    }
+
+    /* Decent Floating Architectural Text (No Background, Uniform Font Size, ~10% Space) */
+    .hero-text-caption {
+      position: absolute;
+      bottom: 40px;
+      left: 48px;
+      z-index: 10;
+      max-width: 540px;
+      font-family: var(--font-ui);
+      font-size: 0.95rem;
+      font-weight: 500;
+      line-height: 1.55;
+      color: #FFFFFF;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7), 0 1px 3px rgba(0, 0, 0, 0.5);
+      letter-spacing: -0.01em;
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+
+    /* Preset Scale Buttons (Used in Estimator Studio) */
+    .preset-pill-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding-top: 10px;
+    }
+
+    .preset-label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-right: 4px;
+    }
+
+    .preset-link {
+      background: #FFFFFF;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-pill);
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--charcoal);
+      text-decoration: none;
+      box-shadow: var(--shadow-ambient);
+      transition: all 0.2s ease;
+      font-family: var(--font-mono);
+    }
+
+    .preset-link:hover {
+      border-color: var(--obsidian);
+      color: var(--obsidian);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-elevated);
+    }
+
+    /* ==========================================================================
+       PHILOSOPHY & METRICS STRIP
+       ========================================================================== */
+    .metrics-bar {
+      padding: 40px 0;
+      border-top: 1px solid var(--border-hairline);
+      border-bottom: 1px solid var(--border-hairline);
+      background: #FFFFFF;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+    }
+
+    .metric-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-left: 2px solid var(--obsidian);
+      padding-left: 20px;
+    }
+
+    .metric-num {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--obsidian);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .metric-lbl {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* ==========================================================================
+       SECTION COMMON STYLES
+       ========================================================================== */
+    .section {
+      padding: 110px 0;
+      position: relative;
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 60px;
+    }
+
+    .section-title {
+      font-size: 2.6rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+      color: var(--obsidian);
+    }
+
+    .section-desc {
+      font-size: 1.05rem;
+      color: var(--slate);
+      line-height: 1.65;
+    }
+
+    /* ==========================================================================
+       DRAFTING BENCH: QUICK ESTIMATOR STUDIO
+       ========================================================================== */
+    .estimator-studio-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-xl);
+      padding: 52px;
+      box-shadow: var(--shadow-elevated);
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 52px;
+      align-items: center;
+    }
+
+    .studio-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .control-block {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .control-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .control-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--obsidian);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-value-pill {
+      font-family: var(--font-mono);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--obsidian);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 4px 14px;
+      border-radius: var(--radius-pill);
+    }
+
+    /* Custom Hairline Range Slider */
+    .hairline-range {
+      width: 100%;
+      height: 5px;
+      border-radius: 3px;
+      background: #E5E4E0;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    .hairline-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 2px solid var(--obsidian);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .hairline-range::-webkit-slider-thumb:hover {
+      transform: scale(1.12);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .scale-limits {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    /* Vellum Drafting Canvas Area */
+    .studio-preview {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+    }
+
+    #plotEstimatorCanvas {
+      width: 100%;
+      height: 190px;
+      background: var(--bg-vellum);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.02);
+    }
+
+    .stat-display-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      width: 100%;
+    }
+
+    .stat-unit-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-hairline);
+      padding: 16px;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-ambient);
+    }
+
+    .stat-unit-val {
+      font-family: var(--font-display);
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: var(--obsidian);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-unit-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 6px;
+    }
+
+    .studio-recommendation-box {
+      background: var(--accent-spruce-soft);
+      border: 1px solid rgba(15, 58, 46, 0.15);
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      width: 100%;
+      font-size: 0.88rem;
+      color: var(--charcoal);
+      line-height: 1.55;
+    }
+
+    .studio-recommendation-box strong {
+      color: var(--accent-spruce);
+      font-weight: 700;
+    }
+
+    /* ==========================================================================
+       THE 4-STEP PROCESS (EDITORIAL CHRONOLOGY)
+       ========================================================================== */
+    .chronology-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 28px;
+    }
+
+    .chronology-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      padding: 38px 28px;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: var(--shadow-ambient);
+      overflow: hidden;
+    }
+
+    .chronology-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-elevated);
+      border-color: rgba(0, 0, 0, 0.12);
+    }
+
+    .watermark-index {
+      position: absolute;
+      top: 18px;
+      right: 22px;
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: rgba(0, 0, 0, 0.04);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .chronology-icon-disc {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-hairline);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--obsidian);
+    }
+
+    .chronology-title {
+      font-size: 1.22rem;
+      font-weight: 700;
+      color: var(--obsidian);
+    }
+
+    .chronology-body {
+      font-size: 0.92rem;
+      color: var(--slate);
+      line-height: 1.6;
+    }
+
+    /* ==========================================================================
+       ARCHITECTURAL INTELLIGENCE: 6 CRAFT PILLARS
+       ========================================================================== */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    .pillar-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      padding: 38px 32px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: var(--shadow-ambient);
+    }
+
+    .pillar-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-elevated);
+      border-color: rgba(0, 0, 0, 0.12);
+    }
+
+    .pillar-icon-box {
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      background: var(--accent-spruce-soft);
+      border: 1px solid rgba(15, 58, 46, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-spruce);
+    }
+
+    .pillar-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--obsidian);
+    }
+
+    .pillar-text {
+      font-size: 0.94rem;
+      color: var(--slate);
+      line-height: 1.65;
+    }
+
+    /* ==========================================================================
+       CURATED ARCHETYPES (TEMPLATE CATALOGUE)
+       ========================================================================== */
+    .catalogue-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 44px;
+      flex-wrap: wrap;
+    }
+
+    .catalogue-tab {
+      background: #FFFFFF;
+      border: 1px solid var(--border-subtle);
+      color: var(--slate);
+      padding: 9px 22px;
+      border-radius: var(--radius-pill);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-ambient);
+    }
+
+    .catalogue-tab:hover,
+    .catalogue-tab.active {
+      background: var(--obsidian);
+      color: #FFFFFF;
+      border-color: var(--obsidian);
+      box-shadow: var(--shadow-elevated);
+    }
+
+    .catalogue-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    .catalogue-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      transition: all 0.25s ease;
+      box-shadow: var(--shadow-ambient);
+    }
+
+    .catalogue-card:hover {
+      border-color: rgba(0, 0, 0, 0.14);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-elevated);
+    }
+
+    .card-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-typology-pill {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--obsidian);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-hairline);
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+    }
+
+    .card-plan-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--obsidian);
+      letter-spacing: -0.01em;
+    }
+
+    .card-spec-table {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.86rem;
+      color: var(--slate);
+    }
+
+    .card-spec-table li {
+      display: flex;
+      justify-content: space-between;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed rgba(0, 0, 0, 0.07);
+    }
+
+    .card-spec-table li span:last-child {
+      color: var(--obsidian);
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+
+    /* ==========================================================================
+       DUAL STUDIO: 2D BLUEPRINT VS 3D SPATIAL MODEL
+       ========================================================================== */
+    .dual-studio-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 36px;
+      background: #FFFFFF;
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-xl);
+      padding: 44px;
+      box-shadow: var(--shadow-elevated);
+    }
+
+    .studio-chamber {
+      background: var(--bg-subtle);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      border: 1px solid var(--border-hairline);
+    }
+
+    .chamber-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chamber-tag {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .tag-cad {
+      background: rgba(17, 20, 24, 0.06);
+      color: var(--obsidian);
+      border: 1px solid rgba(17, 20, 24, 0.12);
+    }
+
+    .tag-3d {
+      background: var(--accent-spruce-soft);
+      color: var(--accent-spruce);
+      border: 1px solid rgba(15, 58, 46, 0.18);
+    }
+
+    .viewport-box {
+      height: 240px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-vellum);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ==========================================================================
+       FAQ ACCORDION (SWISS MINIMALIST LIST)
+       ========================================================================== */
+    .faq-container {
+      max-width: 820px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .faq-row {
+      background: #FFFFFF;
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-ambient);
+      transition: all 0.2s ease;
+    }
+
+    .faq-row.active {
+      border-color: rgba(0, 0, 0, 0.14);
+      box-shadow: var(--shadow-elevated);
+    }
+
+    .faq-trigger {
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--obsidian);
+    }
+
+    .faq-plus {
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      color: var(--muted);
+      transition: transform 0.25s ease, color 0.25s ease;
+    }
+
+    .faq-row.active .faq-plus {
+      transform: rotate(45deg);
+      color: var(--obsidian);
+    }
+
+    .faq-body {
+      padding: 0 28px 24px;
+      font-size: 0.95rem;
+      color: var(--slate);
+      line-height: 1.7;
+      display: none;
+    }
+
+    .faq-row.active .faq-body {
+      display: block;
+    }
+
+    /* ==========================================================================
+       CONCLUDING HERO CALL-TO-ACTION WITH GPU INTERACTIVE PARTICLES
+       ========================================================================== */
+    .concluding-banner {
+      background: radial-gradient(circle at center, #172421 0%, #111418 70%, #0c0e10 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-xl);
+      min-height: 560px;
+      padding: 60px 32px;
+      text-align: center;
+      box-shadow: var(--shadow-floating);
+      position: relative;
+      overflow: hidden;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .particles-stage {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: auto;
+      cursor: crosshair;
+    }
+
+    .particles-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Top and bottom controls overlay */
+    .particles-controls-bar {
+      position: absolute;
+      top: 20px;
+      left: 24px;
+      right: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .particles-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: rgba(17, 20, 24, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-pill);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #94A3B8;
+      pointer-events: auto;
+      user-select: none;
+    }
+
+    .particles-badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 10px #10B981;
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.4;
+        transform: scale(0.8);
+      }
+    }
+
+    .particles-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      pointer-events: auto;
+    }
+
+    .particle-upload-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 16px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: var(--radius-pill);
+      color: rgba(255, 255, 255, 0.85);
+      font-family: var(--font-ui);
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .particle-upload-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #FFFFFF;
+      transform: translateY(-1px);
+    }
+
+    .particles-presets {
+      position: absolute;
+      bottom: 20px;
+      right: 24px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(17, 20, 24, 0.65);
+      padding: 4px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 10;
+      pointer-events: auto;
+    }
+
+    .preset-chip {
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      font-family: var(--font-ui);
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #94A3B8;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .preset-chip.active,
+    .preset-chip:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .preset-chip.active {
+      background: rgba(255, 255, 255, 0.18);
+      color: #38BDF8;
+    }
+
+    .particles-interactive-hint {
+      position: absolute;
+      bottom: 22px;
+      left: 24px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.45);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 10;
+      pointer-events: none;
+      letter-spacing: 0.04em;
+    }
+
+    .concluding-content {
+      position: relative;
+      z-index: 2;
+      max-width: 640px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      pointer-events: none;
+      background: radial-gradient(circle at center, rgba(17, 20, 24, 0.6) 0%, rgba(17, 20, 24, 0.2) 65%, transparent 100%);
+      padding: 32px 24px;
+      border-radius: var(--radius-lg);
+    }
+
+    .concluding-title {
+      font-size: 3rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: -0.03em;
+      text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+    }
+
+    .concluding-desc {
+      font-size: 1.1rem;
+      color: #E2E8F0;
+      line-height: 1.6;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+    }
+
+    .concluding-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      pointer-events: auto;
+    }
+
+    .concluding-btn {
+      background: #FFFFFF;
+      color: var(--obsidian);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+      pointer-events: auto;
+    }
+
+    .concluding-btn:hover {
+      background: #F8FAFC;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .concluding-banner {
+        min-height: 480px;
+        padding: 40px 20px;
+      }
+
+      .concluding-title {
+        font-size: 2rem;
+      }
+
+      .particles-controls-bar {
+        top: 14px;
+        left: 14px;
+        right: 14px;
+      }
+
+      .particles-interactive-hint {
+        display: none;
+      }
+
+      .particles-presets {
+        bottom: 14px;
+        right: 14px;
+      }
+    }
+
+    /* ==========================================================================
+       ARCHITECTURAL FOOTER
+       ========================================================================== */
+    .footer {
+      border-top: 1px solid var(--border-hairline);
+      background: #FFFFFF;
+      padding: 70px 0 36px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 60px;
+    }
+
+    .footer-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .footer-col h4 {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--obsidian);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .footer-links a {
+      color: var(--slate);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--obsidian);
+    }
+
+    .footer-bottom {
+      border-top: 1px solid var(--border-hairline);
+      padding-top: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.84rem;
+      color: var(--muted);
+      font-family: var(--font-mono);
+    }
+
+    /* ==========================================================================
+       SOCIAL FLIP BUTTON ("C O N T A C T")
+       ========================================================================== */
+    .social-flip-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 44px 0 28px;
+      border-top: 1px solid var(--border-hairline);
+      margin-bottom: 24px;
+    }
+
+    .social-flip-caption {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .social-flip-box {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 20px;
+      background: #FFFFFF;
+      padding: 16px 20px;
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      user-select: none;
+    }
+
+    /* Moving gradient laser border lines */
+    .social-flip-borders {
+      position: absolute;
+      inset: -1px;
+      border-radius: 20px;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .social-flip-border-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 1px;
+      width: 100%;
+      background: linear-gradient(90deg, transparent, rgba(17, 20, 24, 0.5), transparent);
+      animation: laserSlideRight 2.5s linear infinite;
+    }
+
+    .social-flip-border-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 1px;
+      width: 100%;
+      background: linear-gradient(90deg, transparent, rgba(17, 20, 24, 0.5), transparent);
+      animation: laserSlideLeft 2.5s linear infinite;
+    }
+
+    @keyframes laserSlideRight {
+      0% {
+        transform: translateX(-100%);
+      }
+
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    @keyframes laserSlideLeft {
+      0% {
+        transform: translateX(100%);
+      }
+
+      100% {
+        transform: translateX(-100%);
+      }
+    }
+
+    /* Flip Node */
+    .social-flip-node {
+      position: relative;
+      width: 42px;
+      height: 42px;
+      perspective: 1000px;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+    }
+
+    .social-flip-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Sequential flip delays */
+    .social-flip-box:hover .social-flip-node:nth-child(2) .social-flip-inner {
+      transition-delay: 0s;
+      transform: rotateY(180deg);
+    }
+
+    .social-flip-box:hover .social-flip-node:nth-child(3) .social-flip-inner {
+      transition-delay: 0.08s;
+      transform: rotateY(180deg);
+    }
+
+    .social-flip-box:hover .social-flip-node:nth-child(4) .social-flip-inner {
+      transition-delay: 0.16s;
+      transform: rotateY(180deg);
+    }
+
+    .social-flip-box:hover .social-flip-node:nth-child(5) .social-flip-inner {
+      transition-delay: 0.24s;
+      transform: rotateY(180deg);
+    }
+
+    .social-flip-box:hover .social-flip-node:nth-child(6) .social-flip-inner {
+      transition-delay: 0.32s;
+      transform: rotateY(180deg);
+    }
+
+    .social-flip-box:hover .social-flip-node:nth-child(7) .social-flip-inner {
+      transition-delay: 0.40s;
+      transform: rotateY(180deg);
+    }
+
+    .social-flip-box:hover .social-flip-node:nth-child(8) .social-flip-inner {
+      transition-delay: 0.48s;
+      transform: rotateY(180deg);
+    }
+
+    /* Touch or active fallback */
+    .social-flip-box.is-flipped .social-flip-node:nth-child(2) .social-flip-inner {
+      transition-delay: 0s;
+      transform: rotateY(180deg);
+    }
+
+    .social-flip-box.is-flipped .social-flip-node:nth-child(3) .social-flip-inner {
+      transition-delay: 0.08s;
+      transform: rotateY(180deg);
+    }
+
+    .social-flip-box.is-flipped .social-flip-node:nth-child(4) .social-flip-inner {
+      transition-delay: 0.16s;
+      transform: rotateY(180deg);
+    }
+
+    .social-flip-box.is-flipped .social-flip-node:nth-child(5) .social-flip-inner {
+      transition-delay: 0.24s;
+      transform: rotateY(180deg);
+    }
+
+    .social-flip-box.is-flipped .social-flip-node:nth-child(6) .social-flip-inner {
+      transition-delay: 0.32s;
+      transform: rotateY(180deg);
+    }
+
+    .social-flip-box.is-flipped .social-flip-node:nth-child(7) .social-flip-inner {
+      transition-delay: 0.40s;
+      transform: rotateY(180deg);
+    }
+
+    .social-flip-box.is-flipped .social-flip-node:nth-child(8) .social-flip-inner {
+      transition-delay: 0.48s;
+      transform: rotateY(180deg);
+    }
+
+    /* Front side (Letter) */
+    .social-flip-front {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: #F4F4F5;
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #18181B;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    /* Back side (Icon) */
+    .social-flip-back {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: #111418;
+      color: #FFFFFF;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform: rotateY(180deg);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .social-flip-node:hover .social-flip-back {
+      background: #0F3A2E;
+      transform: rotateY(180deg) scale(1.08);
+    }
+
+    .social-flip-back svg {
+      width: 19px;
+      height: 19px;
+      fill: currentColor;
+    }
+
+    /* Tooltip */
+    .social-flip-tooltip {
+      position: absolute;
+      top: -48px;
+      left: 50%;
+      transform: translateX(-50%) translateY(8px) scale(0.85);
+      background: #111418;
+      color: #FFFFFF;
+      font-family: var(--font-ui);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      padding: 5px 11px;
+      border-radius: 8px;
+      white-space: nowrap;
+      box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 50;
+    }
+
+    .social-flip-tooltip::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 8px;
+      height: 8px;
+      background: #111418;
+    }
+
+    .social-flip-box:hover .social-flip-node:hover .social-flip-tooltip,
+    .social-flip-box.is-flipped .social-flip-node:hover .social-flip-tooltip {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    @media (max-width: 480px) {
+      .social-flip-box {
+        gap: 5px;
+        padding: 12px 10px;
+      }
+
+      .social-flip-node {
+        width: 36px;
+        height: 36px;
+      }
+
+      .social-flip-front {
+        font-size: 1rem;
+      }
+
+      .social-flip-back svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    /* ==========================================================================
+       RESPONSIVE REFINEMENT
+       ========================================================================== */
+    @media (max-width: 1024px) {
+      .estimator-studio-card {
+        grid-template-columns: 1fr;
+      }
+
+      .chronology-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .pillars-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .catalogue-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 0 12px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hero-title {
+        font-size: 2.5rem;
+      }
+
+      .hero-card-porcelain {
+        padding: 32px 24px;
+      }
+
+      .arch-hud-panel {
+        padding: 24px 20px;
+        max-width: 100%;
+      }
+
+      .pillars-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .catalogue-cards-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .chronology-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .dual-studio-container {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+      }
+
+      .hero-action-pill {
+        right: 16px !important;
+        left: 16px !important;
+        bottom: 20px !important;
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ==========================================================================
+       FLOATING ISLAND NAVIGATION BAR
+       ========================================================================== -->
+  <header class="navbar-wrapper">
+    <nav class="navbar" id="topNavbar">
+      <a href="home.html" class="brand">
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <span class="brand-title">AETHER</span>
+          <span class="brand-caption">Architectural Studio</span>
+        </div>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#heroScrollytelling">The Reel</a></li>
+        <li><a href="#estimator">Drafting Studio</a></li>
+        <li><a href="#howItWorks">Methodology</a></li>
+        <li><a href="#templates">Archetypes</a></li>
+        <li><a href="#pillars">Engineering</a></li>
+        <li><a href="#compare">Dual View</a></li>
+        <li><a href="#faq">Inquiries</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+
+      <div class="nav-actions" style="display: flex; align-items: center; gap: 10px;">
+        <a href="index.html?guide=1" class="btn btn-outline" style="font-size: 0.84rem; padding: 10px 18px; border-radius: var(--radius-pill);">
+          <span>✨ Guided Tour</span>
+        </a>
+        <a href="index.html" class="btn btn-obsidian" id="launchNavBtn" style="font-size: 0.84rem; padding: 10px 20px; border-radius: var(--radius-pill);">
+          <span>Launch Studio</span>
+          <svg class="icon-svg" viewBox="0 0 24 24">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+    </nav>
+  </header>
+
+
+  <!-- ==========================================================================
+       CINEMATIC SCROLLYTELLING HERO (FULL-BLEED ARCHITECTURAL REEL)
+       ========================================================================== -->
+  <section class="hero-scrollstory" id="heroScrollytelling">
+    <div class="hero-sticky-stage">
+
+      <!-- Full-Screen 50-Frame Background Canvas -->
+      <canvas id="heroSequenceCanvas" width="1280" height="720"></canvas>
+
+      <!-- Ambient Scrim (Subtle edge vignette for navbar legibility) -->
+      <div class="hero-stage-scrim"></div>
+
+      <!-- Decent Floating Architectural Text (Zero Background, Uniform Font Size, ~10% Space) -->
+      <div class="hero-text-caption" id="heroTextCaption">The Architecture of Living &mdash; Interactive 2D drafting and
+        3D spatial models in real-time.</div>
+
+      <!-- Floating Hero Callout Card (Drafted.ai Signature) -->
+      <div class="hero-action-pill" style="position: absolute; bottom: 36px; right: 48px; z-index: 10; display: flex; align-items: center; gap: 12px; background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 8px 10px 8px 20px; border-radius: var(--radius-pill); border: 1px solid rgba(0, 0, 0, 0.08); box-shadow: var(--shadow-floating);">
+        <span style="font-size: 0.86rem; font-weight: 600; color: var(--obsidian); font-family: var(--font-ui);">Ready to design your plot?</span>
+        <a href="index.html?guide=1" class="btn btn-obsidian" style="padding: 10px 22px; font-size: 0.84rem;">
+          <span>Start Guided Plan →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==========================================================================
+       PHILOSOPHY & METRICS STRIP
+       ========================================================================== -->
+  <section class="metrics-bar">
+    <div class="container">
+      <div class="metrics-grid">
+        <div class="metric-item">
+          <span class="metric-num">20+</span>
+          <span class="metric-lbl">Curated Architectural Archetypes</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-num">100%</span>
+          <span class="metric-lbl">Client-Side Private Execution</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-num">Dual CAD</span>
+          <span class="metric-lbl">Synchronous 2D & 3D WebGL</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-num">&lt; 100ms</span>
+          <span class="metric-lbl">Instant Parametric Resolution</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==========================================================================
+       DRAFTING BENCH: QUICK ESTIMATOR STUDIO
+       ========================================================================== -->
+  <section class="section" id="estimator">
+    <div class="container">
+      <div class="section-header">
+        <div class="eyebrow">Drafting Studio</div>
+        <h2 class="section-title">Plot Boundary Estimator</h2>
+        <p class="section-desc">
+          Calibrate your rectangular plot dimensions. Observe real-time area computations and receive verified
+          structural typology guidance.
+        </p>
+      </div>
+
+      <div class="estimator-studio-card">
+
+        <!-- Controls Column -->
+        <div class="studio-controls">
+
+          <!-- Width Slider -->
+          <div class="control-block">
+            <div class="control-header">
+              <span class="control-title">
+                <svg class="icon-svg" viewBox="0 0 24 24">
+                  <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                  <line x1="3" y1="12" x2="21" y2="12"></line>
+                </svg>
+                Plot Width
+              </span>
+              <span class="control-value-pill" id="sliderWidthVal">35 FT</span>
+            </div>
+            <input type="range" class="hairline-range" id="estWidthInput" min="15" max="100" value="35"
+              oninput="updateEstimator()">
+            <div class="scale-limits">
+              <span>15 FT (MIN)</span>
+              <span>100 FT (MAX)</span>
+            </div>
+          </div>
+
+          <!-- Length Slider -->
+          <div class="control-block">
+            <div class="control-header">
+              <span class="control-title">
+                <svg class="icon-svg" viewBox="0 0 24 24">
+                  <rect x="5" y="3" width="14" height="18" rx="2"></rect>
+                  <line x1="12" y1="3" x2="12" y2="21"></line>
+                </svg>
+                Plot Length
+              </span>
+              <span class="control-value-pill" id="sliderLengthVal">45 FT</span>
+            </div>
+            <input type="range" class="hairline-range" id="estLengthInput" min="15" max="100" value="45"
+              oninput="updateEstimator()">
+            <div class="scale-limits">
+              <span>15 FT (MIN)</span>
+              <span>100 FT (MAX)</span>
+            </div>
+          </div>
+
+          <!-- Standard Preset Scale Shortcuts -->
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: -6px;">
+            <span
+              style="font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-right: 2px;">Standard
+              Scales:</span>
+            <button type="button" class="preset-link" onclick="setEstimatorDims(30, 40)"
+              style="cursor: pointer; background: #FFFFFF; border: 1px solid var(--border-subtle); border-radius: var(--radius-pill); padding: 5px 12px; font-size: 0.78rem; font-weight: 600; color: var(--charcoal); font-family: var(--font-mono);">30
+              × 40 FT</button>
+            <button type="button" class="preset-link" onclick="setEstimatorDims(35, 45)"
+              style="cursor: pointer; background: #FFFFFF; border: 1px solid var(--border-subtle); border-radius: var(--radius-pill); padding: 5px 12px; font-size: 0.78rem; font-weight: 600; color: var(--charcoal); font-family: var(--font-mono);">35
+              × 45 FT</button>
+            <button type="button" class="preset-link" onclick="setEstimatorDims(40, 60)"
+              style="cursor: pointer; background: #FFFFFF; border: 1px solid var(--border-subtle); border-radius: var(--radius-pill); padding: 5px 12px; font-size: 0.78rem; font-weight: 600; color: var(--charcoal); font-family: var(--font-mono);">40
+              × 60 FT</button>
+          </div>
+
+          <!-- Launch with current params -->
+          <button class="btn btn-obsidian btn-large" id="estGenerateBtn" onclick="launchWithEstimatorParams()">
+            <span>Generate Plans for this Plot (<span id="estBtnDims">35 × 45 FT</span>)</span>
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Live Vector Preview Column -->
+        <div class="studio-preview">
+          <canvas id="plotEstimatorCanvas"></canvas>
+
+          <div class="stat-display-grid">
+            <div class="stat-unit-card">
+              <div class="stat-unit-val" id="estAreaSqft">1,575</div>
+              <div class="stat-unit-label">Square Feet (SQ.FT)</div>
+            </div>
+            <div class="stat-unit-card">
+              <div class="stat-unit-val" id="estAreaSqm">146.3</div>
+              <div class="stat-unit-label">Square Meters (M²)</div>
+            </div>
+          </div>
+
+          <div class="studio-recommendation-box" id="estRecommendation">
+            <strong>Recommended Typology:</strong> Contemporary 3 BHK Residence with dedicated vehicle portico, living
+            veranda, and private rear balcony.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==========================================================================
+       THE 4-STEP PROCESS (CHRONOLOGY)
+       ========================================================================== -->
+  <section class="section" id="howItWorks"
+    style="background: #FFFFFF; border-top: 1px solid var(--border-hairline); border-bottom: 1px solid var(--border-hairline);">
+    <div class="container">
+      <div class="section-header">
+        <div class="eyebrow">Methodology</div>
+        <h2 class="section-title">The Four-Step Workflow</h2>
+        <p class="section-desc">
+          An intuitive, verified sequence translating abstract parcel dimensions into buildable residential reality.
+        </p>
+      </div>
+
+      <div class="chronology-grid">
+
+        <div class="chronology-card">
+          <span class="watermark-index">01</span>
+          <div class="chronology-icon-disc">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
+          </div>
+          <h3 class="chronology-title">Plot Calibration</h3>
+          <p class="chronology-body">
+            Specify plot width and length in feet or meters. The geometry solver validates aspect ratios and flags
+            severe parcel skews.
+          </p>
+        </div>
+
+        <div class="chronology-card">
+          <span class="watermark-index">02</span>
+          <div class="chronology-icon-disc">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+          <h3 class="chronology-title">Program Specification</h3>
+          <p class="chronology-body">
+            Select bedroom counts (1 to 5 BHK), covered parking, open/closed culinary layout, study or pooja niches, and
+            cardinal road frontage.
+          </p>
+        </div>
+
+        <div class="chronology-card">
+          <span class="watermark-index">03</span>
+          <div class="chronology-icon-disc">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          <h3 class="chronology-title">Parametric Matching</h3>
+          <p class="chronology-body">
+            Our algorithmic engine scores 20+ architectural archetypes against your plot, ranking the most
+            space-efficient configurations.
+          </p>
+        </div>
+
+        <div class="chronology-card">
+          <span class="watermark-index">04</span>
+          <div class="chronology-icon-disc">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <path
+                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+              </path>
+            </svg>
+          </div>
+          <h3 class="chronology-title">Dual Viewport & CAD</h3>
+          <p class="chronology-body">
+            Inspect live scaled rooms with exact dimensions, orbit in 3D WebGL, verify building compliance, and export
+            high-resolution drawings.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==========================================================================
+       ARCHITECTURAL INTELLIGENCE (6 PILLARS)
+       ========================================================================== -->
+  <section class="section" id="pillars">
+    <div class="container">
+      <div class="section-header">
+        <div class="eyebrow">Engineering Craft</div>
+        <h2 class="section-title">Built on Spatial Rigor</h2>
+        <p class="section-desc">
+          Mathematical foundations engineered to ensure every generated floor plan is structurally sound and genuinely
+          habitable.
+        </p>
+      </div>
+
+      <div class="pillars-grid">
+
+        <div class="pillar-card">
+          <div class="pillar-icon-box">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+          </div>
+          <h3 class="pillar-title">Parametric Coordinate Solver</h3>
+          <p class="pillar-text">
+            Rooms scale proportionally along independent X and Y axes, preserving mandatory structural circulation
+            corridors and egress pathways.
+          </p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon-box">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <path
+                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+              </path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+          </div>
+          <h3 class="pillar-title">Hardware-Accelerated 3D</h3>
+          <p class="pillar-text">
+            Wall geometry extrusion, volumetric door headers, and natural sunlight shadows render instantaneously via
+            client-side Three.js WebGL.
+          </p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon-box">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <h3 class="pillar-title">Building Code Compliance</h3>
+          <p class="pillar-text">
+            Automated verification audits bedroom areas (≥90 sqft), bathrooms (≥25 sqft), doorway widths, and boundary
+            clearances, flagging issues before build.
+          </p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon-box">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+            </svg>
+          </div>
+          <h3 class="pillar-title">Vastu & Solar Harmonic Matcher</h3>
+          <p class="pillar-text">
+            Algorithms analyze road access direction (N/S/E/W) to position living hubs toward morning sunlight and honor
+            traditional spatial balance.
+          </p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon-box">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <h3 class="pillar-title">Confidential & Offline-Ready</h3>
+          <p class="pillar-text">
+            Zero cloud uploads. Zero personal data collection. Once initial assets load, the entire parametric engine
+            operates completely offline in your browser.
+          </p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon-box">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </div>
+          <h3 class="pillar-title">Precision Vector & CAD Export</h3>
+          <p class="pillar-text">
+            Generate high-resolution PNG blueprints for contractor alignment or save portable JSON project files to
+            resume modifications anytime.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==========================================================================
+       CURATED ARCHETYPES (TEMPLATE CATALOGUE)
+       ========================================================================== -->
+  <section class="section" id="templates"
+    style="background: #FFFFFF; border-top: 1px solid var(--border-hairline); border-bottom: 1px solid var(--border-hairline);">
+    <div class="container">
+      <div class="section-header">
+        <div class="eyebrow">Catalogue</div>
+        <h2 class="section-title">Architectural Archetypes</h2>
+        <p class="section-desc">
+          Explore our foundational collection of pre-engineered floor plans designed for standard suburban and urban
+          parcel geometries.
+        </p>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="catalogue-tabs">
+        <button class="catalogue-tab active" onclick="filterTemplatesGallery('all', this)">All Archetypes</button>
+        <button class="catalogue-tab" onclick="filterTemplatesGallery('1', this)">1 BHK Compact</button>
+        <button class="catalogue-tab" onclick="filterTemplatesGallery('2', this)">2 BHK Residence</button>
+        <button class="catalogue-tab" onclick="filterTemplatesGallery('3', this)">3 BHK Villa</button>
+        <button class="catalogue-tab" onclick="filterTemplatesGallery('4', this)">4+ BHK Luxury</button>
+        <button class="catalogue-tab" onclick="filterTemplatesGallery('parking', this)">Covered Garage</button>
+      </div>
+
+      <!-- Template Cards Container -->
+      <div class="catalogue-cards-grid" id="templateGalleryGrid">
+        <!-- Rendered dynamically by JS -->
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==========================================================================
+       DUAL STUDIO: 2D BLUEPRINT VS 3D SPATIAL MODEL
+       ========================================================================== -->
+  <section class="section" id="compare">
+    <div class="container">
+      <div class="section-header">
+        <div class="eyebrow">Dual Studio</div>
+        <h2 class="section-title">Precision CAD & Real-Time WebGL</h2>
+        <p class="section-desc">
+          Shift between engineering dimensional rigor and volumetric spatial reality with a single click.
+        </p>
+      </div>
+
+      <div class="dual-studio-container">
+
+        <!-- 2D CAD Chamber -->
+        <div class="studio-chamber">
+          <div class="chamber-header">
+            <h3 style="font-size: 1.25rem; color: var(--obsidian);">2D Drafting Blueprint</h3>
+            <span class="chamber-tag tag-cad">CAD Spec</span>
+          </div>
+          <p style="font-size: 0.92rem; color: var(--slate);">
+            High-contrast drafting plan showing wall thicknesses, door swing arcs, room square footages, window
+            positions, and exterior dimensions.
+          </p>
+          <div class="viewport-box">
+            <canvas id="mockup2DCanvas" width="450" height="240" style="width: 100%; height: 100%;"></canvas>
+          </div>
+          <ul
+            style="list-style: none; font-size: 0.85rem; color: var(--muted); display: flex; flex-direction: column; gap: 6px; font-family: var(--font-mono);">
+            <li>✓ Auto-calculated room sqft labels</li>
+            <li>✓ Dimension lines along all four plot edges</li>
+            <li>✓ Color-zoned functional circulation</li>
+          </ul>
+        </div>
+
+        <!-- 3D Orbit Chamber -->
+        <div class="studio-chamber">
+          <div class="chamber-header">
+            <h3 style="font-size: 1.25rem; color: var(--obsidian);">3D WebGL Spatial Model</h3>
+            <span class="chamber-tag tag-3d">Orbit View</span>
+          </div>
+          <p style="font-size: 0.92rem; color: var(--slate);">
+            Real-time extruded wall boundaries with directional sun shadows, ambient light, floor plates, and full
+            orbit/pan/zoom inspection controls.
+          </p>
+          <div class="viewport-box" id="mockup3DContainer">
+            <canvas id="mockup3DCanvas" style="width: 100%; height: 100%;"></canvas>
+          </div>
+          <ul
+            style="list-style: none; font-size: 0.85rem; color: var(--muted); display: flex; flex-direction: column; gap: 6px; font-family: var(--font-mono);">
+            <li>✓ Smooth orbital camera inspection</li>
+            <li>✓ True-to-scale wall height extrusion (9 ft)</li>
+            <li>✓ Volumetric depth & spatial appreciation</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==========================================================================
+       FAQ ACCORDION (SWISS MINIMALIST LIST)
+       ========================================================================== -->
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="section-header">
+        <div class="eyebrow">Inquiries</div>
+        <h2 class="section-title">Frequently Asked Questions</h2>
+        <p class="section-desc">
+          Key specifications regarding parametric scaling, offline security, and architectural utility.
+        </p>
+      </div>
+
+      <div class="faq-container">
+
+        <div class="faq-row active">
+          <div class="faq-trigger" onclick="toggleFAQ(this)">
+            <span>What range of plot dimensions is supported?</span>
+            <span class="faq-plus">+</span>
+          </div>
+          <div class="faq-body">
+            The studio accepts rectangular plots ranging from <strong>15 × 15 ft (225 sqft)</strong> up to <strong>100 ×
+              100 ft (10,000 sqft)</strong>, or metric equivalents (4.5m to 30.5m). Both standard proportions and long
+            urban narrow parcels are mathematically accommodated.
+          </div>
+        </div>
+
+        <div class="faq-row">
+          <div class="faq-trigger" onclick="toggleFAQ(this)">
+            <span>Does this software replace a licensed architect?</span>
+            <span class="faq-plus">+</span>
+          </div>
+          <div class="faq-body">
+            No. Aether Design is an instant architectural conceptualization and spatial exploration studio. It empowers
+            landowners, builders, and developers to explore room configurations before engaging licensed architects and
+            structural engineers for municipal approval drawings.
+          </div>
+        </div>
+
+        <div class="faq-row">
+          <div class="faq-trigger" onclick="toggleFAQ(this)">
+            <span>How does the parametric geometric engine adapt rooms?</span>
+            <span class="faq-plus">+</span>
+          </div>
+          <div class="faq-body">
+            Every archetypal floor plan is authored against a reference plot dimension. When you input your plot size,
+            independent X and Y scale factors adapt each room while checking that rooms never fall below habitable
+            building standards.
+          </div>
+        </div>
+
+        <div class="faq-row">
+          <div class="faq-trigger" onclick="toggleFAQ(this)">
+            <span>Can floor plans be exported for CAD and contractor collaboration?</span>
+            <span class="faq-plus">+</span>
+          </div>
+          <div class="faq-body">
+            Yes. You can export high-resolution PNG blueprints for visual alignment or download a portable JSON state
+            file. You can import this JSON state file back into the app at any time to resume editing.
+          </div>
+        </div>
+
+        <div class="faq-row">
+          <div class="faq-trigger" onclick="toggleFAQ(this)">
+            <span>Are designs uploaded to an external server?</span>
+            <span class="faq-plus">+</span>
+          </div>
+          <div class="faq-body">
+            No. All computations, 2D vector drawing, and 3D Three.js WebGL scenes execute entirely client-side in your
+            browser. Your property dimensions and designs remain completely private.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==========================================================================
+       CONCLUDING MONOLITHIC BANNER WITH GPU INTERACTIVE PARTICLES
+       ========================================================================== -->
+  <section class="section" style="padding-top: 20px; padding-bottom: 70px;">
+    <div class="container">
+      <div class="concluding-banner" id="concludingBanner">
+
+        <!-- Interactive 3D GPU Particle Canvas Stage -->
+        <div class="particles-stage" id="particlesContainer">
+          <canvas id="particlesCanvas" class="particles-canvas"></canvas>
+        </div>
+
+        <!-- Top Controls Bar -->
+        <div class="particles-controls-bar">
+          <div class="particles-badge">
+            <span class="particles-badge-dot"></span>
+            <span>GPU Particle Simulation</span>
+          </div>
+
+          <div class="particles-actions">
+            <input type="file" id="particlesFileInput" accept="image/*" style="display:none;" />
+            <button type="button" id="particlesUploadBtn" class="particle-upload-btn"
+              title="Upload custom plot or floorplan image">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              <span>Upload Image</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Center Atmospheric Architectural Typography -->
+        <div class="concluding-content">
+          <h2 class="concluding-title">Bring Your Plot to Life.</h2>
+          <p class="concluding-desc">
+            Experience the synergy of architectural precision and real-time 3D spatial realization. Instantaneous,
+            private, and running completely in your browser.
+          </p>
+          <div class="concluding-actions">
+            <a href="index.html" class="btn concluding-btn btn-large">
+              <span>Open Generator Studio</span>
+              <svg class="icon-svg" viewBox="0 0 24 24">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Bottom Ambient Interactive Indicators -->
+        <div class="particles-interactive-hint">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="m12 8 4 4-4 4M8 12h8" />
+          </svg>
+          <span>Move cursor to scatter &amp; sculpt GPU particles</span>
+        </div>
+
+        <div class="particles-presets">
+          <button type="button" class="preset-chip active"
+            data-src="home-section-img/ezgif-frame-050.jpg">Villa</button>
+          <button type="button" class="preset-chip" data-src="home-section-img/ezgif-frame-025.jpg">Structure</button>
+          <button type="button" class="preset-chip" data-src="home-section-img/ezgif-frame-001.jpg">Plot</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==========================================================================
+       ARCHITECTURAL FOOTER
+       ========================================================================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+
+        <div class="footer-col">
+          <a href="home.html" class="brand">
+            <div class="brand-mark">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+            </div>
+            <div class="brand-info">
+              <span class="brand-title">AETHER</span>
+              <span class="brand-caption">Architectural Studio</span>
+            </div>
+          </a>
+          <p style="font-size: 0.88rem; color: var(--muted); margin-top: 10px; line-height: 1.6;">
+            Next-generation in-browser residential layout generator combining parametric room scaling, building code
+            validation, and Three.js 3D WebGL rendering.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="index.html">Generator Studio</a></li>
+            <li><a href="#estimator">Plot Estimator</a></li>
+            <li><a href="#howItWorks">Methodology</a></li>
+            <li><a href="#templates">Floor Plan Library</a></li>
+            <li><a href="#faq">Inquiries</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Standard Scales</h4>
+          <ul class="footer-links">
+            <li><a href="index.html?w=30&l=40&bhk=2">30 × 40 FT · 2 BHK (1,200 SQ.FT)</a></li>
+            <li><a href="index.html?w=35&l=45&bhk=3">35 × 45 FT · 3 BHK (1,575 SQ.FT)</a></li>
+            <li><a href="index.html?w=40&l=60&bhk=4">40 × 60 FT · 4 BHK (2,400 SQ.FT)</a></li>
+            <li><a href="index.html?w=22&l=28&bhk=1">22 × 28 FT · 1 BHK (616 SQ.FT)</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Specifications</h4>
+          <ul class="footer-links" style="color: var(--muted); font-size: 0.85rem; font-family: var(--font-mono);">
+            <li>Release: v1.0.0 Stable</li>
+            <li>Engine: Three.js r128 & 2D Vector</li>
+            <li>Zero Dependencies · 100% Client-Side</li>
+            <li>License: Open Architectural Spec</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- ====================================================================
+           SOCIAL FLIP BUTTON ("C O N T A C T")
+           ==================================================================== -->
+      <div class="social-flip-wrapper" id="contact">
+        <div class="social-flip-caption">Connect With Architectural Studio</div>
+        <div class="social-flip-box" id="socialFlipBox">
+          <!-- Animated Laser Edge Borders -->
+          <div class="social-flip-borders">
+            <div class="social-flip-border-top"></div>
+            <div class="social-flip-border-bottom"></div>
+          </div>
+
+          <!-- Node 1: C -> Github -->
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="social-flip-node"
+            aria-label="GitHub">
+            <div class="social-flip-tooltip">GitHub</div>
+            <div class="social-flip-inner">
+              <div class="social-flip-front">C</div>
+              <div class="social-flip-back">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                </svg>
+              </div>
+            </div>
+          </a>
+
+          <!-- Node 2: O -> Twitter / X -->
+          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="social-flip-node"
+            aria-label="Twitter">
+            <div class="social-flip-tooltip">Twitter / X</div>
+            <div class="social-flip-inner">
+              <div class="social-flip-front">O</div>
+              <div class="social-flip-back">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+              </div>
+            </div>
+          </a>
+
+          <!-- Node 3: N -> LinkedIn -->
+          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="social-flip-node"
+            aria-label="LinkedIn">
+            <div class="social-flip-tooltip">LinkedIn</div>
+            <div class="social-flip-inner">
+              <div class="social-flip-front">N</div>
+              <div class="social-flip-back">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
+                </svg>
+              </div>
+            </div>
+          </a>
+
+          <!-- Node 4: T -> Instagram -->
+          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="social-flip-node"
+            aria-label="Instagram">
+            <div class="social-flip-tooltip">Instagram</div>
+            <div class="social-flip-inner">
+              <div class="social-flip-front">T</div>
+              <div class="social-flip-back">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                </svg>
+              </div>
+            </div>
+          </a>
+
+          <!-- Node 5: A -> Facebook -->
+          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="social-flip-node"
+            aria-label="Facebook">
+            <div class="social-flip-tooltip">Facebook</div>
+            <div class="social-flip-inner">
+              <div class="social-flip-front">A</div>
+              <div class="social-flip-back">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                </svg>
+              </div>
+            </div>
+          </a>
+
+          <!-- Node 6: C -> Email -->
+          <a href="mailto:contact@aether-design.com" class="social-flip-node" aria-label="Email">
+            <div class="social-flip-tooltip">Email</div>
+            <div class="social-flip-inner">
+              <div class="social-flip-front">C</div>
+              <div class="social-flip-back">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                </svg>
+              </div>
+            </div>
+          </a>
+
+          <!-- Node 7: T -> Discord -->
+          <a href="https://discord.gg" target="_blank" rel="noopener noreferrer" class="social-flip-node"
+            aria-label="Discord">
+            <div class="social-flip-tooltip">Discord</div>
+            <div class="social-flip-inner">
+              <div class="social-flip-front">T</div>
+              <div class="social-flip-back">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+                </svg>
+              </div>
+            </div>
+          </a>
+
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 AETHER ARCHITECTURAL STUDIO. ALL RIGHTS RESERVED.</span>
+        <span>ENGINEERED FOR HIGH-PRECISION RESIDENTIAL CONCEPTUALIZATION.</span>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- ==========================================================================
+       INTERACTIVE LOGIC (HERO SEQUENCE + ESTIMATOR + GALLERY + 3D MOCKUP)
+       ========================================================================== -->
+  <script>
+    /* --------------------------------------------------------------------------
+       FULL-PAGE NATIVE ARCHITECTURAL SCROLLSTORY (50 FRAMES)
+       -------------------------------------------------------------------------- */
+    const TOTAL_SEQUENCE_FRAMES = 50;
+    const sequenceFrames = [];
+    let currentSequenceFrameIndex = 0;
+    let isSequenceLoaded = false;
+
+    function preloadHeroSequenceImages() {
+      const canvas = document.getElementById("heroSequenceCanvas");
+      if (!canvas) return;
+
+      let loadedCount = 0;
+      for (let i = 1; i <= TOTAL_SEQUENCE_FRAMES; i++) {
+        const img = new Image();
+        const frameNum = String(i).padStart(3, "0");
+        img.src = `home-section-img/ezgif-frame-${frameNum}.jpg`;
+        img.onerror = () => {
+          img.src = `New%20folder/ezgif-frame-${frameNum}.jpg`;
+        };
+        img.onload = () => {
+          loadedCount++;
+          if (loadedCount === 1) {
+            resizeHeroSequenceCanvas();
+            drawHeroSequenceFrame(0);
+          }
+          if (loadedCount === TOTAL_SEQUENCE_FRAMES) {
+            isSequenceLoaded = true;
+          }
+        };
+        sequenceFrames.push(img);
+      }
+    }
+
+    function resizeHeroSequenceCanvas() {
+      const canvas = document.getElementById("heroSequenceCanvas");
+      if (!canvas) return;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      drawHeroSequenceFrame(currentSequenceFrameIndex);
+    }
+
+    function drawHeroSequenceFrame(index) {
+      const canvas = document.getElementById("heroSequenceCanvas");
+      if (!canvas || !sequenceFrames[index]) return;
+      const ctx = canvas.getContext("2d");
+      const img = sequenceFrames[index];
+      if (!img.complete || img.naturalWidth === 0) return;
+
+      currentSequenceFrameIndex = index;
+
+      const cw = canvas.width;
+      const ch = canvas.height;
+      const imgRatio = 1280 / 720;
+      const canvasRatio = cw / ch;
+
+      let dw, dh, dx, dy;
+      if (canvasRatio > imgRatio) {
+        dw = cw;
+        dh = cw / imgRatio;
+        dx = 0;
+        dy = (ch - dh) / 2;
+      } else {
+        dh = ch;
+        dw = ch * imgRatio;
+        dy = 0;
+        dx = (cw - dw) / 2;
+      }
+
+      ctx.clearRect(0, 0, cw, ch);
+      ctx.drawImage(img, dx, dy, dw, dh);
+    }
+
+    // Smooth scroll listener for storytelling HUD
+    let heroTicking = false;
+    function handleHeroStoryScroll() {
+      if (heroTicking) return;
+      heroTicking = true;
+
+      requestAnimationFrame(() => {
+        heroTicking = false;
+        const section = document.getElementById("heroScrollytelling");
+        if (!section) return;
+
+        const rect = section.getBoundingClientRect();
+        const totalDistance = section.offsetHeight - window.innerHeight;
+        if (totalDistance <= 0) return;
+
+        const offset = -rect.top;
+        if (offset < 0) {
+          drawHeroSequenceFrame(0);
+          updateHeroText(0);
+          return;
+        }
+
+        const progress = Math.min(1, Math.max(0, offset / totalDistance));
+        const frameIndex = Math.min(TOTAL_SEQUENCE_FRAMES - 1, Math.floor(progress * TOTAL_SEQUENCE_FRAMES));
+
+        if (frameIndex !== currentSequenceFrameIndex) {
+          drawHeroSequenceFrame(frameIndex);
+        }
+
+        updateHeroText(progress);
+      });
+    }
+
+    /* Decent architectural captions (uniform font size, zero background, ~5-10% space) */
+    const HERO_PHASE_TEXTS = [
+      "The Architecture of Living — Interactive 2D drafting and 3D spatial models in real-time.",
+      "01 / Plot Calibration — Validating parcel boundaries, municipal setbacks, and solar orientation.",
+      "02 / Parametric Framing — Extruding load-bearing concrete cores with proportional coordinate solving.",
+      "03 / Living Architecture — Integrating panoramic glass facades, ventilation corridors, and room suites.",
+      "04 / Residence Realized — Turnkey structural layout and interactive WebGL space ready for exploration."
+    ];
+
+    let currentHeroPhaseIndex = -1;
+    function updateHeroText(progress) {
+      let phaseIndex = 0;
+      if (progress < 0.18) phaseIndex = 0;
+      else if (progress < 0.42) phaseIndex = 1;
+      else if (progress < 0.65) phaseIndex = 2;
+      else if (progress < 0.85) phaseIndex = 3;
+      else phaseIndex = 4;
+
+      if (phaseIndex === currentHeroPhaseIndex) return;
+      currentHeroPhaseIndex = phaseIndex;
+
+      const caption = document.getElementById("heroTextCaption");
+      if (!caption) return;
+
+      caption.style.opacity = "0";
+      caption.style.transform = "translateY(2px)";
+      setTimeout(() => {
+        caption.textContent = HERO_PHASE_TEXTS[phaseIndex];
+        caption.style.opacity = "1";
+        caption.style.transform = "translateY(0)";
+      }, 120);
+    }
+
+    window.addEventListener("scroll", handleHeroStoryScroll, { passive: true });
+    window.addEventListener("resize", resizeHeroSequenceCanvas);
+    updateHeroText(0);
+
+
+    /* --------------------------------------------------------------------------
+       DRAFTING BENCH: QUICK ESTIMATOR STUDIO
+       -------------------------------------------------------------------------- */
+    function updateEstimator() {
+      const w = parseInt(document.getElementById("estWidthInput").value, 10);
+      const l = parseInt(document.getElementById("estLengthInput").value, 10);
+
+      document.getElementById("sliderWidthVal").textContent = `${w} FT`;
+      document.getElementById("sliderLengthVal").textContent = `${l} FT`;
+      document.getElementById("estBtnDims").textContent = `${w} × ${l} FT`;
+
+      const areaSqft = w * l;
+      const areaSqm = (areaSqft * 0.092903).toFixed(1);
+
+      document.getElementById("estAreaSqft").textContent = areaSqft.toLocaleString();
+      document.getElementById("estAreaSqm").textContent = areaSqm;
+
+      // Smart recommendation
+      const recBox = document.getElementById("estRecommendation");
+      let recText = "";
+      if (areaSqft < 750) {
+        recText = "<strong>Recommended Typology:</strong> Urban Studio / 1 BHK Flat. Maximized single bedroom with open culinary zone and integrated bathroom.";
+      } else if (areaSqft < 1300) {
+        recText = "<strong>Recommended Typology:</strong> Balanced 2 BHK Suburban Home. Living hall, dedicated dining, master bedroom with ensuite, and sheltered portico.";
+      } else if (areaSqft < 2200) {
+        recText = "<strong>Recommended Typology:</strong> Contemporary 3 BHK Residence. 3 luxury suites, dedicated pooja/meditation niche, car parking, and wrap-around balcony.";
+      } else {
+        recText = "<strong>Recommended Typology:</strong> Executive 4–5 BHK Luxury Estate. Multi-wing layout, dual-car garage, private study, servant quarters, and double-height living.";
+      }
+      recBox.innerHTML = recText;
+
+      drawEstimatorCanvas(w, l);
+    }
+
+    function drawEstimatorCanvas(w, l) {
+      const canvas = document.getElementById("plotEstimatorCanvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const cw = rect.width;
+      const ch = rect.height;
+
+      // Fine vellum background
+      ctx.fillStyle = "#F4F2EC";
+      ctx.fillRect(0, 0, cw, ch);
+
+      // Fine architectural grid (12px / 48px)
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.035)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < cw; x += 12) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, ch);
+        ctx.stroke();
+      }
+      for (let y = 0; y < ch; y += 12) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(cw, y);
+        ctx.stroke();
+      }
+
+      // Fit rectangle inside canvas with margin
+      const maxPlotW = 100;
+      const maxPlotL = 100;
+      const maxDrawW = cw - 70;
+      const maxDrawH = ch - 54;
+
+      const scale = Math.min(maxDrawW / maxPlotW, maxDrawH / maxPlotL);
+      const drawW = w * scale;
+      const drawH = l * scale;
+
+      const startX = (cw - drawW) / 2;
+      const startY = (ch - drawH) / 2;
+
+      // Outer Plot
+      ctx.fillStyle = "rgba(15, 58, 46, 0.06)";
+      ctx.fillRect(startX, startY, drawW, drawH);
+
+      ctx.strokeStyle = "#0F3A2E";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(startX, startY, drawW, drawH);
+
+      // Dimension CAD lines
+      ctx.fillStyle = "#111418";
+      ctx.font = "700 11px 'Space Grotesk', monospace";
+      ctx.textAlign = "center";
+      ctx.fillText(`${w} FT`, startX + drawW / 2, startY - 8);
+
+      ctx.save();
+      ctx.translate(startX + drawW + 16, startY + drawH / 2);
+      ctx.rotate(Math.PI / 2);
+      ctx.fillText(`${l} FT`, 0, 0);
+      ctx.restore();
+
+      // Interior Architectural Room Divisions
+      ctx.strokeStyle = "rgba(15, 58, 46, 0.25)";
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(startX + 4, startY + 4, drawW * 0.45, drawH * 0.5);
+      ctx.strokeRect(startX + drawW * 0.45 + 4, startY + 4, drawW * 0.5 - 8, drawH * 0.5);
+      ctx.strokeRect(startX + 4, startY + drawH * 0.5 + 4, drawW - 8, drawH * 0.5 - 8);
+    }
+
+    function launchWithEstimatorParams() {
+      const w = document.getElementById("estWidthInput").value;
+      const l = document.getElementById("estLengthInput").value;
+      const area = w * l;
+      let bhk = 3;
+      if (area < 800) bhk = 1;
+      else if (area < 1400) bhk = 2;
+      else if (area < 2200) bhk = 3;
+      else bhk = 4;
+      window.location.href = `index.html?w=${w}&l=${l}&bhk=${bhk}`;
+    }
+
+    function setEstimatorDims(w, l) {
+      document.getElementById("estWidthInput").value = w;
+      document.getElementById("estLengthInput").value = l;
+      updateEstimator();
+    }
+
+
+    /* --------------------------------------------------------------------------
+       CURATED ARCHETYPES GALLERY (DYNAMIC RENDER)
+       -------------------------------------------------------------------------- */
+    function renderTemplatesGallery(filter = 'all') {
+      const grid = document.getElementById("templateGalleryGrid");
+      if (!grid) return;
+
+      if (typeof TEMPLATES === 'undefined' || !Array.isArray(TEMPLATES)) {
+        grid.innerHTML = `<p style="color: var(--muted); grid-column: 1 / -1;">Archetypes loading...</p>`;
+        return;
+      }
+
+      let filtered = TEMPLATES;
+      if (filter === '1') filtered = TEMPLATES.filter(t => t.bhk === 1);
+      else if (filter === '2') filtered = TEMPLATES.filter(t => t.bhk === 2);
+      else if (filter === '3') filtered = TEMPLATES.filter(t => t.bhk === 3);
+      else if (filter === '4') filtered = TEMPLATES.filter(t => t.bhk >= 4);
+      else if (filter === 'parking') filtered = TEMPLATES.filter(t => t.hasParking);
+
+      grid.innerHTML = filtered.map(tpl => {
+        const area = tpl.referencePlot.width * tpl.referencePlot.length;
+        const roomNames = tpl.rooms.map(r => r.name).slice(0, 4).join(" · ");
+        const facingName = { N: "North", S: "South", E: "East", W: "West" }[tpl.facing] || tpl.facing;
+
+        return `
+          <div class="catalogue-card">
+            <div class="card-meta-row">
+              <span class="card-typology-pill">${tpl.bhk} BHK Typology</span>
+              <span style="font-size: 0.8rem; font-weight: 600; color: ${tpl.hasParking ? 'var(--accent-spruce)' : 'var(--muted)'}; font-family: var(--font-mono);">
+                ${tpl.hasParking ? 'Sheltered Garage' : 'No Garage'}
+              </span>
+            </div>
+
+            <h4 class="card-plan-name">${tpl.name}</h4>
+
+            <ul class="card-spec-table">
+              <li>
+                <span>Reference Scale</span>
+                <span>${tpl.referencePlot.width} × ${tpl.referencePlot.length} FT (${area} SQ.FT)</span>
+              </li>
+              <li>
+                <span>Road Frontage</span>
+                <span>${facingName} Facing</span>
+              </li>
+              <li>
+                <span>Core Program</span>
+                <span style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 140px;" title="${roomNames}">${roomNames}</span>
+              </li>
+            </ul>
+
+            <a href="index.html?w=${tpl.referencePlot.width}&l=${tpl.referencePlot.length}&bhk=${tpl.bhk}&parking=${tpl.hasParking ? '1car' : 'none'}&facing=${tpl.facing}" class="btn btn-outline" style="width: 100%; font-size: 0.88rem; padding: 10px 0;">
+              <span>Explore Archetype</span>
+              <svg class="icon-svg" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function filterTemplatesGallery(category, btn) {
+      document.querySelectorAll(".catalogue-tab").forEach(tab => tab.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+      renderTemplatesGallery(category);
+    }
+
+
+    /* --------------------------------------------------------------------------
+       2D BLUEPRINT DRAFTING MOCKUP (FINE CAD NOTATION)
+       -------------------------------------------------------------------------- */
+    function draw2DMockup() {
+      const canvas = document.getElementById("mockup2DCanvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+
+      canvas.width = (rect.width || 450) * dpr;
+      canvas.height = (rect.height || 240) * dpr;
+      ctx.scale(dpr, dpr);
+
+      const w = rect.width || 450;
+      const h = rect.height || 240;
+
+      // Fine vellum background
+      ctx.fillStyle = "#F4F2EC";
+      ctx.fillRect(0, 0, w, h);
+
+      // Blueprint grid lines
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.04)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < w; x += 16) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, h);
+        ctx.stroke();
+      }
+      for (let y = 0; y < h; y += 16) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+
+      // Rooms
+      const rooms = [
+        { name: "LIVING ROOM", sqft: "240 SQ.FT", x: 25, y: 25, rw: 210, rh: 110, fill: "rgba(255, 255, 255, 0.95)" },
+        { name: "KITCHEN", sqft: "110 SQ.FT", x: 245, y: 25, rw: 180, rh: 110, fill: "rgba(255, 255, 255, 0.95)" },
+        { name: "MASTER SUITE", sqft: "180 SQ.FT", x: 25, y: 145, rw: 210, rh: 70, fill: "rgba(255, 255, 255, 0.95)" },
+        { name: "BATH", sqft: "50 SQ.FT", x: 245, y: 145, rw: 85, rh: 70, fill: "rgba(255, 255, 255, 0.95)" },
+        { name: "BALCONY", sqft: "60 SQ.FT", x: 340, y: 145, rw: 85, rh: 70, fill: "rgba(15, 58, 46, 0.07)" }
+      ];
+
+      rooms.forEach(r => {
+        ctx.fillStyle = r.fill;
+        ctx.fillRect(r.x, r.y, r.rw, r.rh);
+
+        ctx.strokeStyle = "#0F3A2E";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(r.x, r.y, r.rw, r.rh);
+
+        ctx.fillStyle = "#111418";
+        ctx.font = "bold 10px 'Space Grotesk', monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(r.name, r.x + r.rw / 2, r.y + r.rh / 2 - 2);
+
+        ctx.fillStyle = "#7E8694";
+        ctx.font = "500 9px 'Plus Jakarta Sans', sans-serif";
+        ctx.fillText(r.sqft, r.x + r.rw / 2, r.y + r.rh / 2 + 12);
+      });
+    }
+
+
+    /* --------------------------------------------------------------------------
+       LIVE 3D PREVIEW (THREE.JS STUDIO VIEWPORT)
+       -------------------------------------------------------------------------- */
+    let mini3DScene, mini3DCamera, mini3DRenderer, mini3DControls;
+
+    function init3DMockup() {
+      const container = document.getElementById("mockup3DContainer");
+      const canvas = document.getElementById("mockup3DCanvas");
+      if (!container || !canvas || typeof THREE === "undefined") return;
+
+      const width = container.clientWidth || 450;
+      const height = container.clientHeight || 240;
+
+      // 1. Scene
+      mini3DScene = new THREE.Scene();
+      mini3DScene.background = new THREE.Color(0xF4F2EC);
+
+      // 2. Camera
+      mini3DCamera = new THREE.PerspectiveCamera(38, width / height, 0.1, 1000);
+      mini3DCamera.position.set(48, 44, 56);
+
+      // 3. Renderer
+      mini3DRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+      mini3DRenderer.setSize(width, height);
+      mini3DRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      mini3DRenderer.shadowMap.enabled = true;
+
+      // 4. OrbitControls
+      if (typeof THREE.OrbitControls !== "undefined") {
+        mini3DControls = new THREE.OrbitControls(mini3DCamera, mini3DRenderer.domElement);
+        mini3DControls.enableDamping = true;
+        mini3DControls.dampingFactor = 0.08;
+        mini3DControls.autoRotate = true;
+        mini3DControls.autoRotateSpeed = 1.2;
+        mini3DControls.enableZoom = false; // preserve scroll smoothness
+        mini3DControls.maxPolarAngle = Math.PI / 2.15;
+      }
+
+      // 5. Studio Lighting
+      const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.75);
+      mini3DScene.add(ambientLight);
+
+      const dirLight = new THREE.DirectionalLight(0xFFFBF0, 0.9);
+      dirLight.position.set(30, 50, 40);
+      dirLight.castShadow = true;
+      mini3DScene.add(dirLight);
+
+      const hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xD4D8DE, 0.4);
+      mini3DScene.add(hemiLight);
+
+      // 6. Build Architectural House Model
+      const houseGroup = new THREE.Group();
+
+      // Concrete foundation slab
+      const slabGeo = new THREE.BoxGeometry(38, 1, 46);
+      const slabMat = new THREE.MeshStandardMaterial({ color: 0xE4E2DC, roughness: 0.8 });
+      const slabMesh = new THREE.Mesh(slabGeo, slabMat);
+      slabMesh.position.y = -0.5;
+      houseGroup.add(slabMesh);
+
+      // Oak floor plate
+      const woodGeo = new THREE.BoxGeometry(36, 0.2, 44);
+      const woodMat = new THREE.MeshStandardMaterial({ color: 0xF7F6F2, roughness: 0.5 });
+      const woodMesh = new THREE.Mesh(woodGeo, woodMat);
+      woodMesh.position.y = 0.1;
+      houseGroup.add(woodMesh);
+
+      // Architectural Walls
+      const wallMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 0.3 });
+      const wallAccentMat = new THREE.MeshStandardMaterial({ color: 0x0F3A2E, roughness: 0.4 });
+      const glassMat = new THREE.MeshStandardMaterial({ color: 0xBAE6FD, roughness: 0.1, transparent: true, opacity: 0.4 });
+
+      function createWall(w, h, d, x, y, z, mat = wallMat) {
+        const geo = new THREE.BoxGeometry(w, h, d);
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(x, y + h / 2, z);
+        houseGroup.add(mesh);
+      }
+
+      const wallHeight = 8;
+      // Perimeter
+      createWall(1, wallHeight, 44, -18, 0, 0); // Left
+      createWall(1, wallHeight, 44, 18, 0, 0); // Right
+      createWall(36, wallHeight, 1, 0, 0, -22); // Back
+      createWall(16, wallHeight, 1, -10, 0, 22); // Front left
+      createWall(10, wallHeight, 1, 13, 0, 22); // Front right
+      createWall(10, wallHeight, 0.4, 3, 0, 22, glassMat); // Glass portal
+
+      // Partitions
+      createWall(1, wallHeight, 22, 0, 0, -11); // Center spine
+      createWall(18, wallHeight, 1, 9, 0, 0, wallAccentMat); // Spruce bedroom wall
+      createWall(18, wallHeight, 1, -9, 0, 6); // Kitchen partition
+
+      // Furniture Accents (Architectural solids)
+      const bedGeo = new THREE.BoxGeometry(10, 3, 12);
+      const bedMat = new THREE.MeshStandardMaterial({ color: 0x0F3A2E, roughness: 0.5 });
+      const bedMesh = new THREE.Mesh(bedGeo, bedMat);
+      bedMesh.position.set(9, 1.5, -10);
+      houseGroup.add(bedMesh);
+
+      const sofaGeo = new THREE.BoxGeometry(12, 2.5, 6);
+      const sofaMat = new THREE.MeshStandardMaterial({ color: 0x2C313A, roughness: 0.7 });
+      const sofaMesh = new THREE.Mesh(sofaGeo, sofaMat);
+      sofaMesh.position.set(-8, 1.25, 14);
+      houseGroup.add(sofaMesh);
+
+      mini3DScene.add(houseGroup);
+
+      // Render loop
+      function animate3D() {
+        requestAnimationFrame(animate3D);
+        if (mini3DControls) mini3DControls.update();
+        mini3DRenderer.render(mini3DScene, mini3DCamera);
+      }
+      animate3D();
+
+      // Responsive resize
+      window.addEventListener("resize", () => {
+        if (!container || !mini3DRenderer || !mini3DCamera) return;
+        const nw = container.clientWidth || 450;
+        const nh = container.clientHeight || 240;
+        mini3DCamera.aspect = nw / nh;
+        mini3DCamera.updateProjectionMatrix();
+        mini3DRenderer.setSize(nw, nh);
+      });
+    }
+
+
+    /* --------------------------------------------------------------------------
+       SWISS ACCORDION TOGGLE
+       -------------------------------------------------------------------------- */
+    function toggleFAQ(element) {
+      const item = element.parentElement;
+      const isActive = item.classList.contains("active");
+
+      document.querySelectorAll(".faq-row").forEach(el => el.classList.remove("active"));
+      if (!isActive) {
+        item.classList.add("active");
+      }
+    }
+
+
+    /* ==========================================================================
+       GPU INTERACTIVE PARTICLES ENGINE ("BRING YOUR PLOT TO LIFE")
+       Ported from Bruno Imbrizi / Codrops into Three.js with inlined simplex GLSL,
+       touch texture cursor displacement, and GSAP intro animation.
+       ========================================================================== */
+
+    const SIMPLEX_2D = /* glsl */ `
+vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+vec3 permute(vec3 x) { return mod289(((x * 34.0) + 1.0) * x); }
+float snoise(vec2 v) {
+  const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+  vec2 i  = floor(v + dot(v, C.yy));
+  vec2 x0 = v - i + dot(i, C.xx);
+  vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+  vec4 x12 = x0.xyxy + C.xxzz;
+  x12.xy -= i1;
+  i = mod289(i);
+  vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
+  vec3 m = max(0.5 - vec3(dot(x0, x0), dot(x12.xy, x12.xy), dot(x12.zw, x12.zw)), 0.0);
+  m = m * m; m = m * m;
+  vec3 x = 2.0 * fract(p * C.www) - 1.0;
+  vec3 h = abs(x) - 0.5;
+  vec3 ox = floor(x + 0.5);
+  vec3 a0 = x - ox;
+  m *= 1.79284291400159 - 0.85373472095314 * (a0 * a0 + h * h);
+  vec3 g;
+  g.x  = a0.x  * x0.x  + h.x  * x0.y;
+  g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+  return 130.0 * dot(m, g);
+}
+`;
+
+    const PARTICLE_VERT = /* glsl */ `
+precision highp float;
+
+attribute float pindex;
+attribute vec3 position;
+attribute vec3 offset;
+attribute vec2 uv;
+attribute float angle;
+
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+
+uniform float uTime;
+uniform float uRandom;
+uniform float uDepth;
+uniform float uSize;
+uniform vec2 uTextureSize;
+uniform sampler2D uTexture;
+uniform sampler2D uTouch;
+
+varying vec2 vPUv;
+varying vec2 vUv;
+
+${SIMPLEX_2D}
+
+float random(float n) {
+  return fract(sin(n) * 43758.5453123);
+}
+
+void main() {
+  vUv = uv;
+
+  vec2 puv = offset.xy / uTextureSize;
+  vPUv = puv;
+
+  vec4 colA = texture2D(uTexture, puv);
+  float grey = colA.r * 0.21 + colA.g * 0.71 + colA.b * 0.07;
+
+  vec3 displaced = offset;
+  displaced.xy += vec2(random(pindex) - 0.5, random(offset.x + pindex) - 0.5) * uRandom;
+  float rndz = (random(pindex) + snoise(vec2(pindex * 0.1, uTime * 0.1)));
+  displaced.z += rndz * (random(pindex) * 2.0 * uDepth);
+  displaced.xy -= uTextureSize * 0.5;
+
+  float t = texture2D(uTouch, puv).r;
+  displaced.z += t * 20.0 * rndz;
+  displaced.x += cos(angle) * t * 20.0 * rndz;
+  displaced.y += sin(angle) * t * 20.0 * rndz;
+
+  float psize = (snoise(vec2(uTime, pindex) * 0.5) + 2.0);
+  psize *= max(grey, 0.2);
+  psize *= uSize;
+
+  vec4 mvPosition = modelViewMatrix * vec4(displaced, 1.0);
+  mvPosition.xyz += position * psize;
+  vec4 finalPosition = projectionMatrix * mvPosition;
+
+  gl_Position = finalPosition;
+}
+`;
+
+    const PARTICLE_FRAG = /* glsl */ `
+precision highp float;
+
+uniform sampler2D uTexture;
+uniform vec3 uColor;
+
+varying vec2 vPUv;
+varying vec2 vUv;
+
+void main() {
+  vec2 uv = vUv;
+  vec2 puv = vPUv;
+
+  vec4 colA = texture2D(uTexture, puv);
+  float grey = colA.r * 0.21 + colA.g * 0.71 + colA.b * 0.07;
+
+  // Soft, feathered dot instead of a hard-edged circle
+  float radius = 0.5;
+  float border = 0.45;
+  float dist = radius - distance(uv, vec2(0.5));
+  float t = smoothstep(0.0, border, dist);
+
+  // Tint the greyscale value and let dimmer particles fade
+  vec3 rgb = vec3(grey) * uColor;
+  float alpha = t * (0.35 + 0.65 * grey);
+
+  gl_FragColor = vec4(rgb, alpha);
+}
+`;
+
+    class TouchTexture {
+      constructor(radius = 0.15) {
+        this.size = 64;
+        this.maxAge = 120;
+        this.radius = radius;
+        this.trail = [];
+        this.canvas = document.createElement("canvas");
+        this.canvas.width = this.canvas.height = this.size;
+        this.ctx = this.canvas.getContext("2d");
+        this.ctx.fillStyle = "black";
+        this.ctx.fillRect(0, 0, this.size, this.size);
+        this.texture = new THREE.Texture(this.canvas);
+        this.texture.minFilter = THREE.LinearFilter;
+        this.texture.magFilter = THREE.LinearFilter;
+      }
+
+      easeOutSine(t, b, c, d) {
+        return c * Math.sin((t / d) * (Math.PI / 2)) + b;
+      }
+
+      addTouch(x, y) {
+        let force = 0;
+        const last = this.trail[this.trail.length - 1];
+        if (last) {
+          const dx = last.x - x;
+          const dy = last.y - y;
+          force = Math.min((dx * dx + dy * dy) * 10000, 1);
+        }
+        this.trail.push({ x, y, age: 0, force });
+      }
+
+      update() {
+        this.ctx.fillStyle = "black";
+        this.ctx.fillRect(0, 0, this.size, this.size);
+
+        for (let i = this.trail.length - 1; i >= 0; i--) {
+          this.trail[i].age++;
+          if (this.trail[i].age > this.maxAge) this.trail.splice(i, 1);
+        }
+        for (const point of this.trail) {
+          this.drawTouch(point);
+        }
+
+        this.texture.needsUpdate = true;
+      }
+
+      drawTouch(point) {
+        const pos = { x: point.x * this.size, y: (1 - point.y) * this.size };
+        let intensity;
+        if (point.age < this.maxAge * 0.3) {
+          intensity = this.easeOutSine(point.age / (this.maxAge * 0.3), 0, 1, 1);
+        } else {
+          intensity = this.easeOutSine(1 - (point.age - this.maxAge * 0.3) / (this.maxAge * 0.7), 0, 1, 1);
+        }
+        intensity *= point.force;
+
+        const radius = this.size * this.radius * intensity;
+        if (radius <= 0.001) return;
+        const grd = this.ctx.createRadialGradient(pos.x, pos.y, radius * 0.25, pos.x, pos.y, radius);
+        grd.addColorStop(0, "rgba(255, 255, 255, 0.2)");
+        grd.addColorStop(1, "rgba(0, 0, 0, 0.0)");
+        this.ctx.beginPath();
+        this.ctx.fillStyle = grd;
+        this.ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+
+      dispose() {
+        if (this.texture) this.texture.dispose();
+      }
+    }
+
+    let particlesEngine = null;
+
+    function initInteractiveParticles() {
+      const container = document.getElementById("particlesContainer");
+      const canvas = document.getElementById("particlesCanvas");
+      const banner = document.getElementById("concludingBanner");
+      if (!container || !canvas) return;
+
+      const config = {
+        src: "home-section-img/ezgif-frame-050.jpg",
+        maxDimension: 320,
+        color: "#ffffff",
+        size: 1.2,
+        randomness: 1.8,
+        depth: 3.0,
+        touchRadius: 0.15,
+        threshold: 34,
+      };
+
+      let currentSrc = config.src;
+      let objectUrl = null;
+      let disposed = false;
+      let object3D = null;
+      let hitArea = null;
+      let touch = null;
+      let uniforms = null;
+      let imgWidth = 0;
+      let imgHeight = 0;
+      let isInViewport = true;
+      let lastRender = 0;
+      const frameInterval = 1000 / 30;
+
+      const getSize = () => ({
+        width: container.clientWidth || 800,
+        height: container.clientHeight || 560,
+      });
+      let view = getSize();
+
+      // Three.js Scene, Camera, Renderer
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(50, view.width / view.height, 1, 10000);
+      camera.position.z = 300;
+
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(view.width, view.height);
+      renderer.setClearColor(0x000000, 0);
+
+      let fovHeight = 2 * Math.tan((camera.fov * Math.PI) / 180 / 2) * camera.position.z;
+
+      const clock = new THREE.Clock(true);
+      const container3D = new THREE.Object3D();
+      scene.add(container3D);
+
+      const raycaster = new THREE.Raycaster();
+      const mouseNDC = new THREE.Vector2();
+
+      function applyScale() {
+        if (!object3D || !hitArea || !imgHeight) return;
+        const scale = fovHeight / imgHeight;
+        object3D.scale.set(scale, scale, 1);
+        hitArea.scale.set(scale, scale, 1);
+      }
+
+      function applySize() {
+        if (!container || !renderer || !camera) return;
+        view = getSize();
+        camera.aspect = view.width / view.height;
+        camera.updateProjectionMatrix();
+        fovHeight = 2 * Math.tan((camera.fov * Math.PI) / 180 / 2) * camera.position.z;
+        renderer.setSize(view.width, view.height);
+        applyScale();
+      }
+
+      function onPointerMove(e) {
+        if (!hitArea || !touch) return;
+        const rect = canvas.getBoundingClientRect();
+        mouseNDC.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        mouseNDC.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(mouseNDC, camera);
+        const hits = raycaster.intersectObject(hitArea);
+        if (hits.length > 0 && hits[0].uv) {
+          touch.addTouch(hits[0].uv.x, hits[0].uv.y);
+        }
+      }
+
+      canvas.addEventListener("pointermove", onPointerMove);
+      if (banner) banner.addEventListener("pointermove", onPointerMove);
+
+      function loadTextureAndBuild(src) {
+        if (object3D) {
+          container3D.remove(object3D);
+          if (object3D.geometry) object3D.geometry.dispose();
+          if (object3D.material) object3D.material.dispose();
+          object3D = null;
+        }
+        if (hitArea) {
+          container3D.remove(hitArea);
+          if (hitArea.geometry) hitArea.geometry.dispose();
+          if (hitArea.material) hitArea.material.dispose();
+          hitArea = null;
+        }
+        if (touch) {
+          touch.dispose();
+          touch = null;
+        }
+
+        const loader = new THREE.TextureLoader();
+        loader.setCrossOrigin("anonymous");
+        loader.load(
+          src,
+          (texture) => {
+            if (disposed) {
+              texture.dispose();
+              return;
+            }
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+
+            const image = texture.image;
+            const longest = Math.max(image.width || 1, image.height || 1);
+            const scaleDown = longest > config.maxDimension ? config.maxDimension / longest : 1;
+            imgWidth = Math.max(1, Math.round((image.width || 1) * scaleDown));
+            imgHeight = Math.max(1, Math.round((image.height || 1) * scaleDown));
+            const numPoints = imgWidth * imgHeight;
+
+            let colors = null;
+            try {
+              const readCanvas = document.createElement("canvas");
+              readCanvas.width = imgWidth;
+              readCanvas.height = imgHeight;
+              const rctx = readCanvas.getContext("2d");
+              rctx.scale(1, -1);
+              rctx.drawImage(image, 0, 0, imgWidth, imgHeight * -1);
+              colors = Float32Array.from(rctx.getImageData(0, 0, imgWidth, imgHeight).data);
+            } catch (err) {
+              console.warn("Direct pixel sampling restricted, using full geometry grid:", err);
+            }
+
+            let numVisible = 0;
+            if (colors) {
+              for (let i = 0; i < numPoints; i++) {
+                const lum = colors[i * 4] * 0.21 + colors[i * 4 + 1] * 0.71 + colors[i * 4 + 2] * 0.07;
+                if (lum > config.threshold) numVisible++;
+              }
+            }
+            if (numVisible === 0) numVisible = numPoints;
+
+            touch = new TouchTexture(config.touchRadius);
+
+            uniforms = {
+              uTime: { value: 0 },
+              uRandom: { value: 1.0 },
+              uDepth: { value: 2.0 },
+              uSize: { value: 0.0 },
+              uTextureSize: { value: new THREE.Vector2(imgWidth, imgHeight) },
+              uTexture: { value: texture },
+              uTouch: { value: touch.texture },
+              uColor: { value: new THREE.Color(config.color) },
+            };
+
+            const material = new THREE.RawShaderMaterial({
+              uniforms,
+              vertexShader: PARTICLE_VERT,
+              fragmentShader: PARTICLE_FRAG,
+              depthTest: false,
+              transparent: true,
+            });
+
+            const geometry = new THREE.InstancedBufferGeometry();
+
+            const positions = new THREE.BufferAttribute(new Float32Array(4 * 3), 3);
+            positions.setXYZ(0, -0.5, 0.5, 0.0);
+            positions.setXYZ(1, 0.5, 0.5, 0.0);
+            positions.setXYZ(2, -0.5, -0.5, 0.0);
+            positions.setXYZ(3, 0.5, -0.5, 0.0);
+            geometry.setAttribute("position", positions);
+
+            const uvs = new THREE.BufferAttribute(new Float32Array(4 * 2), 2);
+            uvs.setXY(0, 0.0, 0.0);
+            uvs.setXY(1, 1.0, 0.0);
+            uvs.setXY(2, 0.0, 1.0);
+            uvs.setXY(3, 1.0, 1.0);
+            geometry.setAttribute("uv", uvs);
+
+            geometry.setIndex(new THREE.BufferAttribute(new Uint16Array([0, 2, 1, 2, 3, 1]), 1));
+
+            const indices = new Uint16Array(numVisible);
+            const offsets = new Float32Array(numVisible * 3);
+            const angles = new Float32Array(numVisible);
+
+            let j = 0;
+            for (let i = 0; i < numPoints; i++) {
+              if (colors) {
+                const lum = colors[i * 4] * 0.21 + colors[i * 4 + 1] * 0.71 + colors[i * 4 + 2] * 0.07;
+                if (lum <= config.threshold && numVisible < numPoints) continue;
+              }
+              offsets[j * 3 + 0] = i % imgWidth;
+              offsets[j * 3 + 1] = Math.floor(i / imgWidth);
+              offsets[j * 3 + 2] = 0;
+              indices[j] = i;
+              angles[j] = Math.random() * Math.PI;
+              j++;
+              if (j >= numVisible) break;
+            }
+
+            geometry.setAttribute("pindex", new THREE.InstancedBufferAttribute(indices, 1, false));
+            geometry.setAttribute("offset", new THREE.InstancedBufferAttribute(offsets, 3, false));
+            geometry.setAttribute("angle", new THREE.InstancedBufferAttribute(angles, 1, false));
+
+            object3D = new THREE.Mesh(geometry, material);
+            container3D.add(object3D);
+
+            const hitGeo = new THREE.PlaneGeometry(imgWidth, imgHeight, 1, 1);
+            const hitMat = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, depthTest: false });
+            hitMat.visible = false;
+            hitArea = new THREE.Mesh(hitGeo, hitMat);
+            container3D.add(hitArea);
+
+            applyScale();
+
+            if (window.gsap) {
+              gsap.fromTo(uniforms.uSize, { value: 0.5 }, { value: config.size, duration: 1.0, ease: "power2.out" });
+              gsap.to(uniforms.uRandom, { value: config.randomness, duration: 1.0, ease: "power2.out" });
+              gsap.fromTo(uniforms.uDepth, { value: 40.0 }, { value: config.depth, duration: 1.5, ease: "power3.out" });
+            } else {
+              uniforms.uSize.value = config.size;
+              uniforms.uRandom.value = config.randomness;
+              uniforms.uDepth.value = config.depth;
+            }
+          },
+          undefined,
+          (err) => {
+            console.error("Failed to load particle image texture:", err);
+          }
+        );
+      }
+
+      loadTextureAndBuild(currentSrc);
+
+      const resizeObserver = new ResizeObserver(applySize);
+      resizeObserver.observe(container);
+      window.addEventListener("resize", applySize);
+
+      const renderFrame = (timestamp) => {
+        if (timestamp - lastRender < frameInterval) return;
+        lastRender = timestamp;
+        const delta = Math.min(clock.getDelta(), 0.05);
+        if (touch) touch.update();
+        if (uniforms) uniforms.uTime.value += delta;
+        renderer.render(scene, camera);
+      };
+
+      const updateAnimationLoop = () => {
+        renderer.setAnimationLoop(!disposed && isInViewport && !document.hidden ? renderFrame : null);
+      };
+
+      const visibilityObserver = new IntersectionObserver(
+        ([entry]) => {
+          isInViewport = entry.isIntersecting;
+          updateAnimationLoop();
+        },
+        { rootMargin: "160px" }
+      );
+      visibilityObserver.observe(container);
+
+      const onVisibilityChange = () => updateAnimationLoop();
+      document.addEventListener("visibilitychange", onVisibilityChange);
+      updateAnimationLoop();
+
+      // Wire up File Upload
+      const fileInput = document.getElementById("particlesFileInput");
+      const uploadBtn = document.getElementById("particlesUploadBtn");
+
+      if (uploadBtn && fileInput) {
+        uploadBtn.addEventListener("click", () => fileInput.click());
+        fileInput.addEventListener("change", (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file || !file.type.startsWith("image/")) return;
+          if (objectUrl) URL.revokeObjectURL(objectUrl);
+          objectUrl = URL.createObjectURL(file);
+          currentSrc = objectUrl;
+          document.querySelectorAll(".preset-chip").forEach(p => p.classList.remove("active"));
+          loadTextureAndBuild(currentSrc);
+          e.target.value = "";
+        });
+      }
+
+      // Wire up Preset Chips
+      const presetChips = document.querySelectorAll(".preset-chip");
+      presetChips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+          presetChips.forEach(p => p.classList.remove("active"));
+          chip.classList.add("active");
+          const src = chip.getAttribute("data-src");
+          if (src) {
+            if (objectUrl) {
+              URL.revokeObjectURL(objectUrl);
+              objectUrl = null;
+            }
+            currentSrc = src;
+            loadTextureAndBuild(currentSrc);
+          }
+        });
+      });
+
+      particlesEngine = {
+        loadTexture: loadTextureAndBuild,
+        dispose: () => {
+          disposed = true;
+          renderer.setAnimationLoop(null);
+          visibilityObserver.disconnect();
+          document.removeEventListener("visibilitychange", onVisibilityChange);
+          canvas.removeEventListener("pointermove", onPointerMove);
+          if (banner) banner.removeEventListener("pointermove", onPointerMove);
+          window.removeEventListener("resize", applySize);
+          resizeObserver.disconnect();
+          if (objectUrl) URL.revokeObjectURL(objectUrl);
+          if (touch) touch.dispose();
+          if (object3D) {
+            object3D.geometry.dispose();
+            object3D.material.dispose();
+          }
+          if (hitArea) {
+            hitArea.geometry.dispose();
+            hitArea.material.dispose();
+          }
+          renderer.dispose();
+        }
+      };
+    }
+
+
+    /* --------------------------------------------------------------------------
+       SOCIAL FLIP BUTTON TOUCH INTERACTION
+       -------------------------------------------------------------------------- */
+    function initSocialFlipButton() {
+      const box = document.getElementById("socialFlipBox");
+      if (!box) return;
+      box.addEventListener("click", (e) => {
+        if (!e.target.closest(".social-flip-node")) {
+          box.classList.toggle("is-flipped");
+        }
+      });
+    }
+
+
+    /* --------------------------------------------------------------------------
+       PAGE INITIALIZATION
+       -------------------------------------------------------------------------- */
+    window.addEventListener("DOMContentLoaded", () => {
+      preloadHeroSequenceImages();
+      updateEstimator();
+      renderTemplatesGallery('all');
+      draw2DMockup();
+      init3DMockup();
+      initInteractiveParticles();
+      initSocialFlipButton();
+    });
+  </script>
+</body>
+
+</html>
