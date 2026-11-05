@@ -54,8 +54,12 @@ const ALLOWED_REDIRECT_PATHS = [
   '/home.html',
   '/signin',
   '/signin.html',
+  '/terms',
   '/terms.html',
-  '/privacy.html'
+  '/privacy',
+  '/privacy.html',
+  '/admin',
+  '/admin.html'
 ];
 
 function validateRedirectTarget(rawNext) {
@@ -72,105 +76,16 @@ function validateRedirectTarget(rawNext) {
 }
 
 // =============================================================================
-// USER & SESSION PERSISTENCE (Compliant with privacy: stores minimal fields)
+// USER, SESSION & TELEMETRY PERSISTENCE (SQLite Engine via src/db.js)
 // =============================================================================
-const DATA_DIR = path.join(__dirname, 'data');
-const USERS_FILE = path.join(DATA_DIR, 'users.json');
-const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
-
-const users = new Map();
-const sessions = new Map();
-
-function loadStorage() {
-  try {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-    if (fs.existsSync(USERS_FILE)) {
-      const data = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
-      for (const [uid, user] of Object.entries(data)) {
-        users.set(uid, user);
-      }
-    }
-  } catch (err) {
-    console.warn('[Storage] Could not read users:', err.message);
-  }
-
-  try {
-    if (fs.existsSync(SESSIONS_FILE)) {
-      const data = JSON.parse(fs.readFileSync(SESSIONS_FILE, 'utf8'));
-      for (const [sid, sess] of Object.entries(data)) {
-        // Purge expired sessions
-        if (sess.expiresAt && new Date(sess.expiresAt) < new Date()) continue;
-        sessions.set(sid, sess);
-      }
-    }
-  } catch (err) {
-    console.warn('[Storage] Could not read sessions:', err.message);
-  }
-}
-
-function persistUsers() {
-  try {
-    const data = Object.fromEntries(users.entries());
-    fs.writeFileSync(USERS_FILE, JSON.stringify(data, null, 2));
-  } catch (err) {
-    console.warn('[Storage] Could not persist users:', err.message);
-  }
-}
-
-function persistSessions() {
-  try {
-    const data = Object.fromEntries(sessions.entries());
-    fs.writeFileSync(SESSIONS_FILE, JSON.stringify(data, null, 2));
-  } catch (err) {
-    console.warn('[Storage] Could not persist sessions:', err.message);
-  }
-}
-
-loadStorage();
+const db = require('./src/db.js');
 
 function upsertUser({ id, email, name, given_name, picture }) {
-  const now = new Date().toISOString();
-  let user = users.get(id);
-  if (!user) {
-    user = {
-      id,
-      email: email.toLowerCase(),
-      name: name || email.split('@')[0],
-      given_name: given_name || (name ? name.split(' ')[0] : 'Architect'),
-      picture: picture || '',
-      created_at: now,
-      last_login: now
-    };
-    users.set(id, user);
-    console.log(`[Auth] Registered new architect: ${user.name} <${user.email}>`);
-  } else {
-    user.last_login = now;
-    if (name) user.name = name;
-    if (given_name) user.given_name = given_name;
-    if (picture) user.picture = picture;
-    users.set(id, user);
-    console.log(`[Auth] Returning architect signed in: ${user.name} <${user.email}>`);
-  }
-  persistUsers();
-  return user;
+  return db.upsertGoogleUser({ id, email, name, given_name, picture });
 }
 
 function createSession(user) {
-  const sessionId = crypto.randomUUID ? crypto.randomUUID() : crypto.randomBytes(32).toString('hex');
-  const csrfToken = crypto.randomBytes(16).toString('hex');
-  const sessionData = {
-    userId: user.id,
-    email: user.email,
-    name: user.name,
-    given_name: user.given_name,
-    picture: user.picture,
-    csrfToken,
-    createdAt: new Date().toISOString(),
-    expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-  };
-  sessions.set(sessionId, sessionData);
-  persistSessions();
-  return { sessionId, csrfToken };
+  return db.createSession(user);
 }
 
 // =============================================================================
@@ -259,13 +174,8 @@ function getSession(req) {
   const cookies = parseCookies(req);
   const token = cookies.intall_session;
   if (!token) return null;
-  const sess = sessions.get(token);
+  const sess = db.getSession(token);
   if (!sess) return null;
-  if (sess.expiresAt && new Date(sess.expiresAt) < new Date()) {
-    sessions.delete(token);
-    persistSessions();
-    return null;
-  }
   return { token, ...sess };
 }
 
@@ -273,12 +183,13 @@ function getSessionUser(req) {
   const sess = getSession(req);
   if (!sess) return null;
   return {
-    id: sess.userId,
+    id: sess.user_id || sess.userId,
     email: sess.email,
     name: sess.name,
     given_name: sess.given_name,
     picture: sess.picture,
-    csrfToken: sess.csrfToken
+    csrfToken: sess.csrf_token || sess.csrfToken,
+    auth_provider: sess.auth_provider || 'google'
   };
 }
 
@@ -365,6 +276,22 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ===========================================================================
+  // 0. TELEMETRY LOGGING (Track views & visits in SQLite)
+  // ===========================================================================
+  if (method === 'GET' && (pathname === '/' || pathname === '/index.html' || pathname === '/home.html' || pathname === '/signin' || pathname === '/signin.html' || pathname === '/admin' || pathname === '/admin.html' || pathname === '/terms' || pathname === '/privacy')) {
+    const user = getSessionUser(req);
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+    db.logEvent({
+      event_type: 'view',
+      path: pathname === '/' ? '/home.html' : pathname,
+      user_id: user ? user.id : null,
+      user_email: user ? user.email : null,
+      ip,
+      user_agent: req.headers['user-agent']
+    });
+  }
+
+  // ===========================================================================
   // 1. CLEAN URL SHORTCUTS & ROUTE ALIASES
   // ===========================================================================
   if (pathname === '/signin' || pathname === '/login') {
@@ -389,16 +316,21 @@ const server = http.createServer(async (req, res) => {
 
   // ===========================================================================
   // 2. ROUTE PROTECTION MIDDLEWARE
-  //    The 2D/3D studio (/index.html) requires Google authentication.
-  //    Unauthenticated users are safely redirected to /signin?next=/index.html.
+  //    The website and 3D studio (/index.html, /home.html, /admin) require login.
+  //    Unauthenticated users are immediately redirected to /signin.
   // ===========================================================================
-  if (pathname === '/index.html') {
+  if (pathname === '/' || pathname === '/index.html' || pathname === '/home.html' || pathname === '/admin' || pathname === '/admin.html') {
     const user = getSessionUser(req);
     if (!user) {
-      console.log(`[Middleware] Protected route /index.html accessed without session. Redirecting to /signin.`);
-      res.writeHead(302, { 'Location': '/signin?next=/index.html' });
+      const target = pathname === '/' ? '/home.html' : pathname;
+      console.log(`[Middleware] Protected route ${pathname} accessed without session. Redirecting to /signin.`);
+      res.writeHead(302, { 'Location': `/signin?next=${encodeURIComponent(target)}` });
       return res.end();
     }
+  }
+
+  if (pathname === '/admin' || pathname === '/admin.html') {
+    return serveStaticFile(path.join(PUBLIC_DIR, 'admin.html'), res);
   }
 
   // ===========================================================================
@@ -458,6 +390,17 @@ const server = http.createServer(async (req, res) => {
       const { sessionId, csrfToken } = createSession(user);
       const safeRedirect = validateRedirectTarget(body.next);
 
+      // Log login event in SQLite
+      const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+      db.logEvent({
+        event_type: 'login',
+        path: '/api/auth/google/verify',
+        user_id: user.id,
+        user_email: user.email,
+        ip: clientIp,
+        user_agent: req.headers['user-agent']
+      });
+
       res.writeHead(200, {
         'Content-Type': 'application/json; charset=utf-8',
         'Set-Cookie': makeSessionCookie(sessionId, isSecure)
@@ -482,6 +425,123 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  // (A2) Local Registration with Strict Password Strength (POST /api/auth/register)
+  if (pathname === '/api/auth/register' && method === 'POST') {
+    if (!checkRateLimit(req)) {
+      return sendJson(res, 429, { error: 'Too many registration attempts. Please slow down.' });
+    }
+
+    try {
+      const body = await parseJsonBody(req);
+      const { email, password, name } = body;
+
+      if (!email || !password) {
+        return sendJson(res, 400, { error: 'Email and password are required.' });
+      }
+
+      const user = db.registerLocalUser({ email, password, name });
+      const { sessionId, csrfToken } = createSession(user);
+      const safeRedirect = validateRedirectTarget(body.next || '/index.html');
+
+      const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+      db.logEvent({
+        event_type: 'signup',
+        path: '/api/auth/register',
+        user_id: user.id,
+        user_email: user.email,
+        ip: clientIp,
+        user_agent: req.headers['user-agent']
+      });
+      db.logEvent({
+        event_type: 'login',
+        path: '/api/auth/register',
+        user_id: user.id,
+        user_email: user.email,
+        ip: clientIp,
+        user_agent: req.headers['user-agent']
+      });
+
+      res.writeHead(200, {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Set-Cookie': makeSessionCookie(sessionId, isSecure)
+      });
+
+      return res.end(JSON.stringify({
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          given_name: user.given_name,
+          picture: user.picture
+        },
+        csrfToken,
+        redirect: safeRedirect
+      }, null, 2));
+
+    } catch (err) {
+      console.warn('[Register] Registration rejected:', err.message);
+      return sendJson(res, 400, { error: err.message });
+    }
+  }
+
+  // (A3) Local Email/Password Login (POST /api/auth/login)
+  if (pathname === '/api/auth/login' && method === 'POST') {
+    if (!checkRateLimit(req)) {
+      return sendJson(res, 429, { error: 'Too many authentication attempts. Please slow down.' });
+    }
+
+    try {
+      const body = await parseJsonBody(req);
+      const { email, password } = body;
+
+      if (!email || !password) {
+        return sendJson(res, 400, { error: 'Email and password are required.' });
+      }
+
+      const result = db.verifyLocalUser(email, password);
+      if (!result.success) {
+        return sendJson(res, 401, { error: result.error });
+      }
+
+      const user = result.user;
+      const { sessionId, csrfToken } = createSession(user);
+      const safeRedirect = validateRedirectTarget(body.next || '/index.html');
+
+      const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+      db.logEvent({
+        event_type: 'login',
+        path: '/api/auth/login',
+        user_id: user.id,
+        user_email: user.email,
+        ip: clientIp,
+        user_agent: req.headers['user-agent']
+      });
+
+      res.writeHead(200, {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Set-Cookie': makeSessionCookie(sessionId, isSecure)
+      });
+
+      return res.end(JSON.stringify({
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          given_name: user.given_name,
+          picture: user.picture
+        },
+        csrfToken,
+        redirect: safeRedirect
+      }, null, 2));
+
+    } catch (err) {
+      console.error('[Login] Error in login endpoint:', err);
+      return sendJson(res, 500, { error: 'Internal login failure', message: err.message });
+    }
+  }
+
   // (B1) Development Demo Sign-In (Active only in non-production for local testing)
   if (!IS_PROD && pathname === '/auth/dev-login' && method === 'GET') {
     const rawReturn = parsedUrl.query.returnTo || parsedUrl.query.next || '/index.html';
@@ -494,6 +554,15 @@ const server = http.createServer(async (req, res) => {
       picture: ''
     });
     const { sessionId } = createSession(devUser);
+    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+    db.logEvent({
+      event_type: 'login',
+      path: '/auth/dev-login',
+      user_id: devUser.id,
+      user_email: devUser.email,
+      ip: clientIp,
+      user_agent: req.headers['user-agent']
+    });
     res.writeHead(302, {
       'Location': returnTo,
       'Set-Cookie': makeSessionCookie(sessionId, isSecure)
@@ -608,8 +677,7 @@ const server = http.createServer(async (req, res) => {
   if ((pathname === '/auth/logout' || pathname === '/api/auth/logout') && (method === 'GET' || method === 'POST')) {
     const cookies = parseCookies(req);
     if (cookies.intall_session) {
-      sessions.delete(cookies.intall_session);
-      persistSessions();
+      db.deleteSession(cookies.intall_session);
     }
 
     if (pathname.startsWith('/api/')) {
@@ -619,7 +687,7 @@ const server = http.createServer(async (req, res) => {
       });
       return res.end(JSON.stringify({ success: true, message: 'Logged out successfully' }));
     } else {
-      const returnTo = validateRedirectTarget(parsedUrl.query.returnTo || '/home.html');
+      const returnTo = validateRedirectTarget(parsedUrl.query.returnTo || '/signin');
       res.writeHead(302, {
         'Location': returnTo,
         'Set-Cookie': makeLogoutCookie()
@@ -637,22 +705,17 @@ const server = http.createServer(async (req, res) => {
 
     // CSRF Verification
     const clientCsrf = req.headers['x-csrf-token'];
-    if (!clientCsrf || clientCsrf !== session.csrfToken) {
+    if (!clientCsrf || clientCsrf !== (session.csrf_token || session.csrfToken)) {
       return sendJson(res, 403, { error: 'Invalid or missing CSRF token.' });
     }
 
-    const userId = session.userId;
-    // 1. Remove user
-    users.delete(userId);
-    persistUsers();
-
-    // 2. Remove all sessions for this user
-    for (const [sid, sess] of sessions.entries()) {
-      if (sess.userId === userId) {
-        sessions.delete(sid);
-      }
+    const userId = session.user_id || session.userId;
+    try {
+      db.getDb().prepare('DELETE FROM users WHERE id = ?').run(userId);
+      db.getDb().prepare('DELETE FROM sessions WHERE user_id = ?').run(userId);
+    } catch (e) {
+      console.warn('[Storage] Delete user error:', e.message);
     }
-    persistSessions();
 
     console.log(`[Privacy] User account ${userId} permanently purged.`);
 
@@ -688,6 +751,16 @@ const server = http.createServer(async (req, res) => {
           authenticated: Boolean(user),
           user: user || null
         });
+      }
+
+      // Admin Telemetry & Metrics (GET /api/admin/metrics)
+      if (pathname === '/api/admin/metrics' && method === 'GET') {
+        const user = getSessionUser(req);
+        if (!user) {
+          return sendJson(res, 401, { error: 'Authentication required for admin telemetry.' });
+        }
+        const summary = db.getAnalyticsSummary();
+        return sendJson(res, 200, summary);
       }
 
       // Public Client Config (GET /api/auth/config)

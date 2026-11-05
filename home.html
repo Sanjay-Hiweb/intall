@@ -1923,7 +1923,7 @@
 
         <!-- Floating Architectural Telemetry Card (Updates with frames) -->
         <div class="hero-phase-hud" id="heroPhaseHud">
-          <div class="phase-hud-clause" id="heroPhaseTag">STAGE 01 · SITE TOPOGRAPHY</div>
+          <div class="phase-hud-clause" id="heroPhaseTag">SITE TOPOGRAPHY</div>
           <div class="phase-hud-name" id="heroPhaseTitle">Raw Land Parcel &amp; Survey Limits</div>
           <div class="phase-hud-detail" id="heroPhaseDesc">35.0' × 45.0' unbuilt survey coordinates with road setback clearances.</div>
           <div class="phase-hud-metric" id="heroPhaseStat">1,575 SQ.FT · 0% BUILT</div>
@@ -2261,7 +2261,7 @@
           <!-- Sticky Drawing Viewport on Left -->
           <div class="evolution-sticky-drawing drafting-card">
             <div class="sheet-titlebar">
-              <span class="sheet-titlebar-title" id="stageSvgBadge">STAGE 01 / BOUNDARY</span>
+              <span class="sheet-titlebar-title" id="stageSvgBadge">01 / BOUNDARY</span>
               <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--pencil-accent);">1:50 METRIC</span>
             </div>
             
@@ -2278,9 +2278,9 @@
           <!-- Stage Steps on Right -->
           <div class="evolution-steps-col">
             
-            <!-- Stage 1 -->
+            <!-- Step 1 -->
             <div class="stage-card active" onclick="switchStage(1, this)">
-              <div class="stage-card-num">STAGE 01</div>
+              <div class="stage-card-num">PHASE 01</div>
               <h3 class="stage-card-title">Survey Boundary &amp; Setbacks</h3>
               <p class="stage-card-desc">
                 Survey coordinates establish the property polygon. Solar azimuth orientation and mandatory municipal road setback offsets (Front 10', Rear 7', Sides 3') are mapped before any partition is placed.
@@ -2291,9 +2291,9 @@
               </ul>
             </div>
 
-            <!-- Stage 2 -->
+            <!-- Step 2 -->
             <div class="stage-card" onclick="switchStage(2, this)">
-              <div class="stage-card-num">STAGE 02</div>
+              <div class="stage-card-num">PHASE 02</div>
               <h3 class="stage-card-title">Rooms &amp; Circulation Corridors</h3>
               <p class="stage-card-desc">
                 Spatial zoning distributes living, culinary, and sleeping quarters across independent structural axes. Circulation corridors maintain mandatory clear widths (&ge;3.5 ft) without dead ends.
@@ -2304,9 +2304,9 @@
               </ul>
             </div>
 
-            <!-- Stage 3 -->
+            <!-- Step 3 -->
             <div class="stage-card" onclick="switchStage(3, this)">
-              <div class="stage-card-num">STAGE 03</div>
+              <div class="stage-card-num">PHASE 03</div>
               <h3 class="stage-card-title">Wall Thickness &amp; Openings</h3>
               <p class="stage-card-desc">
                 Schematic boundaries resolve into true-to-scale construction geometry: 9-inch load-bearing brick envelopes, 4.5-inch acoustic interior walls, and standard door swing clearance arcs.
@@ -2317,9 +2317,9 @@
               </ul>
             </div>
 
-            <!-- Stage 4 -->
+            <!-- Step 4 -->
             <div class="stage-card" onclick="switchStage(4, this)">
-              <div class="stage-card-num">STAGE 04</div>
+              <div class="stage-card-num">PHASE 04</div>
               <h3 class="stage-card-title">Bylaw Audit &amp; Material Takeoff</h3>
               <p class="stage-card-desc">
                 Automated municipal compliance verification flags zero violations, while itemizing foundation concrete volumes, masonry square footage, and flooring rate schedules.
@@ -3379,10 +3379,10 @@
       card.classList.add('active');
 
       const badges = {
-        1: "STAGE 01 / BOUNDARY &amp; SETBACKS",
-        2: "STAGE 02 / ROOMS &amp; CORRIDORS",
-        3: "STAGE 03 / WALLS &amp; OPENINGS",
-        4: "STAGE 04 / BYLAWS &amp; TAKEOFF"
+        1: "BOUNDARY &amp; SETBACKS",
+        2: "ROOMS &amp; CORRIDORS",
+        3: "WALLS &amp; OPENINGS",
+        4: "BYLAWS &amp; TAKEOFF"
       };
 
       document.getElementById('stageSvgBadge').innerHTML = badges[stageNum];
@@ -3426,7 +3426,7 @@
     const heroMilestones = [
       {
         maxFrame: 16,
-        tag: "STAGE 01 · SITE TOPOGRAPHY",
+        tag: "SITE TOPOGRAPHY",
         title: "Raw Land Parcel & Survey Limits",
         desc: "35.0' × 45.0' unbuilt survey coordinates mapped with road setback clearances.",
         metric: "1,575 SQ.FT · 0% BUILT",
@@ -3434,7 +3434,7 @@
       },
       {
         maxFrame: 34,
-        tag: "STAGE 02 · STRUCTURAL ENVELOPE",
+        tag: "STRUCTURAL ENVELOPE",
         title: "Parametric Glazing & Framing",
         desc: "Double-height curtain walls, load paths, and daylighting core dynamically solved.",
         metric: "2,240 SQ.FT · 65% BUILT",
@@ -3442,7 +3442,7 @@
       },
       {
         maxFrame: 50,
-        tag: "STAGE 03 · TURNKEY LIVING VILLA",
+        tag: "TURNKEY LIVING VILLA",
         title: "Completed Contemporary Residence",
         desc: "Permit-ready architectural realization with dual carport and integrated lighting.",
         metric: "2,850 SQ.FT · 100% EXECUTED",

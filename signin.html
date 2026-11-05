@@ -619,6 +619,174 @@
       outline-offset: 2px;
     }
 
+    /* Auth Tabs */
+    .auth-tabs-bar {
+      display: flex;
+      border: 1px solid var(--paper-border-solid);
+      border-radius: var(--radius-sm);
+      margin-bottom: 20px;
+      background: var(--paper-bg);
+      overflow: hidden;
+    }
+    .auth-tab-btn {
+      flex: 1;
+      padding: 10px 14px;
+      background: transparent;
+      border: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--paper-text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .auth-tab-btn.active {
+      background: var(--ink-bg);
+      color: var(--ink-text);
+    }
+    .auth-tab-btn:hover:not(.active) {
+      background: var(--paper-card);
+      color: var(--paper-text);
+    }
+
+    /* Drafting Divider */
+    .drafting-divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 18px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--paper-text-faint);
+    }
+    .drafting-divider::before,
+    .drafting-divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--paper-border-solid);
+    }
+    .drafting-divider span {
+      padding: 0 10px;
+    }
+
+    /* Form Fields */
+    .drafting-field {
+      margin-bottom: 12px;
+      text-align: left;
+    }
+    .drafting-field label {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--paper-text);
+      margin-bottom: 5px;
+    }
+    .drafting-field input {
+      width: 100%;
+      height: 42px;
+      padding: 0 12px;
+      background: var(--paper-card-white);
+      border: 1px solid var(--paper-border-solid);
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: var(--paper-text);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .drafting-field input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-soft);
+    }
+
+    /* Password Criteria Checklist */
+    .pw-criteria-box {
+      background: var(--paper-card);
+      border: 1px solid var(--paper-border-solid);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      margin-bottom: 14px;
+      text-align: left;
+    }
+    .pw-criteria-header {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--paper-text-secondary);
+      margin-bottom: 8px;
+    }
+    .pw-criteria-grid {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.02em;
+    }
+    @media (max-width: 480px) {
+      .pw-criteria-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .pw-crit-item {
+      color: var(--paper-text-faint);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.15s ease;
+    }
+    .pw-crit-item.valid {
+      color: var(--pass-green);
+      font-weight: 600;
+    }
+    .pw-crit-item.invalid {
+      color: var(--paper-text-faint);
+    }
+    .crit-icon {
+      font-weight: bold;
+    }
+
+    /* Submit Button */
+    .drafting-submit-btn {
+      width: 100%;
+      height: 46px;
+      background: var(--ink-bg);
+      color: var(--ink-text);
+      border: 1px solid var(--ink-bg);
+      border-radius: var(--radius-sm);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      margin-top: 6px;
+    }
+    .drafting-submit-btn:hover:not(:disabled) {
+      background: var(--ink-bg-elevated);
+      border-color: var(--accent);
+    }
+    .drafting-submit-btn:disabled {
+      background: #D8D2C5;
+      border-color: #D8D2C5;
+      color: #8E9BAE;
+      cursor: not-allowed;
+    }
+
     /* Button Loading State */
     .google-auth-btn.loading {
       cursor: not-allowed;
@@ -1237,8 +1405,18 @@
         <!-- 03. Form Header & Title -->
         <div id="authFormSection">
           <span class="section-clause">§ 00 / ACCESS</span>
-          <h1 class="auth-headline">Sign in to your <em>drawing board.</em></h1>
-          <p class="auth-subcopy">One account. Your plots and plans are saved to it.</p>
+          <h1 class="auth-headline" id="authHeadline">Sign in to your <em>drawing board.</em></h1>
+          <p class="auth-subcopy" id="authSubcopy">Log in with Gmail or sign in with your email and password.</p>
+
+          <!-- Architectural Tabs: Log In vs Sign Up -->
+          <div class="auth-tabs-bar" role="tablist">
+            <button type="button" class="auth-tab-btn active" id="tabBtnSignIn" onclick="switchAuthTab('signin')" role="tab" aria-selected="true">
+              Log In
+            </button>
+            <button type="button" class="auth-tab-btn" id="tabBtnSignUp" onclick="switchAuthTab('signup')" role="tab" aria-selected="false">
+              Sign Up / Register
+            </button>
+          </div>
 
           <!-- 04. Primary Google Sign-In Button -->
           <button type="button" class="google-auth-btn" id="googleAuthBtn" aria-label="Continue with Google">
@@ -1251,12 +1429,80 @@
             </svg>
             <!-- Loading Spinner inside button -->
             <span class="btn-spinner" aria-hidden="true"></span>
-            <span id="googleBtnLabel">Continue with Google</span>
+            <span id="googleBtnLabel">Continue with Google / Gmail</span>
           </button>
 
+          <div class="drafting-divider">
+            <span id="dividerLabel">OR SIGN IN WITH EMAIL &amp; PASSWORD</span>
+          </div>
+
+          <!-- (A) SIGN IN FORM -->
+          <form id="signInForm" onsubmit="handleLocalLogin(event)">
+            <div class="drafting-field">
+              <label for="loginEmail">Email / Gmail Address</label>
+              <input type="email" id="loginEmail" placeholder="architect@gmail.com" required autocomplete="username">
+            </div>
+            <div class="drafting-field">
+              <label for="loginPassword">Password</label>
+              <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="drafting-submit-btn" id="loginSubmitBtn">
+              <span id="loginSubmitText">Sign In &amp; Enter Studio →</span>
+            </button>
+          </form>
+
+          <!-- (B) SIGN UP FORM -->
+          <form id="signUpForm" onsubmit="handleLocalRegister(event)" style="display: none;">
+            <div class="drafting-field">
+              <label for="regName">Architect Name</label>
+              <input type="text" id="regName" placeholder="e.g. Sanjay Kumar" autocomplete="name">
+            </div>
+            <div class="drafting-field">
+              <label for="regEmail">Email / Gmail Address</label>
+              <input type="email" id="regEmail" placeholder="yourname@gmail.com" required autocomplete="username" oninput="checkPasswordCriteria()">
+            </div>
+            <div class="drafting-field">
+              <label for="regPassword">Strong Password</label>
+              <input type="password" id="regPassword" placeholder="Enter strong password" required autocomplete="new-password" oninput="checkPasswordCriteria()">
+            </div>
+            <div class="drafting-field">
+              <label for="regConfirmPassword">Confirm Password</label>
+              <input type="password" id="regConfirmPassword" placeholder="Repeat password" required autocomplete="new-password" oninput="checkPasswordCriteria()">
+            </div>
+
+            <!-- MANDATORY PASSWORD CRITERIA CHECKLIST -->
+            <div class="pw-criteria-box">
+              <div class="pw-criteria-header">MANDATORY PASSWORD CRITERIA:</div>
+              <ul class="pw-criteria-grid">
+                <li id="critLen" class="pw-crit-item">
+                  <span class="crit-icon">○</span> 8+ Characters
+                </li>
+                <li id="critUpper" class="pw-crit-item">
+                  <span class="crit-icon">○</span> 1 Capital (A-Z)
+                </li>
+                <li id="critLower" class="pw-crit-item">
+                  <span class="crit-icon">○</span> 1 Small (a-z)
+                </li>
+                <li id="critNum" class="pw-crit-item">
+                  <span class="crit-icon">○</span> 2+ Numbers (0-9)
+                </li>
+                <li id="critSpec" class="pw-crit-item">
+                  <span class="crit-icon">○</span> Special (!@#$%...)
+                </li>
+                <li id="critMatch" class="pw-crit-item">
+                  <span class="crit-icon">○</span> Passwords Match
+                </li>
+              </ul>
+            </div>
+
+            <button type="submit" class="drafting-submit-btn" id="regSubmitBtn" disabled>
+              <span id="regSubmitText">Register &amp; Enter Studio →</span>
+            </button>
+          </form>
+
           <!-- Automatic Creation Subtext -->
-          <div class="account-note">
-            New here? An account is created automatically on first sign-in.
+          <div class="account-note" id="accountNoteText">
+            Signing in authorizes your clearance to the 2D &amp; 3D architectural CAD generator.
           </div>
 
           <!-- Dev / Guest Access (Local Testing) -->
@@ -1273,9 +1519,9 @@
 
           <!-- Reassurance Row (3 short mono items) -->
           <ul class="reassurance-list" aria-label="Privacy and Security Guarantees">
-            <li class="reassurance-item">No password to remember</li>
-            <li class="reassurance-item">We only read your name, email and photo</li>
-            <li class="reassurance-item">Plans never leave your browser unless you save them.</li>
+            <li class="reassurance-item">Saved directly to secure local SQLite database</li>
+            <li class="reassurance-item">We only read your name, email and drawing states</li>
+            <li class="reassurance-item">Plans never leave your system unless you export them.</li>
           </ul>
         </div>
 
@@ -1515,6 +1761,154 @@
           console.warn('[GSI] Initialize error:', e.message);
         }
       }
+
+      // Switch Auth Tab (Sign In vs Sign Up)
+      function switchAuthTab(tab) {
+        clearErrorState();
+        const isSignIn = tab === 'signin';
+        document.getElementById('tabBtnSignIn').classList.toggle('active', isSignIn);
+        document.getElementById('tabBtnSignUp').classList.toggle('active', !isSignIn);
+        document.getElementById('tabBtnSignIn').setAttribute('aria-selected', isSignIn);
+        document.getElementById('tabBtnSignUp').setAttribute('aria-selected', !isSignIn);
+
+        document.getElementById('signInForm').style.display = isSignIn ? 'block' : 'none';
+        document.getElementById('signUpForm').style.display = isSignIn ? 'none' : 'block';
+
+        document.getElementById('authHeadline').innerHTML = isSignIn
+          ? 'Sign in to your <em>drawing board.</em>'
+          : 'Register your <em>architect account.</em>';
+
+        document.getElementById('authSubcopy').textContent = isSignIn
+          ? 'Log in with Gmail or sign in with your email and password.'
+          : 'Create a password-protected account or continue with Gmail.';
+
+        document.getElementById('googleBtnLabel').textContent = isSignIn
+          ? 'Continue with Google / Gmail'
+          : 'Sign Up with Google / Gmail';
+
+        document.getElementById('dividerLabel').textContent = isSignIn
+          ? 'OR SIGN IN WITH EMAIL & PASSWORD'
+          : 'OR REGISTER WITH EMAIL & STRONG PASSWORD';
+      }
+
+      // Live Password Criteria Checker
+      function checkPasswordCriteria() {
+        const email = (document.getElementById('regEmail').value || '').trim();
+        const password = document.getElementById('regPassword').value || '';
+        const confirmPassword = document.getElementById('regConfirmPassword').value || '';
+
+        const hasLen = password.length >= 8;
+        const hasUpper = /[A-Z]/.test(password);
+        const hasLower = /[a-z]/.test(password);
+        const numMatches = (password.match(/\d/g) || []).length;
+        const hasTwoNums = numMatches >= 2;
+        const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(password);
+        const hasMatch = password.length > 0 && password === confirmPassword;
+
+        function setCrit(id, isValid) {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.classList.toggle('valid', isValid);
+          el.classList.toggle('invalid', !isValid);
+          const icon = el.querySelector('.crit-icon');
+          if (icon) icon.textContent = isValid ? '✓' : '○';
+        }
+
+        setCrit('critLen', hasLen);
+        setCrit('critUpper', hasUpper);
+        setCrit('critLower', hasLower);
+        setCrit('critNum', hasTwoNums);
+        setCrit('critSpec', hasSpecial);
+        setCrit('critMatch', hasMatch);
+
+        const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        const allValid = hasLen && hasUpper && hasLower && hasTwoNums && hasSpecial && hasMatch && isEmailValid;
+
+        const submitBtn = document.getElementById('regSubmitBtn');
+        if (submitBtn) {
+          submitBtn.disabled = !allValid;
+        }
+      }
+
+      // Handle Local Email/Password Login
+      async function handleLocalLogin(e) {
+        e.preventDefault();
+        const email = (document.getElementById('loginEmail').value || '').trim();
+        const password = document.getElementById('loginPassword').value || '';
+        const submitBtn = document.getElementById('loginSubmitBtn');
+        const submitText = document.getElementById('loginSubmitText');
+
+        submitBtn.disabled = true;
+        submitText.textContent = 'Verifying Credentials...';
+        clearErrorState();
+
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password, next: safeNext })
+          });
+          const result = await res.json();
+          if (res.ok && result.success) {
+            const firstName = result.user?.given_name || (result.user?.name ? result.user.name.split(' ')[0] : 'Architect');
+            showSuccessState(firstName, 'Session authorized under NBC 2016.', result.redirect || safeNext);
+          } else {
+            showErrorState('unknown', result.error || 'Invalid email or password.');
+            submitBtn.disabled = false;
+            submitText.textContent = 'Sign In & Enter Studio →';
+          }
+        } catch (err) {
+          showErrorState('offline', 'Could not connect to authentication service.');
+          submitBtn.disabled = false;
+          submitText.textContent = 'Sign In & Enter Studio →';
+        }
+      }
+
+      // Handle Local Email/Password Registration
+      async function handleLocalRegister(e) {
+        e.preventDefault();
+        const name = (document.getElementById('regName').value || '').trim();
+        const email = (document.getElementById('regEmail').value || '').trim();
+        const password = document.getElementById('regPassword').value || '';
+        const confirmPassword = document.getElementById('regConfirmPassword').value || '';
+        const submitBtn = document.getElementById('regSubmitBtn');
+        const submitText = document.getElementById('regSubmitText');
+
+        if (password !== confirmPassword) {
+          showErrorState('unknown', 'Password confirmation does not match.');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitText.textContent = 'Creating Account & Storing in DB...';
+        clearErrorState();
+
+        try {
+          const res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password, next: safeNext })
+          });
+          const result = await res.json();
+          if (res.ok && result.success) {
+            const firstName = result.user?.given_name || (result.user?.name ? result.user.name.split(' ')[0] : 'Architect');
+            showSuccessState(firstName, 'Account registered & saved in SQLite database. Entering studio...', result.redirect || safeNext);
+          } else {
+            showErrorState('unknown', result.error || 'Registration failed.');
+            submitBtn.disabled = false;
+            submitText.textContent = 'Register & Enter Studio →';
+          }
+        } catch (err) {
+          showErrorState('offline', 'Could not connect to authentication service.');
+          submitBtn.disabled = false;
+          submitText.textContent = 'Register & Enter Studio →';
+        }
+      }
+
+      window.switchAuthTab = switchAuthTab;
+      window.checkPasswordCriteria = checkPasswordCriteria;
+      window.handleLocalLogin = handleLocalLogin;
+      window.handleLocalRegister = handleLocalRegister;
 
       // Handle ID Token from Google Identity Services
       async function handleGoogleCredentialResponse(response) {

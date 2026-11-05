@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard & Telemetry — INTALL Architectural Studio</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --paper-bg: #F5F2EA;
+      --paper-card: #FAF8F3;
+      --paper-card-white: #FFFFFF;
+      --paper-border: rgba(14, 26, 43, 0.16);
+      --paper-border-solid: #D8D2C5;
+      --paper-text: #0E1A2B;
+      --paper-text-secondary: #536278;
+      --paper-text-faint: #6E7C91;
+
+      --ink-bg: #0E1A2B;
+      --ink-bg-elevated: #152438;
+      --ink-border: #223754;
+      --ink-text: #F5F2EA;
+      --ink-text-secondary: #B8C0CC;
+      --ink-text-faint: #8E9BAE;
+
+      --accent: #E4572E;
+      --accent-hover: #D0461D;
+      --accent-soft: rgba(228, 87, 46, 0.10);
+
+      --pass-green: #1B8A44;
+      --pass-green-soft: rgba(27, 138, 68, 0.12);
+      --badge-blue: #2563EB;
+      --badge-blue-soft: rgba(37, 99, 235, 0.12);
+      --badge-purple: #7C3AED;
+      --badge-purple-soft: rgba(124, 58, 237, 0.12);
+
+      --radius-sm: 2px;
+      --radius-md: 4px;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-serif: 'Fraunces', serif;
+      --font-body: 'Inter', -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--paper-bg);
+      color: var(--paper-text);
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image:
+        linear-gradient(to right, rgba(14, 26, 43, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(14, 26, 43, 0.035) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    /* TOP ARCHITECTURAL APP BAR */
+    .admin-header {
+      background: var(--ink-bg);
+      color: var(--ink-text);
+      border-bottom: 2px solid var(--accent);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-logo-seal {
+      width: 38px;
+      height: 38px;
+      background: var(--accent);
+      color: #FFFFFF;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .brand-meta h1 {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--ink-text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .admin-pill-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .brand-meta p {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-text-faint);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+    }
+
+    .btn-action-primary {
+      background: var(--accent);
+      color: #FFFFFF;
+      border-color: var(--accent);
+    }
+    .btn-action-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-action-secondary {
+      background: var(--ink-bg-elevated);
+      color: var(--ink-text);
+      border-color: var(--ink-border);
+    }
+    .btn-action-secondary:hover {
+      background: rgba(245, 242, 234, 0.1);
+      border-color: var(--ink-text-secondary);
+    }
+
+    .user-badge-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-text-secondary);
+      background: var(--ink-bg-elevated);
+      padding: 6px 12px;
+      border: 1px solid var(--ink-border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--pass-green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--pass-green);
+      animation: pulseDot 2s infinite;
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* MAIN CONTAINER */
+    .admin-main {
+      max-width: 1380px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 28px 24px 60px;
+      flex: 1;
+    }
+
+    /* SECTION TITLES */
+    .section-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--paper-border-solid);
+    }
+
+    .section-clause {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--paper-text);
+      letter-spacing: -0.01em;
+    }
+
+    /* 4 BIG METRICS CARDS GRID */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .metric-card {
+      background: var(--paper-card-white);
+      border: 1px solid var(--paper-border-solid);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      position: relative;
+      box-shadow: 0 2px 6px rgba(14, 26, 43, 0.04);
+      transition: border-color 0.15s ease;
+    }
+    .metric-card:hover {
+      border-color: var(--paper-text);
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--paper-border-solid);
+    }
+    .metric-card.accent-border::before { background: var(--accent); }
+    .metric-card.green-border::before { background: var(--pass-green); }
+    .metric-card.blue-border::before { background: var(--badge-blue); }
+    .metric-card.purple-border::before { background: var(--badge-purple); }
+
+    .metric-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--paper-text-secondary);
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .metric-value {
+      font-family: var(--font-mono);
+      font-size: 34px;
+      font-weight: 700;
+      color: var(--paper-text);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .metric-sub {
+      font-size: 12px;
+      color: var(--paper-text-faint);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* 2-COLUMN DASHBOARD LAYOUT */
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 1024px) {
+      .dashboard-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* DRAFTING PANELS */
+    .dashboard-panel {
+      background: var(--paper-card-white);
+      border: 1px solid var(--paper-border-solid);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 2px 6px rgba(14, 26, 43, 0.04);
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 24px;
+    }
+
+    .panel-header {
+      padding: 14px 18px;
+      background: var(--paper-card);
+      border-bottom: 1px solid var(--paper-border-solid);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-title {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--paper-text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-body {
+      padding: 16px 18px;
+      overflow-x: auto;
+    }
+
+    /* TABLE STYLES */
+    .telemetry-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .telemetry-table th {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--paper-text-secondary);
+      text-align: left;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--paper-border-solid);
+      background: var(--paper-bg);
+    }
+
+    .telemetry-table td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(14, 26, 43, 0.08);
+      vertical-align: middle;
+    }
+
+    .telemetry-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .telemetry-table tr:hover td {
+      background: var(--paper-card);
+    }
+
+    /* BADGES */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    .badge-google {
+      background: rgba(66, 133, 244, 0.12);
+      color: #1A73E8;
+      border: 1px solid rgba(66, 133, 244, 0.3);
+    }
+
+    .badge-local {
+      background: rgba(228, 87, 46, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(228, 87, 46, 0.3);
+    }
+
+    .badge-online {
+      background: var(--pass-green-soft);
+      color: var(--pass-green);
+      border: 1px solid var(--pass-green);
+    }
+
+    .badge-event-view {
+      background: rgba(14, 26, 43, 0.08);
+      color: var(--paper-text);
+      border: 1px solid var(--paper-border-solid);
+    }
+
+    .badge-event-login {
+      background: var(--pass-green-soft);
+      color: var(--pass-green);
+      border: 1px solid var(--pass-green);
+    }
+
+    .badge-event-signup {
+      background: var(--badge-purple-soft);
+      color: var(--badge-purple);
+      border: 1px solid var(--badge-purple);
+    }
+
+    /* USER AVATAR / INITIALS */
+    .user-avatar-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--ink-bg);
+      color: #FFFFFF;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--paper-border-solid);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .user-avatar-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .user-flex {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-name-text {
+      font-weight: 600;
+      color: var(--paper-text);
+    }
+
+    .user-email-text {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--paper-text-secondary);
+    }
+
+    /* ACTIVITY FEED */
+    .activity-feed-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 480px;
+      overflow-y: auto;
+    }
+
+    .activity-feed-item {
+      padding: 10px 14px;
+      background: var(--paper-card);
+      border: 1px solid var(--paper-border-solid);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    .activity-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+    }
+
+    .activity-desc {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .activity-time {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--paper-text-faint);
+      white-space: nowrap;
+    }
+
+    /* BREAKDOWN PROGRESS BARS */
+    .breakdown-row {
+      margin-bottom: 12px;
+    }
+
+    .breakdown-meta {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      margin-bottom: 4px;
+      color: var(--paper-text);
+    }
+
+    .breakdown-bar-wrap {
+      height: 8px;
+      background: var(--paper-bg);
+      border: 1px solid var(--paper-border-solid);
+      border-radius: 1px;
+      overflow: hidden;
+    }
+
+    .breakdown-bar-fill {
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      padding: 32px 16px;
+      text-align: center;
+      color: var(--paper-text-secondary);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ADMIN APP BAR -->
+  <header class="admin-header">
+    <div class="brand-section">
+      <div class="brand-logo-seal">INT</div>
+      <div class="brand-meta">
+        <h1>
+          INTALL Studio Telemetry
+          <span class="admin-pill-tag">Admin Panel</span>
+        </h1>
+        <p>Real-time Access &amp; Activity Dashboard</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="user-badge-tag" id="adminUserBadge">
+        <span class="live-dot"></span>
+        <span id="adminUserEmail">Connecting...</span>
+      </div>
+
+      <button type="button" class="btn-action btn-action-secondary" onclick="fetchMetrics()" id="refreshBtn">
+        ↻ Refresh
+      </button>
+
+      <a href="/index.html" class="btn-action btn-action-primary" target="_blank">
+        3D Studio Viewport →
+      </a>
+
+      <a href="/home.html" class="btn-action btn-action-secondary">
+        🏠 Home
+      </a>
+
+      <a href="/auth/logout" class="btn-action btn-action-secondary">
+        Sign Out
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN ADMIN DASHBOARD -->
+  <main class="admin-main">
+    
+    <div class="section-bar">
+      <div>
+        <div class="section-clause">§ 01 / PLATFORM TELEMETRY</div>
+        <h2 class="section-title">Site Activity &amp; Municipal Engagement</h2>
+      </div>
+      <div style="font-family: var(--font-mono); font-size: 11px; color: var(--paper-text-secondary);" id="lastUpdatedTime">
+        Updated: Just now
+      </div>
+    </div>
+
+    <!-- 4 BIG METRICS -->
+    <div class="metrics-grid">
+      <div class="metric-card accent-border">
+        <div class="metric-label">
+          <span>Total Views</span>
+          <span style="color: var(--accent);">●</span>
+        </div>
+        <div class="metric-value" id="valTotalViews">0</div>
+        <div class="metric-sub">Across 3D Studio, Home &amp; Pages</div>
+      </div>
+
+      <div class="metric-card blue-border">
+        <div class="metric-label">
+          <span>Unique Visits</span>
+          <span style="color: var(--badge-blue);">●</span>
+        </div>
+        <div class="metric-value" id="valTotalVisits">0</div>
+        <div class="metric-sub">Distinct client IPs &amp; sessions</div>
+      </div>
+
+      <div class="metric-card green-border">
+        <div class="metric-label">
+          <span>Total Logins</span>
+          <span style="color: var(--pass-green);">●</span>
+        </div>
+        <div class="metric-value" id="valTotalLogins">0</div>
+        <div class="metric-sub">Google OAuth &amp; Local sign-ins</div>
+      </div>
+
+      <div class="metric-card purple-border">
+        <div class="metric-label">
+          <span>Signups &amp; Accounts</span>
+          <span style="color: var(--badge-purple);">●</span>
+        </div>
+        <div class="metric-value" id="valTotalSignups">0</div>
+        <div class="metric-sub">Registered architects in SQLite</div>
+      </div>
+    </div>
+
+    <!-- 2-COLUMN LAYOUT -->
+    <div class="dashboard-layout">
+      
+      <!-- LEFT COLUMN: WHO IS LOGGED IN & AUDIT STREAM -->
+      <div>
+        
+        <!-- WHO IS LOGGED IN -->
+        <div class="dashboard-panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span class="live-dot"></span>
+              <span>Currently Logged In (<span id="activeSessionsCount">0</span>)</span>
+            </div>
+            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--paper-text-secondary);">Active Sessions</span>
+          </div>
+          <div class="panel-body" style="padding: 0;">
+            <table class="telemetry-table" id="sessionsTable">
+              <thead>
+                <tr>
+                  <th>Architect</th>
+                  <th>Auth Method</th>
+                  <th>Session Started</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="sessionsTableBody">
+                <tr>
+                  <td colspan="4" class="empty-state">Loading active sessions...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- RECENT ACTIVITY AUDIT STREAM -->
+        <div class="dashboard-panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>⚡ Real-Time Activity Audit Stream</span>
+            </div>
+            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--paper-text-secondary);">Last 40 Events</span>
+          </div>
+          <div class="panel-body">
+            <ul class="activity-feed-list" id="activityFeedList">
+              <li class="empty-state">Loading activity feed...</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: PAGE VIEWS BREAKDOWN & REGISTERED ACCOUNTS -->
+      <div>
+        
+        <!-- PAGE VIEWS BREAKDOWN -->
+        <div class="dashboard-panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>📊 Views by Path</span>
+            </div>
+          </div>
+          <div class="panel-body" id="viewsBreakdownContainer">
+            <div class="empty-state">Loading views breakdown...</div>
+          </div>
+        </div>
+
+        <!-- DATABASE REGISTERED USERS -->
+        <div class="dashboard-panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>🏛 Registered User Accounts</span>
+            </div>
+            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--paper-text-secondary);" id="usersCountBadge">SQLite Store</span>
+          </div>
+          <div class="panel-body" style="padding: 0;">
+            <table class="telemetry-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Provider</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody">
+                <tr>
+                  <td colspan="2" class="empty-state">Loading registered users...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      let lastData = null;
+
+      function timeAgo(dateString) {
+        if (!dateString) return 'Just now';
+        const date = new Date(dateString);
+        const seconds = Math.floor((new Date() - date) / 1000);
+        if (seconds < 5) return 'Just now';
+        if (seconds < 60) return `${seconds}s ago`;
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes}m ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}h ago`;
+        return `${Math.floor(hours / 24)}d ago`;
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      async function checkCurrentAdmin() {
+        try {
+          const res = await fetch('/api/auth/me');
+          if (!res.ok) {
+            window.location.href = '/signin?next=/admin';
+            return;
+          }
+          const data = await res.json();
+          if (!data.authenticated || !data.user) {
+            window.location.href = '/signin?next=/admin';
+            return;
+          }
+          document.getElementById('adminUserEmail').textContent = `${data.user.name || 'Architect'} (${data.user.email})`;
+        } catch (e) {
+          window.location.href = '/signin?next=/admin';
+        }
+      }
+
+      async function fetchMetrics() {
+        const refreshBtn = document.getElementById('refreshBtn');
+        if (refreshBtn) refreshBtn.textContent = '↻ Syncing...';
+
+        try {
+          const res = await fetch('/api/admin/metrics');
+          if (res.status === 401) {
+            window.location.href = '/signin?next=/admin';
+            return;
+          }
+          const data = await res.json();
+          lastData = data;
+          renderMetrics(data);
+          document.getElementById('lastUpdatedTime').textContent = `Updated: ${new Date().toLocaleTimeString()}`;
+        } catch (err) {
+          console.error('Failed to load metrics:', err);
+        } finally {
+          if (refreshBtn) refreshBtn.textContent = '↻ Refresh';
+        }
+      }
+
+      function renderMetrics(data) {
+        // Big counters
+        document.getElementById('valTotalViews').textContent = data.totalViews.toLocaleString();
+        document.getElementById('valTotalVisits').textContent = data.totalVisits.toLocaleString();
+        document.getElementById('valTotalLogins').textContent = data.totalLogins.toLocaleString();
+        document.getElementById('valTotalSignups').textContent = data.totalSignups.toLocaleString();
+        document.getElementById('activeSessionsCount').textContent = data.activeSessionsCount;
+
+        // Active Sessions Table (Who is logged in)
+        const sessionsTbody = document.getElementById('sessionsTableBody');
+        if (!data.activeSessions || !data.activeSessions.length) {
+          sessionsTbody.innerHTML = '<tr><td colspan="4" class="empty-state">No active user sessions detected.</td></tr>';
+        } else {
+          sessionsTbody.innerHTML = data.activeSessions.map(s => {
+            const initial = (s.name || s.email || 'A').charAt(0).toUpperCase();
+            const avatarHtml = s.picture
+              ? `<div class="user-avatar-circle"><img src="${escapeHtml(s.picture)}" alt="${escapeHtml(s.name)}"></div>`
+              : `<div class="user-avatar-circle">${initial}</div>`;
+            const providerBadge = s.auth_provider === 'google'
+              ? `<span class="badge badge-google">Google GSI</span>`
+              : `<span class="badge badge-local">Email / Pass</span>`;
+
+            return `
+              <tr>
+                <td>
+                  <div class="user-flex">
+                    ${avatarHtml}
+                    <div>
+                      <div class="user-name-text">${escapeHtml(s.name || 'Studio Architect')}</div>
+                      <div class="user-email-text">${escapeHtml(s.email)}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>${providerBadge}</td>
+                <td>
+                  <div style="font-family: var(--font-mono); font-size: 11px;">
+                    ${timeAgo(s.session_start)}
+                  </div>
+                </td>
+                <td>
+                  <span class="badge badge-online">
+                    <span class="live-dot" style="width:6px;height:6px;"></span>
+                    Online
+                  </span>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+
+        // Real-time Activity Feed
+        const feedList = document.getElementById('activityFeedList');
+        if (!data.recentEvents || !data.recentEvents.length) {
+          feedList.innerHTML = '<li class="empty-state">No activity events recorded yet.</li>';
+        } else {
+          feedList.innerHTML = data.recentEvents.map(ev => {
+            let badgeClass = 'badge-event-view';
+            let badgeText = ev.event_type.toUpperCase();
+            if (ev.event_type === 'login') {
+              badgeClass = 'badge-event-login';
+              badgeText = 'LOGIN';
+            } else if (ev.event_type === 'signup') {
+              badgeClass = 'badge-event-signup';
+              badgeText = 'SIGNUP';
+            } else if (ev.event_type === 'visit') {
+              badgeClass = 'badge-blue';
+              badgeText = 'VISIT';
+            }
+
+            const targetInfo = ev.user_email ? `<strong>${escapeHtml(ev.user_email)}</strong> on <code>${escapeHtml(ev.path)}</code>` : `Visitor viewed <code>${escapeHtml(ev.path)}</code>`;
+
+            return `
+              <li class="activity-feed-item">
+                <div class="activity-left">
+                  <span class="badge ${badgeClass}">${badgeText}</span>
+                  <span class="activity-desc">${targetInfo}</span>
+                </div>
+                <div class="activity-time">${timeAgo(ev.created_at)}</div>
+              </li>
+            `;
+          }).join('');
+        }
+
+        // Views Breakdown by Path
+        const breakdownCont = document.getElementById('viewsBreakdownContainer');
+        if (!data.viewsByPath || !data.viewsByPath.length) {
+          breakdownCont.innerHTML = '<div class="empty-state">No views data available.</div>';
+        } else {
+          const maxCount = Math.max(...data.viewsByPath.map(v => v.count), 1);
+          breakdownCont.innerHTML = data.viewsByPath.map(v => {
+            const pct = Math.round((v.count / maxCount) * 100);
+            return `
+              <div class="breakdown-row">
+                <div class="breakdown-meta">
+                  <span>${escapeHtml(v.path)}</span>
+                  <span>${v.count} views (${pct}%)</span>
+                </div>
+                <div class="breakdown-bar-wrap">
+                  <div class="breakdown-bar-fill" style="width: ${pct}%;"></div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        // Registered Users
+        const usersTbody = document.getElementById('usersTableBody');
+        if (data.activeSessions) {
+          // Unique users from active sessions and total count
+          document.getElementById('usersCountBadge').textContent = `${data.totalUsers} registered`;
+          usersTbody.innerHTML = (data.activeSessions || []).slice(0, 10).map(u => `
+            <tr>
+              <td>
+                <div class="user-name-text">${escapeHtml(u.name || 'Architect')}</div>
+                <div class="user-email-text">${escapeHtml(u.email)}</div>
+              </td>
+              <td>
+                <span class="badge ${u.auth_provider === 'google' ? 'badge-google' : 'badge-local'}">
+                  ${u.auth_provider === 'google' ? 'Google' : 'Local'}
+                </span>
+              </td>
+            </tr>
+          `).join('');
+        }
+      }
+
+      // Initialize
+      checkCurrentAdmin();
+      fetchMetrics();
+
+      // Auto-refresh every 5 seconds for real-time telemetry
+      setInterval(fetchMetrics, 5000);
+
+      window.fetchMetrics = fetchMetrics;
+    })();
+  </script>
+</body>
+</html>

@@ -253,6 +253,9 @@
               <a href="/index.html" style="display: block; padding: 7px 12px; font-size: 11px; text-transform: uppercase; color: #0E1A2B; text-decoration: none; transition: background 0.1s;" onmouseover="this.style.background='#F5F2EA'" onmouseout="this.style.background='transparent'">
                 Studio Drawing Board
               </a>
+              <a href="/admin" style="display: block; padding: 7px 12px; font-size: 11px; text-transform: uppercase; color: #E4572E; font-weight: 700; text-decoration: none; transition: background 0.1s;" onmouseover="this.style.background='#F5F2EA'" onmouseout="this.style.background='transparent'">
+                ⚙ Admin Dashboard
+              </a>
               <a href="/terms.html" style="display: block; padding: 7px 12px; font-size: 11px; text-transform: uppercase; color: #536278; text-decoration: none; transition: background 0.1s;" onmouseover="this.style.background='#F5F2EA'" onmouseout="this.style.background='transparent'">
                 Terms of Service
               </a>
@@ -371,10 +374,21 @@
       window.INTALL_USER = currentUser;
       renderAuthUI(currentUser);
       window.dispatchEvent(new CustomEvent('intall:auth-changed', { detail: { user: currentUser } }));
+
+      // Enforce auth gate: Unauthenticated users cannot view 3D Studio or Home
+      if (!currentUser && (window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('home.html') || window.location.pathname === '/')) {
+        const nextTarget = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `/signin?next=${nextTarget}`;
+      }
     } catch (e) {
       currentUser = null;
       window.INTALL_USER = null;
       renderAuthUI(null);
+
+      if (window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('home.html') || window.location.pathname === '/') {
+        const nextTarget = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `/signin?next=${nextTarget}`;
+      }
     }
   }
 
