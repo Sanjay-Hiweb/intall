@@ -1,107 +1,107 @@
 {
-  "currency": "USD",
-  "currencySymbol": "$",
-  "rateTier": "Standard Premium",
+  "currency": "INR",
+  "currencySymbol": "₹",
+  "rateTier": "Standard Premium (Indian Market Rates)",
   "flooring": {
     "vitrified_tile": {
-      "name": "Vitrified Porcelain Tile (600×600mm)",
+      "name": "Vitrified Porcelain Floor Tiles (600×600mm / 1200×600mm)",
       "unit": "sqft",
-      "materialRate": 4.50,
-      "laborRate": 2.25,
+      "materialRate": 68.0,
+      "laborRate": 32.0,
       "wastagePct": 8,
       "applicableRoomTypes": ["hall", "living", "dining", "passage"]
     },
     "hardwood_oak": {
-      "name": "Engineered White Oak Hardwood",
+      "name": "Wooden Texture Vitrified Planks / Engineered Wood",
       "unit": "sqft",
-      "materialRate": 9.50,
-      "laborRate": 3.75,
+      "materialRate": 115.0,
+      "laborRate": 35.0,
       "wastagePct": 10,
       "applicableRoomTypes": ["bedroom", "study"]
     },
     "anti_skid_tile": {
-      "name": "Anti-Skid Matte Ceramic Tile",
+      "name": "Anti-Skid Matte Ceramic Floor & Wall Tiles",
       "unit": "sqft",
-      "materialRate": 3.80,
-      "laborRate": 2.50,
+      "materialRate": 58.0,
+      "laborRate": 28.0,
       "wastagePct": 10,
       "applicableRoomTypes": ["bathroom", "balcony"]
     },
     "granite_slab": {
-      "name": "Polished Jet Black Granite Counter & Floor",
+      "name": "Polished Jet Black South Indian Granite (18mm)",
       "unit": "sqft",
-      "materialRate": 8.00,
-      "laborRate": 4.00,
+      "materialRate": 165.0,
+      "laborRate": 55.0,
       "wastagePct": 8,
-      "applicableRoomTypes": ["kitchen", "pooja"]
+      "applicableRoomTypes": ["kitchen", "pooja", "stairs"]
     },
     "paved_pavers": {
-      "name": "Interlocking Heavy-Duty Concrete Pavers",
+      "name": "Heavy-Duty 60mm M30 Concrete Interlocking Pavers",
       "unit": "sqft",
-      "materialRate": 3.20,
-      "laborRate": 1.80,
+      "materialRate": 48.0,
+      "laborRate": 22.0,
       "wastagePct": 5,
       "applicableRoomTypes": ["parking"]
     }
   },
   "masonryAndWalls": {
     "brickWall9in": {
-      "name": "9-inch External Load-Bearing Masonry Wall",
+      "name": "9-inch External Red Clay Brick / Solid Block Masonry",
       "unit": "sqft_surface",
       "wallHeightFt": 9.5,
       "bricksPerSqft": 9.0,
-      "brickUnitCost": 0.65,
-      "mortarCostPerSqft": 1.20,
-      "laborCostPerSqft": 2.80
+      "brickUnitCost": 10.50,
+      "mortarCostPerSqft": 35.00,
+      "laborCostPerSqft": 45.00
     },
     "partitionWall4in": {
-      "name": "4.5-inch Internal Partition Wall",
+      "name": "4.5-inch Internal Partition Brick / AAC Block Wall",
       "unit": "sqft_surface",
       "wallHeightFt": 9.5,
       "bricksPerSqft": 4.5,
-      "brickUnitCost": 0.65,
-      "mortarCostPerSqft": 0.80,
-      "laborCostPerSqft": 2.10
+      "brickUnitCost": 10.50,
+      "mortarCostPerSqft": 22.00,
+      "laborCostPerSqft": 32.00
     },
     "interiorPlasterAndPaint": {
-      "name": "Double-Coat Putty + Low-VOC Acrylic Emulsion",
+      "name": "Internal Double-Coat Sand Plaster + Wall Putty + Acrylic Emulsion",
       "unit": "sqft_surface",
-      "ratePerSqft": 1.45
+      "ratePerSqft": 38.00
     },
     "exteriorWeatherShield": {
-      "name": "Siliconized Exterior Weathercoat Finish",
+      "name": "Apex Ultima Weatherproof Exterior Emulsion & Primer",
       "unit": "sqft_surface",
-      "ratePerSqft": 1.85
+      "ratePerSqft": 45.00
     }
   },
   "openings": {
     "mainEntryDoor": {
-      "name": "Pre-Hung Solid Teak Wood Entry Door with Digital Lock",
-      "unitPrice": 650.00
+      "name": "Solid Teakwood Main Door (3.5×7ft) with Brass Fittings & Mortise/Digital Lock",
+      "unitPrice": 28500.00
     },
     "roomInternalDoor": {
-      "name": "Engineered Flush Core Door with Stainless Steel Hardware",
-      "unitPrice": 220.00
+      "name": "Hardwood Frame with Pre-Hung Laminated Flush Shutter & SS Mortise Latch",
+      "unitPrice": 8500.00
     },
     "bathroomWaterproofDoor": {
-      "name": "FRP/WPC Waterproof Bathroom Door",
-      "unitPrice": 160.00
+      "name": "FRP/WPC Waterproof Bathroom Door with Polymer Frame",
+      "unitPrice": 5800.00
     },
     "casementWindow": {
-      "name": "Double-Glazed UPVC Casement Window with Mosquito Mesh",
-      "ratePerSqft": 38.00
+      "name": "UPVC 2.5-Track Sliding / Casement Window with Mesh & 5mm Toughened Glass",
+      "ratePerSqft": 520.00
     }
   },
   "structuralConcreteAndSteel": {
     "rccSlabFooting": {
-      "name": "Reinforced Cement Concrete (RCC M25 Grade) Slab & Beams",
+      "name": "Reinforced Cement Concrete (RCC M20/M25) Foundation, Columns, Plinth & 5\" Roof Slab with Fe500D TMT Rebar",
       "unit": "sqft_builtup",
-      "ratePerSqft": 32.00
+      "ratePerSqft": 880.00
     },
     "electricalAndPlumbing": {
-      "name": "Concealed Conduit Wiring, Sanitary Lines & PEX Water Supply",
+      "name": "Concealed FRLS Copper Wiring (Polycab), Modular Switches, CPVC Plumbing (Astral) & Jaquar/Cera Sanitaryware",
       "unit": "sqft_builtup",
-      "ratePerSqft": 18.50
+      "ratePerSqft": 295.00
     }
   }
 }

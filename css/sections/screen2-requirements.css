@@ -1,0 +1,151 @@
+/* ==========================================================================
+   SCREEN 2: REQUIREMENTS SPECIFICS (DRAFTING TABLE SPEC)
+   ========================================================================== */
+.requirements-layout {
+  max-width: 680px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Segmented Controls */
+.segmented-control {
+  display: flex;
+  background: #EAE5D9;
+  border: 1px solid var(--paper-border-solid);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  gap: 3px;
+}
+
+.segmented-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--paper-text-secondary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.segmented-btn:hover {
+  color: var(--paper-text);
+}
+
+.segmented-btn.active {
+  background: var(--ink-bg);
+  color: var(--ink-text);
+  font-weight: 700;
+}
+
+/* Chips Group */
+.chips-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  background: #FFFFFF;
+  border: 1px solid var(--paper-border-solid);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--paper-text);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+.chip-item:hover {
+  border-color: var(--pencil-accent);
+  background: rgba(228, 87, 46, 0.04);
+}
+
+.chip-item.active {
+  border-color: var(--pencil-accent);
+  background: rgba(228, 87, 46, 0.08);
+  color: var(--pencil-accent);
+  font-weight: 700;
+}
+
+.chip-check {
+  font-size: 0.80rem;
+  display: none;
+}
+
+.chip-item.active .chip-check {
+  display: inline;
+}
+
+/* Compass Picker */
+.compass-picker-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 12px 0;
+}
+
+.compass-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 50px);
+  grid-template-rows: repeat(3, 50px);
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper-card);
+  border: 1px solid var(--paper-border-solid);
+  padding: 10px;
+  border-radius: 50%;
+}
+
+.compass-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 1px solid var(--paper-border-solid);
+  background: #FFFFFF;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--paper-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.compass-btn:hover {
+  border-color: var(--pencil-accent);
+  color: var(--pencil-accent);
+  background: rgba(228, 87, 46, 0.04);
+}
+
+.compass-btn.active {
+  background: var(--pencil-accent);
+  color: #FFFFFF;
+  border-color: var(--pencil-accent);
+}
+
+.compass-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.70rem;
+  font-weight: 700;
+  color: var(--paper-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — INTALL Architectural Studio</title>
+  <meta name="description" content="Privacy Policy for INTALL In-Browser Parametric Architectural Studio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper-bg: #F5F2EA;
+      --paper-card: #FAF8F3;
+      --paper-border: rgba(14, 26, 43, 0.18);
+      --paper-text: #0E1A2B;
+      --paper-text-secondary: #536278;
+      --accent: #E4572E;
+      --ink-bg: #0E1A2B;
+      --ink-text: #F5F2EA;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--paper-bg);
+      color: var(--paper-text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      background-image: 
+        linear-gradient(to right, rgba(14, 26, 43, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(14, 26, 43, 0.04) 1px, transparent 1px);
+      background-size: 24px 24px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      border-bottom: 1px solid var(--paper-border);
+      background: var(--paper-bg);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      color: var(--paper-text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-dot { width: 8px; height: 8px; background: var(--accent); }
+    .back-link {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--paper-text-secondary);
+      text-decoration: none;
+      padding: 8px 12px;
+      border: 1px solid var(--paper-border);
+      border-radius: 2px;
+      transition: all 0.15s ease;
+    }
+    .back-link:hover {
+      border-color: var(--paper-text);
+      color: var(--paper-text);
+    }
+    main {
+      flex: 1;
+      max-width: 800px;
+      margin: 48px auto;
+      padding: 0 24px;
+    }
+    .spec-sheet {
+      background: var(--paper-card);
+      border: 1px solid var(--paper-border);
+      padding: 40px;
+      border-radius: 4px;
+      position: relative;
+    }
+    .spec-sheet::before {
+      content: "+";
+      position: absolute;
+      top: -9px;
+      left: -6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: var(--paper-text-secondary);
+    }
+    .spec-sheet::after {
+      content: "+";
+      position: absolute;
+      bottom: -9px;
+      right: -6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: var(--paper-text-secondary);
+    }
+    .doc-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 36px;
+      font-weight: 600;
+      line-height: 1.2;
+      margin-bottom: 24px;
+      letter-spacing: -0.02em;
+    }
+    .disclaimer-box {
+      border: 1px solid var(--accent);
+      background: rgba(228, 87, 46, 0.06);
+      padding: 16px;
+      margin-bottom: 32px;
+      border-radius: 2px;
+      font-size: 14px;
+      color: var(--paper-text);
+    }
+    h2 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 28px 0 12px 0;
+      color: var(--paper-text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    h2::before {
+      content: "§";
+      color: var(--accent);
+    }
+    p {
+      margin-bottom: 16px;
+      color: var(--paper-text-secondary);
+    }
+    ul {
+      margin-bottom: 16px;
+      padding-left: 20px;
+      color: var(--paper-text-secondary);
+    }
+    li { margin-bottom: 8px; }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px 0;
+      font-size: 14px;
+    }
+    .data-table th, .data-table td {
+      border: 1px solid var(--paper-border);
+      padding: 10px 14px;
+      text-align: left;
+    }
+    .data-table th {
+      background: var(--paper-bg);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--paper-text);
+    }
+    footer {
+      border-top: 1px solid var(--paper-border);
+      padding: 24px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--paper-text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/home.html" class="logo">
+      <div class="logo-dot"></div>
+      INTALL STUDIO
+    </a>
+    <a href="/signin" class="back-link">← Back to Sign In</a>
+  </header>
+
+  <main>
+    <article class="spec-sheet">
+      <div class="doc-meta">DOCUMENT / LEGAL-02 · REVISION 2026.1</div>
+      <h1>Privacy Policy</h1>
+
+      <div class="disclaimer-box">
+        <strong>Notice:</strong> [REPLACE WITH REAL POLICY] — This policy is a legally structured template for the INTALL parametric architectural studio. Consult qualified legal counsel before binding production deployments.
+      </div>
+
+      <h2>01. Our Minimalist Privacy Philosophy</h2>
+      <p>INTALL is engineered as a local-first architectural drawing tool. We believe your site drawings, plot dimensions, and spatial layouts belong to you. We collect only what is strictly required to maintain your authenticated session and persist your saved revisions.</p>
+
+      <h2>02. Data Collected via Google Identity Services</h2>
+      <p>When you click "Continue with Google", we request only the minimal standard OpenID Connect scopes:</p>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>OAuth Scope</th>
+            <th>Technical Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>User ID (sub)</strong></td>
+            <td><code>openid</code></td>
+            <td>Unique immutable primary key to associate saved CAD drawings.</td>
+          </tr>
+          <tr>
+            <td><strong>Email Address</strong></td>
+            <td><code>email</code></td>
+            <td>Account identification, permit delivery, and security notices.</td>
+          </tr>
+          <tr>
+            <td><strong>Full Name</strong></td>
+            <td><code>profile</code></td>
+            <td>Rendering your name on architectural title blocks and sheets.</td>
+          </tr>
+          <tr>
+            <td><strong>Profile Photo URL</strong></td>
+            <td><code>profile</code></td>
+            <td>Avatar display in the studio toolbar.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>We <strong>NEVER</strong> request access to Google Drive, Contacts, Gmail, or your calendar. We never sell, rent, or monetize your personal data.</p>
+
+      <h2>03. In-Browser CAD Geometry Storage</h2>
+      <p>Floor plan vertices, room polygons, dimension ticks, and 3D meshes are generated and rendered in your browser using client-side JavaScript, Three.js, and SVG. Plans remain in your browser's local memory unless you explicitly click "Save Plan" or export a bill of materials.</p>
+
+      <h2>04. Cookies & Session Management</h2>
+      <p>We use a single <code>httpOnly</code>, <code>SameSite=Lax</code> session cookie (<code>intall_session</code>) to maintain authentication. We do not use third-party advertising tracking cookies, Facebook Pixels, or cross-site data brokers.</p>
+
+      <h2>05. Right to Erasure & Account Deletion</h2>
+      <p>You have the absolute right to delete your account and all associated architectural plans at any time. When you trigger an account deletion request via our studio settings or by submitting a signed request, all records in our database and session files are permanently purged within 60 seconds.</p>
+    </article>
+  </main>
+
+  <footer>
+    SHEET LEGAL-02 · INTALL ARCHITECTURAL STUDIO · BROWSER-BASED PARAMETRIC CAD
+  </footer>
+</body>
+</html>

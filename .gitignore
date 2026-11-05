@@ -23,10 +23,18 @@ data/*.db-journal
 data/*.db-wal
 data/*.db-shm
 data/plans.json
+data/sessions.json
+data/users.json
 
-# Editor / IDE settings
+# Editor / IDE settings & backups
 .vscode/
 .idea/
+*.bak
+
+# Transient MCP / Test Artifacts
+.playwright-mcp/
+screen4_overview.png
+w*.png
 
 # Duplicate / temporary assets
 New folder/

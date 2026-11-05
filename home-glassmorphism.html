@@ -1,0 +1,4117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>INTALL — In-Browser 2D/3D Residential Floor Plan & Spatial Studio</title>
+  <meta name="description"
+    content="Parametric 2D architectural blueprints, real-time 3D WebGL spatial walk-throughs, municipal building code auditing, and instant bill of materials estimation. 100% private in-browser CAD.">
+  <meta name="theme-color" content="#06080F">
+
+  <!-- OpenGraph / Social Metadata -->
+  <meta property="og:title" content="INTALL — In-Browser 2D/3D Architectural Design Studio">
+  <meta property="og:description"
+    content="Transform plot boundaries into verified floor plans and 3D spatial models in seconds. Zero installation, 100% client-side precision.">
+  <meta property="og:type" content="website">
+
+  <!-- Refined Typography: Plus Jakarta Sans (Primary UI) + Space Grotesk (Metrics/CAD) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Three.js & OrbitControls for Live 3D Spatial Studio -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <!-- GSAP for Smooth Shader & Particle Animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <!-- Curated Templates Library -->
+  <script src="templates.js"></script>
+  <!-- Google Authentication System -->
+  <script src="auth.js"></script>
+
+  <style>
+    /* ==========================================================================
+       INTALL ULTRA-CLEAN GLASSMORPHIC SAAS DESIGN SYSTEM
+       - Controlled Translucent Glass on Navigation, Hero Preview & Controls
+       - High-Contrast Crisp Surfaces for Content Cards (Zero Blur Fatigue)
+       - Alternating Section Visual Rhythm
+       - Distinct Visual Patterns (No Repetitive 3-Card Grids)
+       ========================================================================== */
+    :root {
+      /* Surface Foundations */
+      --bg-canvas: #06080F;
+      --bg-section-alt: #090E1A;
+      --bg-surface: #0D1424;
+      --bg-surface-elevated: #121B30;
+      --bg-card: #0C1222;
+      --bg-card-hover: #111A2E;
+      --bg-subtle: rgba(255, 255, 255, 0.035);
+      --bg-subtle-hover: rgba(255, 255, 255, 0.07);
+
+      /* Controlled Glass Surfaces */
+      --glass-nav: rgba(9, 14, 26, 0.84);
+      --glass-hero-window: rgba(11, 18, 32, 0.90);
+      --glass-hud: rgba(10, 16, 28, 0.82);
+      --glass-floating-ctrl: rgba(13, 20, 36, 0.88);
+
+      /* Typography Scale (WCAG 2.2 AA Contrast Compliant) */
+      --text-white: #FFFFFF;
+      --text-primary: #F8FAFC;
+      --text-secondary: #CBD5E1;
+      --text-muted: #94A3B8;
+      --text-faint: #64748B;
+
+      /* Restrained Architectural Accents */
+      --accent-cyan: #38BDF8;
+      --accent-cyan-hover: #0EA5E9;
+      --accent-cyan-soft: rgba(56, 189, 248, 0.10);
+      --accent-spruce: #2DD4BF;
+      --accent-spruce-soft: rgba(45, 212, 191, 0.10);
+      --accent-amber: #F59E0B;
+      --accent-amber-soft: rgba(245, 158, 11, 0.12);
+      --badge-success: #10B981;
+      --badge-success-soft: rgba(16, 185, 129, 0.12);
+
+      /* Fine Specular Hairline Borders */
+      --border-hairline: rgba(255, 255, 255, 0.08);
+      --border-subtle: rgba(255, 255, 255, 0.13);
+      --border-hover: rgba(56, 189, 248, 0.35);
+      --border-focus: #38BDF8;
+
+      /* Consistent Radii */
+      --radius-xs: 6px;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 26px;
+      --radius-pill: 9999px;
+
+      /* Controlled Elevation & Inset Highlights */
+      --shadow-ambient: 0 4px 20px rgba(0, 0, 0, 0.35);
+      --shadow-elevated: 0 10px 32px rgba(0, 0, 0, 0.45);
+      --shadow-floating: 0 20px 50px -10px rgba(0, 0, 0, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+
+      /* Typography Stacks */
+      --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'Space Grotesk', monospace;
+    }
+
+    /* Reset & Base Setup */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg-canvas);
+      color-scheme: dark;
+      scroll-padding-top: 110px; /* Generous offset so fixed navigation never clips section headers */
+    }
+
+    body {
+      font-family: var(--font-ui);
+      background: var(--bg-canvas);
+      color: var(--text-secondary);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--border-focus);
+      outline-offset: 3px;
+    }
+
+    /* Subtle Architectural Vignette & Grid */
+    .ambient-backdrop {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -10;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 0%, rgba(14, 24, 48, 0.35) 0%, rgba(6, 8, 15, 0.98) 75%);
+    }
+
+    .ambient-grid {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: -9;
+      pointer-events: none;
+      mask-image: radial-gradient(ellipse at 50% 35%, rgba(0, 0, 0, 0.8) 0%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse at 50% 35%, rgba(0, 0, 0, 0.8) 0%, transparent 80%);
+    }
+
+    /* Layout Containers */
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Section Rhythm */
+    .section {
+      padding: 108px 0 88px 0;
+      position: relative;
+      scroll-margin-top: 110px;
+    }
+
+    .section-alt {
+      background: var(--bg-section-alt);
+      border-top: 1px solid var(--border-hairline);
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 760px;
+      margin: 0 auto 52px auto;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px;
+      border-radius: var(--radius-pill);
+      background: var(--accent-cyan-soft);
+      border: 1px solid rgba(56, 189, 248, 0.22);
+      color: var(--accent-cyan);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .eyebrow-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+    }
+
+    .section-title {
+      font-family: var(--font-ui);
+      font-size: clamp(2rem, 3.2vw, 2.6rem);
+      font-weight: 800;
+      color: var(--text-white);
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+      margin-bottom: 14px;
+    }
+
+    .section-desc {
+      font-size: clamp(0.96rem, 1.3vw, 1.1rem);
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* ==========================================================================
+       SECTION 1: CONTROLLED FLOATING GLASS NAVIGATION BAR
+       ========================================================================== */
+    .navbar-wrapper {
+      position: fixed;
+      top: 16px;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      pointer-events: none;
+      display: flex;
+      justify-content: center;
+      padding: 0 16px;
+    }
+
+    .navbar {
+      pointer-events: auto;
+      width: 100%;
+      max-width: 1140px;
+      background: var(--glass-nav);
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-pill);
+      padding: 8px 10px 8px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+      transition: all 0.25s ease;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-cyan);
+    }
+
+    .brand-mark svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-family: var(--font-ui);
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+      color: var(--text-white);
+      line-height: 1.1;
+    }
+
+    .brand-caption {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      list-style: none;
+    }
+
+    .nav-link {
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.86rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--text-white);
+      background: var(--bg-subtle-hover);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-sm);
+      width: 38px;
+      height: 38px;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-white);
+      cursor: pointer;
+    }
+
+    .mobile-drawer {
+      display: none;
+      position: fixed;
+      top: 76px;
+      left: 16px;
+      right: 16px;
+      background: rgba(10, 16, 28, 0.96);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      z-index: 999;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+    }
+
+    .mobile-drawer.active {
+      display: flex;
+    }
+
+    .mobile-drawer a {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 1.02rem;
+      font-weight: 600;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 20px;
+      border-radius: var(--radius-pill);
+      font-family: var(--font-ui);
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: #38BDF8;
+      color: #040814;
+      box-shadow: 0 2px 14px rgba(56, 189, 248, 0.35);
+    }
+
+    .btn-primary:hover {
+      background: #7DD3FC;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 18px rgba(56, 189, 248, 0.45);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-white);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .btn-large {
+      padding: 13px 28px;
+      font-size: 0.95rem;
+    }
+
+    .btn svg {
+      width: 15px;
+      height: 15px;
+      transition: transform 0.2s ease;
+    }
+
+    .btn:hover svg {
+      transform: translateX(2px);
+    }
+
+    /* ==========================================================================
+       SECTION 2: HERO & REAL WORKFLOW PREVIEW
+       ========================================================================== */
+    .hero-section {
+      padding-top: 140px;
+      padding-bottom: 72px;
+      position: relative;
+      text-align: center;
+    }
+
+    .hero-content {
+      max-width: 860px;
+      margin: 0 auto 44px auto;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 5px 16px;
+      border-radius: var(--radius-pill);
+      background: var(--bg-surface-elevated);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      color: var(--accent-cyan);
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+
+    .hero-title {
+      font-family: var(--font-ui);
+      font-size: clamp(2.5rem, 5vw, 3.9rem);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      line-height: 1.12;
+      color: var(--text-white);
+      margin-bottom: 20px;
+    }
+
+    .hero-title-highlight {
+      color: var(--accent-cyan);
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.02rem, 1.6vw, 1.2rem);
+      color: var(--text-secondary);
+      line-height: 1.65;
+      max-width: 720px;
+      margin: 0 auto 30px auto;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 26px;
+    }
+
+    .hero-proof-pills {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .hero-proof-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-proof-check {
+      color: var(--accent-spruce);
+      font-weight: 700;
+    }
+
+    /* REALISTIC WORKFLOW APPLICATION WINDOW */
+    .hero-app-window-wrapper {
+      position: relative;
+      margin-top: 36px;
+    }
+
+    .hero-app-window {
+      background: var(--glass-hero-window);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-floating);
+      overflow: hidden;
+      position: relative;
+      text-align: left;
+    }
+
+    .app-titlebar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+      background: rgba(7, 11, 20, 0.75);
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .app-window-dots {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .window-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .dot-close { background: #EF4444; }
+    .dot-min { background: #F59E0B; }
+    .dot-max { background: #10B981; }
+
+    .app-titlebar-title {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .app-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 9px;
+      border-radius: var(--radius-pill);
+      background: var(--badge-success-soft);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: var(--badge-success);
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 700;
+    }
+
+    .app-status-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--badge-success);
+    }
+
+    .app-mode-tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 3px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-hairline);
+    }
+
+    .app-mode-btn {
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      font-family: var(--font-ui);
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .app-mode-btn.active {
+      background: var(--bg-surface-elevated);
+      color: var(--text-white);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .workflow-stepper-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(6, 9, 16, 0.65);
+      border-bottom: 1px solid var(--border-hairline);
+      padding: 8px 18px;
+      font-size: 0.76rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      overflow-x: auto;
+      white-space: nowrap;
+      gap: 16px;
+    }
+
+    .workflow-step-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .workflow-step-num {
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+    }
+
+    .workflow-step-chip.active {
+      color: var(--text-white);
+    }
+
+    .workflow-step-chip.active .workflow-step-num {
+      background: var(--accent-cyan);
+      color: #040814;
+    }
+
+    .app-stage-container {
+      position: relative;
+      width: 100%;
+      height: 520px;
+      background: #060913;
+      overflow: hidden;
+    }
+
+    #heroThreeCanvas, #hero2DCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    #heroThreeCanvas {
+      cursor: grab;
+    }
+
+    #heroThreeCanvas:active {
+      cursor: grabbing;
+    }
+
+    .hero-workflow-view {
+      display: none;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+      background: #060913;
+      padding: 24px;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .workflow-stage-card {
+      background: rgba(14, 20, 36, 0.7);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stage-card-img-wrap {
+      height: 240px;
+      position: relative;
+      background: #080C16;
+      overflow: hidden;
+    }
+
+    .stage-card-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .stage-card-meta {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .stage-card-badge {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+    }
+
+    .stage-card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-white);
+    }
+
+    .stage-card-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Glass HUD Chips */
+    .hud-widget {
+      position: absolute;
+      background: var(--glass-hud);
+      backdrop-filter: blur(14px) saturate(150%);
+      -webkit-backdrop-filter: blur(14px) saturate(150%);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+      z-index: 10;
+      pointer-events: auto;
+      transition: all 0.2s ease;
+    }
+
+    .hud-widget:hover {
+      border-color: var(--border-hover);
+    }
+
+    .hud-top-left {
+      top: 16px;
+      left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .hud-top-right {
+      top: 16px;
+      right: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .hud-bottom-left {
+      bottom: 16px;
+      left: 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .hud-bottom-right {
+      bottom: 16px;
+      right: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hud-metric-label {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .hud-metric-val {
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-white);
+      line-height: 1.1;
+    }
+
+    .hud-check-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--badge-success);
+      font-family: var(--font-mono);
+    }
+
+    .hud-orbit-hint {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(6, 10, 20, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      opacity: 0.75;
+      transition: opacity 0.3s ease;
+    }
+
+    /* ==========================================================================
+       SECTION 3: METRICS STRIP
+       ========================================================================== */
+    .metrics-section {
+      padding: 24px 0 60px 0;
+    }
+
+    .metrics-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      padding: 26px 32px;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+
+    .metric-card {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      position: relative;
+    }
+
+    .metric-card:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 10%;
+      right: -12px;
+      height: 80%;
+      width: 1px;
+      background: var(--border-hairline);
+    }
+
+    .metric-number {
+      font-family: var(--font-mono);
+      font-size: clamp(1.8rem, 2.5vw, 2.3rem);
+      font-weight: 700;
+      color: var(--text-white);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .metric-number-cyan {
+      color: var(--accent-cyan);
+    }
+
+    .metric-label {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .metric-sublabel {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* ==========================================================================
+       SECTION 4: PRODUCT DEMONSTRATIONS (3 MEANINGFUL ALTERNATING SHOWCASES)
+       ========================================================================== */
+    .demo-showcase-row {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 52px;
+      align-items: center;
+      margin-bottom: 84px;
+    }
+
+    .demo-showcase-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .demo-showcase-row.reversed {
+      grid-template-columns: 1.1fr 1fr;
+    }
+
+    .demo-showcase-row.reversed .demo-text-col {
+      order: 2;
+    }
+
+    .demo-showcase-row.reversed .demo-visual-col {
+      order: 1;
+    }
+
+    .demo-text-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .demo-step-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .demo-heading {
+      font-size: clamp(1.5rem, 2.2vw, 2rem);
+      font-weight: 800;
+      color: var(--text-white);
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+
+    .demo-paragraph {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    .demo-feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      margin-top: 4px;
+    }
+
+    .demo-feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+    }
+
+    .demo-feature-item svg {
+      width: 17px;
+      height: 17px;
+      color: var(--accent-spruce);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .glass-demo-card {
+      background: var(--glass-hero-window);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      box-shadow: var(--shadow-ambient);
+      position: relative;
+    }
+
+    /* Controls in Demo 1 */
+    .estimator-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .control-block {
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+    }
+
+    .control-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .control-label {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--text-white);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-value-pill {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      background: var(--accent-cyan-soft);
+      color: var(--accent-cyan);
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(56, 189, 248, 0.22);
+    }
+
+    .hairline-range {
+      width: 100%;
+      height: 4px;
+      border-radius: var(--radius-pill);
+      background: rgba(255, 255, 255, 0.12);
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .hairline-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      cursor: pointer;
+      border: 2px solid #FFFFFF;
+      transition: transform 0.15s ease;
+    }
+
+    .hairline-range::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    .scale-limits {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-faint);
+      margin-top: 5px;
+    }
+
+    .typology-toggle-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .typology-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-sm);
+      padding: 9px 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .typology-btn.active {
+      background: var(--bg-surface-elevated);
+      color: var(--text-white);
+      border-color: var(--accent-spruce);
+    }
+
+    .estimator-preview-box {
+      margin-top: 16px;
+      background: #080C16;
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      padding: 14px;
+    }
+
+    #plotEstimatorCanvas {
+      width: 100%;
+      height: 160px;
+      display: block;
+      background: #080C16;
+      border-radius: var(--radius-sm);
+    }
+
+    .estimator-stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .stat-chip {
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid var(--border-hairline);
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+    }
+
+    .stat-chip-val {
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-white);
+    }
+
+    .stat-chip-label {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 2px;
+    }
+
+    .recommendation-box {
+      background: rgba(45, 212, 191, 0.06);
+      border: 1px solid rgba(45, 212, 191, 0.2);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      margin-top: 10px;
+    }
+
+    .recommendation-box strong {
+      color: var(--accent-spruce);
+    }
+
+    /* Dual Chamber Preview inside Demo 2 */
+    .dual-viewport-card {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .viewport-toggle-tabs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 3px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-hairline);
+      width: fit-content;
+    }
+
+    .viewport-toggle-btn {
+      padding: 5px 14px;
+      border-radius: var(--radius-pill);
+      font-family: var(--font-ui);
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .viewport-toggle-btn.active {
+      background: var(--bg-surface-elevated);
+      color: var(--text-white);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .viewport-display-stage {
+      height: 310px;
+      background: #080C16;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-hairline);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #demo2DCanvas, #demo3DCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Compliance & BOM Card inside Demo 3 */
+    .compliance-bom-card {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .compliance-checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .compliance-rule-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 12px;
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+    }
+
+    .rule-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .rule-status-pill {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+    }
+
+    .rule-pass {
+      background: var(--badge-success-soft);
+      color: var(--badge-success);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .bom-mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
+
+    .bom-mini-table th {
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .bom-mini-table td {
+      padding: 7px 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.035);
+    }
+
+    /* ==========================================================================
+       SECTION 5: FEATURE OVERVIEW (EXACTLY 3 INTENDED PRIMARY PILLARS)
+       - Renders exactly once with 3 clear primary engineering cards
+       - Plus an integrated technical specification rule (No repeated 3-card grid!)
+       ========================================================================== */
+    .pillars-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .pillar-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      padding: 30px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .pillar-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+    }
+
+    .pillar-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-cyan);
+    }
+
+    .pillar-icon-box svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .pillar-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-white);
+      letter-spacing: -0.01em;
+    }
+
+    .pillar-text {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Secondary Capabilities Specification Bar (Breaks repetitive card syndrome) */
+    .specs-strip-bar {
+      background: rgba(14, 20, 36, 0.45);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      padding: 20px 28px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .specs-strip-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .specs-strip-icon {
+      color: var(--accent-spruce);
+      flex-shrink: 0;
+    }
+
+    .specs-strip-label {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .specs-strip-sub {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       SECTION 6: TARGET USER PROFILES (SPLIT EDITORIAL LAYOUT — NOT A 3-CARD GRID)
+       ========================================================================== */
+    .user-persona-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 40px;
+      align-items: stretch;
+    }
+
+    .persona-spotlight-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      padding: 36px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .persona-quote-tag {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--accent-spruce);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .persona-quote-body {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-white);
+      line-height: 1.5;
+    }
+
+    .persona-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .persona-list-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      transition: all 0.2s ease;
+    }
+
+    .persona-list-item:hover {
+      border-color: rgba(56, 189, 248, 0.3);
+      background: var(--bg-card-hover);
+    }
+
+    .persona-num-badge {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      background: var(--accent-cyan-soft);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .persona-item-content {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .persona-item-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-white);
+    }
+
+    .persona-item-desc {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* ==========================================================================
+       SECTION 7: CURATED ARCHETYPES GALLERY
+       ========================================================================== */
+    .catalogue-tabs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+
+    .catalogue-tab {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-pill);
+      padding: 7px 16px;
+      font-family: var(--font-ui);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .catalogue-tab:hover {
+      color: var(--text-white);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .catalogue-tab.active {
+      background: var(--accent-cyan-soft);
+      border-color: rgba(56, 189, 248, 0.35);
+      color: var(--accent-cyan);
+    }
+
+    .archetypes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .archetype-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .archetype-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+    }
+
+    .archetype-card-duplex {
+      border-top: 3px solid var(--accent-amber);
+    }
+
+    .archetype-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .archetype-typology-pill {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: var(--radius-pill);
+      background: rgba(56, 189, 248, 0.08);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .archetype-typology-pill.duplex {
+      background: var(--accent-amber-soft);
+      color: var(--accent-amber);
+      border-color: rgba(245, 158, 11, 0.25);
+    }
+
+    .archetype-name {
+      font-family: var(--font-ui);
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: var(--text-white);
+      letter-spacing: -0.015em;
+    }
+
+    .archetype-spec-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      border-top: 1px solid var(--border-hairline);
+      border-bottom: 1px solid var(--border-hairline);
+      padding: 10px 0;
+    }
+
+    .archetype-spec-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .archetype-spec-label {
+      color: var(--text-muted);
+      font-size: 0.76rem;
+    }
+
+    .archetype-spec-val {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .archetypes-expand-bar {
+      margin-top: 32px;
+      text-align: center;
+    }
+
+    /* ==========================================================================
+       SECTION 8: TRANSPARENT PRICING & ACCESS TIERS
+       ========================================================================== */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 28px;
+      max-width: 920px;
+      margin: 0 auto;
+    }
+
+    .pricing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      padding: 38px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: relative;
+    }
+
+    .pricing-card-featured {
+      background: var(--bg-surface-elevated);
+      border-color: rgba(56, 189, 248, 0.35);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .pricing-featured-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #38BDF8;
+      color: #040814;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 3px 12px;
+      border-radius: var(--radius-pill);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .pricing-tier-name {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-white);
+    }
+
+    .pricing-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+    }
+
+    .pricing-currency {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      color: var(--text-muted);
+    }
+
+    .pricing-price {
+      font-family: var(--font-mono);
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: var(--text-white);
+      line-height: 1;
+    }
+
+    .pricing-period {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .pricing-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .pricing-features-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      border-top: 1px solid var(--border-hairline);
+      padding-top: 18px;
+    }
+
+    .pricing-feature-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+    }
+
+    .pricing-feature-item svg {
+      width: 16px;
+      height: 16px;
+      color: var(--accent-spruce);
+      flex-shrink: 0;
+    }
+
+    /* ==========================================================================
+       SECTION 9: ACCESSIBLE FAQ ACCORDION
+       ========================================================================== */
+    .faq-container {
+      max-width: 820px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .faq-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .faq-item:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .faq-item.active {
+      border-color: rgba(56, 189, 248, 0.35);
+      background: var(--bg-surface-elevated);
+    }
+
+    .faq-trigger {
+      width: 100%;
+      background: transparent;
+      border: none;
+      padding: 20px 24px;
+      text-align: left;
+      font-family: var(--font-ui);
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: var(--text-white);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      cursor: pointer;
+    }
+
+    .faq-icon {
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      color: var(--accent-cyan);
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .faq-item.active .faq-icon {
+      transform: rotate(45deg);
+      color: var(--text-white);
+    }
+
+    .faq-body {
+      padding: 0 24px 20px 24px;
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      display: none;
+    }
+
+    .faq-item.active .faq-body {
+      display: block;
+    }
+
+    /* ==========================================================================
+       SECTION 10: CONCLUDING CONVERSION HERO (PRESERVED GPU PARTICLES)
+       ========================================================================== */
+    .concluding-banner {
+      background: radial-gradient(circle at center, rgba(16, 26, 48, 0.85) 0%, rgba(6, 8, 15, 0.98) 100%);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      min-height: 480px;
+      padding: 60px 28px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .particles-stage {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: auto;
+      cursor: crosshair;
+    }
+
+    .particles-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .concluding-content {
+      position: relative;
+      z-index: 5;
+      max-width: 660px;
+      margin: 0 auto;
+      pointer-events: none;
+    }
+
+    .concluding-content a, .concluding-content button {
+      pointer-events: auto;
+    }
+
+    .concluding-title {
+      font-size: clamp(2.1rem, 3.5vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      color: var(--text-white);
+    }
+
+    .concluding-desc {
+      font-size: 1.02rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .concluding-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .particles-presets-bar {
+      position: absolute;
+      bottom: 18px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--glass-floating-ctrl);
+      backdrop-filter: blur(12px);
+      padding: 3px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-hairline);
+      z-index: 10;
+      pointer-events: auto;
+    }
+
+    .preset-chip {
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      font-family: var(--font-ui);
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .preset-chip.active, .preset-chip:hover {
+      color: var(--text-white);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .preset-chip.active {
+      color: var(--accent-cyan);
+    }
+
+    /* ==========================================================================
+       SECTION 11: STRUCTURED ARCHITECTURAL FOOTER
+       ========================================================================== */
+    .footer {
+      background: #04060A;
+      border-top: 1px solid var(--border-hairline);
+      padding: 64px 0 32px 0;
+      position: relative;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1.2fr 1fr;
+      gap: 44px;
+      margin-bottom: 44px;
+    }
+
+    .footer-col {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .footer-col h4 {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-white);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.86rem;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent-cyan);
+    }
+
+    .footer-bottom {
+      border-top: 1px solid var(--border-hairline);
+      padding-top: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-faint);
+      font-family: var(--font-mono);
+    }
+
+    /* Social Flip Box (Preserved) */
+    .social-flip-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 28px 0 16px;
+      border-top: 1px solid var(--border-hairline);
+      margin-bottom: 20px;
+    }
+
+    .social-flip-box {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 16px;
+      background: var(--bg-card);
+      padding: 10px 16px;
+      border: 1px solid var(--border-hairline);
+    }
+
+    .social-flip-node {
+      width: 36px;
+      height: 36px;
+      perspective: 1000px;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+    }
+
+    .social-flip-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.5s ease;
+    }
+
+    .social-flip-box:hover .social-flip-inner,
+    .social-flip-box.is-flipped .social-flip-inner {
+      transform: rotateY(180deg);
+    }
+
+    .social-flip-front {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .social-flip-back {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: #0F172A;
+      color: var(--accent-cyan);
+      transform: rotateY(180deg);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .social-flip-back svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    /* ==========================================================================
+       RESPONSIVE BREAKPOINTS
+       ========================================================================== */
+    @media (max-width: 1024px) {
+      .demo-showcase-row,
+      .demo-showcase-row.reversed {
+        grid-template-columns: 1fr;
+        gap: 36px;
+      }
+      .demo-showcase-row.reversed .demo-text-col { order: 1; }
+      .demo-showcase-row.reversed .demo-visual-col { order: 2; }
+      .pillars-grid-3, .archetypes-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .specs-strip-bar {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .user-persona-layout {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+      }
+      .metric-card:not(:last-child)::after { display: none; }
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+      }
+      .hero-workflow-view {
+        grid-template-columns: 1fr;
+        height: auto;
+        position: relative;
+        overflow-y: auto;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .mobile-menu-btn { display: flex; }
+      .hero-section { padding-top: 110px; }
+      .hero-title { font-size: 2.1rem; }
+      .pillars-grid-3, .archetypes-grid, .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+      .app-stage-container { height: 380px; }
+      .hud-top-left, .hud-top-right, .hud-bottom-left, .hud-bottom-right {
+        padding: 7px 11px;
+      }
+      .hud-metric-val { font-size: 1.05rem; }
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-bottom {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-cta-group {
+        flex-direction: column;
+        width: 100%;
+      }
+      .btn-large {
+        width: 100%;
+      }
+      .hud-widget {
+        display: none;
+      }
+      .workflow-stepper-bar {
+        font-size: 0.7rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Ambient Minimal Architectural Vignette & Drafting Grid -->
+  <div class="ambient-backdrop" aria-hidden="true"></div>
+  <div class="ambient-grid" aria-hidden="true"></div>
+
+  <!-- ==========================================================================
+       SECTION 1: CONTROLLED FLOATING GLASS NAVIGATION BAR
+       ========================================================================== -->
+  <header class="navbar-wrapper">
+    <nav class="navbar" id="topNavbar" aria-label="Main Navigation">
+      <a href="home.html" class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">INTALL</span>
+          <span class="brand-caption">Architectural Studio</span>
+        </div>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#overview" class="nav-link">Overview</a></li>
+        <li><a href="#estimator" class="nav-link">Plot Estimator</a></li>
+        <li><a href="#demonstrations" class="nav-link">Capabilities</a></li>
+        <li><a href="#features" class="nav-link">Spatial Rigor</a></li>
+        <li><a href="#usecases" class="nav-link">Users</a></li>
+        <li><a href="#archetypes" class="nav-link">Archetypes</a></li>
+        <li><a href="#pricing" class="nav-link">Access</a></li>
+        <li><a href="#faq" class="nav-link">FAQ</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <!-- Google OAuth Nav Slot -->
+        <div id="authNavContainer" class="auth-nav-slot"></div>
+
+        <a href="index.html" class="btn btn-primary" id="navLaunchBtn">
+          <span>Launch Studio</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+
+        <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu" aria-expanded="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Mobile Drawer Menu -->
+  <div class="mobile-drawer" id="mobileDrawer">
+    <a href="#overview" onclick="closeMobileMenu()">Product Overview</a>
+    <a href="#estimator" onclick="closeMobileMenu()">Plot Estimator Studio</a>
+    <a href="#demonstrations" onclick="closeMobileMenu()">Dual 2D/3D Capabilities</a>
+    <a href="#features" onclick="closeMobileMenu()">Built on Spatial Rigor</a>
+    <a href="#usecases" onclick="closeMobileMenu()">Target Users</a>
+    <a href="#archetypes" onclick="closeMobileMenu()">Floor Plan Archetypes</a>
+    <a href="#pricing" onclick="closeMobileMenu()">Access &amp; Pricing</a>
+    <a href="#faq" onclick="closeMobileMenu()">Frequently Asked Questions</a>
+    <a href="index.html" class="btn btn-primary" style="margin-top: 8px;">
+      <span>Open Design Studio →</span>
+    </a>
+  </div>
+
+
+  <!-- ==========================================================================
+       SECTION 2: HERO SECTION WITH REAL WORKFLOW PREVIEW
+       ========================================================================== -->
+  <section class="hero-section" id="overview">
+    <div class="container">
+      
+      <div class="hero-content">
+        <div class="hero-eyebrow">
+          <span class="eyebrow-dot"></span>
+          <span>In-Browser CAD &amp; Spatial Studio · 100% Client-Side</span>
+        </div>
+
+        <h1 class="hero-title">
+          Transform Plot Dimensions into <span class="hero-title-highlight">Production-Ready Floor Plans.</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Input your parcel boundaries and lifestyle program. INTALL algorithmically computes compliant 2D drafting blueprints, interactive 3D WebGL spatial walk-throughs, and itemized material cost takeoffs — with zero cloud uploads.
+        </p>
+
+        <div class="hero-cta-group">
+          <a href="index.html" class="btn btn-primary btn-large" id="heroPrimaryCta">
+            <span>Launch 3D Design Studio</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+
+          <a href="#estimator" class="btn btn-secondary btn-large" id="heroSecondaryCta">
+            <span>Calibrate Plot Estimator</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
+          </a>
+        </div>
+
+        <div class="hero-proof-pills">
+          <span class="hero-proof-item">
+            <span class="hero-proof-check">✓</span> 20+ Parametric Archetypes
+          </span>
+          <span class="hero-proof-item">
+            <span class="hero-proof-check">✓</span> Municipal Bylaws Audited
+          </span>
+          <span class="hero-proof-item">
+            <span class="hero-proof-check">✓</span> Instant BOM Rate Cards
+          </span>
+          <span class="hero-proof-item">
+            <span class="hero-proof-check">✓</span> High-Res PNG &amp; JSON Export
+          </span>
+        </div>
+      </div>
+
+      <!-- SHOWSTOPPER: REALISTIC SAAS APPLICATION WINDOW DEMONSTRATING REAL WORKFLOW -->
+      <div class="hero-app-window-wrapper">
+        <div class="hero-app-window">
+          
+          <!-- App Window Bar with Workflow Mode Tabs -->
+          <div class="app-titlebar">
+            <div class="app-window-dots">
+              <span class="window-dot dot-close"></span>
+              <span class="window-dot dot-min"></span>
+              <span class="window-dot dot-max"></span>
+            </div>
+
+            <div class="app-titlebar-title">
+              <span>INTALL STUDIO · 35 × 45 FT RESIDENCE (3 BHK VILLA)</span>
+              <span class="app-status-badge">
+                <span class="app-status-dot"></span>
+                <span>Parametric Synced</span>
+              </span>
+            </div>
+
+            <div class="app-mode-tabs">
+              <button type="button" class="app-mode-btn active" id="heroTab3D" onclick="switchHeroView('3d')">3D Spatial View</button>
+              <button type="button" class="app-mode-btn" id="heroTab2D" onclick="switchHeroView('2d')">2D Blueprint CAD</button>
+              <button type="button" class="app-mode-btn" id="heroTabWorkflow" onclick="switchHeroView('workflow')">Plot-to-Plan Workflow</button>
+            </div>
+          </div>
+
+          <!-- Real Architectural Workflow Stepper -->
+          <div class="workflow-stepper-bar">
+            <div class="workflow-step-chip active" id="stepChip1">
+              <span class="workflow-step-num">1</span>
+              <span>Input Parcel (35.0 × 45.0 FT · East Facing)</span>
+            </div>
+            <span>→</span>
+            <div class="workflow-step-chip active" id="stepChip2">
+              <span class="workflow-step-num">2</span>
+              <span>Parametric Solver &amp; NBC 2016 Bylaw Audit</span>
+            </div>
+            <span>→</span>
+            <div class="workflow-step-chip active" id="stepChip3">
+              <span class="workflow-step-num">3</span>
+              <span>Synchronous 2D CAD Blueprint &amp; 3D WebGL Orbit</span>
+            </div>
+          </div>
+
+          <!-- Interactive Viewports Container -->
+          <div class="app-stage-container" id="heroCanvasContainer">
+            
+            <!-- 1. 3D WebGL Scene -->
+            <canvas id="heroThreeCanvas"></canvas>
+
+            <!-- 2. 2D Architectural Blueprint Canvas -->
+            <canvas id="hero2DCanvas" style="display: none;"></canvas>
+
+            <!-- 3. Real Workflow Comparison Showcase (Using actual parcel & construction assets) -->
+            <div class="hero-workflow-view" id="heroWorkflowView">
+              
+              <div class="workflow-stage-card">
+                <div class="stage-card-img-wrap">
+                  <img src="home-section-img/ezgif-frame-001.jpg" alt="Raw Land Parcel" loading="lazy">
+                </div>
+                <div class="stage-card-meta">
+                  <span class="stage-card-badge">Step 01 · Boundary Input</span>
+                  <h4 class="stage-card-title">Raw Land Parcel</h4>
+                  <p class="stage-card-desc">Enter survey plot dimensions (35×45 FT) and road orientation without draftsman delay.</p>
+                </div>
+              </div>
+
+              <div class="workflow-stage-card">
+                <div class="stage-card-img-wrap">
+                  <img src="home-section-img/ezgif-frame-025.jpg" alt="Parametric Structural Framing" loading="lazy">
+                </div>
+                <div class="stage-card-meta">
+                  <span class="stage-card-badge">Step 02 · Spatial Solving</span>
+                  <h4 class="stage-card-title">Parametric Framing</h4>
+                  <p class="stage-card-desc">Rooms scale along independent X/Y axes while verifying setbacks and ground coverage &lt;70%.</p>
+                </div>
+              </div>
+
+              <div class="workflow-stage-card">
+                <div class="stage-card-img-wrap">
+                  <img src="home-section-img/ezgif-frame-050.jpg" alt="Completed Residence" loading="lazy">
+                </div>
+                <div class="stage-card-meta">
+                  <span class="stage-card-badge">Step 03 · Realization</span>
+                  <h4 class="stage-card-title">Verified Living Villa</h4>
+                  <p class="stage-card-desc">Instant 3D walk-through, contractor-ready 2D blueprint export, and material bill of quantities.</p>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Floating Glass HUD Chips (Domain Real-Time Telemetry) -->
+            <div class="hud-widget hud-top-left" id="heroHudTopLeft">
+              <div class="hud-metric-label">PARCEL BOUNDARY &amp; BUILT-UP</div>
+              <div class="hud-metric-val">1,575 <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">SQ.FT</span></div>
+              <span style="font-size: 0.74rem; color: var(--accent-cyan); font-family: var(--font-mono);">35.0' × 45.0' · 70% Ground Coverage</span>
+            </div>
+
+            <div class="hud-widget hud-top-right" id="heroHudTopRight">
+              <div class="hud-metric-label">MUNICIPAL BYLAW AUDIT</div>
+              <div class="hud-metric-val" style="color: var(--accent-spruce);">96<span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">/100</span></div>
+              <span class="hud-check-badge">✓ Setbacks &amp; Min Areas Cleared</span>
+            </div>
+
+            <div class="hud-widget hud-bottom-left" id="heroHudBottomLeft">
+              <div>
+                <div class="hud-metric-label">CORE ARCHITECTURAL PROGRAM</div>
+                <div style="font-size: 0.82rem; color: var(--text-primary); font-weight: 600; margin-top: 2px;">
+                  Living 240 sqft · Master Suite 180 sqft · Kitchen 110 sqft
+                </div>
+              </div>
+            </div>
+
+            <div class="hud-widget hud-bottom-right" id="heroHudBottomRight">
+              <div>
+                <div class="hud-metric-label">ESTIMATED BOM TAKEOFF</div>
+                <div style="font-family: var(--font-mono); font-size: 1.15rem; font-weight: 700; color: var(--text-white);">$78,400</div>
+              </div>
+              <a href="index.html?w=35&l=45&bhk=3&view=3d" class="btn btn-secondary" style="padding: 5px 12px; font-size: 0.75rem;">
+                <span>Studio →</span>
+              </a>
+            </div>
+
+            <div class="hud-orbit-hint" id="hudOrbitHint">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                <path d="M2 12h20"></path>
+              </svg>
+              <span>Click &amp; Drag to Orbit 3D Model</span>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ==========================================================================
+       SECTION 3: METRICS STRIP (INTEGRATED & RESTRAINED)
+       ========================================================================== -->
+  <section class="metrics-section">
+    <div class="container">
+      <div class="metrics-bar">
+        <div class="metrics-grid">
+          
+          <div class="metric-card">
+            <span class="metric-number metric-number-cyan">20+</span>
+            <span class="metric-label">Curated Archetypes</span>
+            <span class="metric-sublabel">Pre-engineered 1 to 5 BHK layouts for standard &amp; narrow parcels</span>
+          </div>
+
+          <div class="metric-card">
+            <span class="metric-number">&lt; 100ms</span>
+            <span class="metric-label">Parametric Engine</span>
+            <span class="metric-sublabel">Instantaneous room coordinate scaling and wall segment solving</span>
+          </div>
+
+          <div class="metric-card">
+            <span class="metric-number metric-number-cyan">100%</span>
+            <span class="metric-label">Client-Side Private</span>
+            <span class="metric-sublabel">Zero cloud uploads. Parcel dimensions remain entirely on your device</span>
+          </div>
+
+          <div class="metric-card">
+            <span class="metric-number">7 Rules</span>
+            <span class="metric-label">Automated Bylaws Audit</span>
+            <span class="metric-sublabel">Real-time validation of setbacks, coverage %, and habitable room minimums</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==========================================================================
+       SECTION 4: PRODUCT DEMONSTRATIONS (3 MEANINGFUL ALTERNATING SHOWCASES)
+       ========================================================================== -->
+  <section class="section section-alt" id="demonstrations">
+    <div class="container">
+
+      <div class="section-header">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          <span>Architectural Capabilities</span>
+        </div>
+        <h2 class="section-title">How the In-Browser Studio Works</h2>
+        <p class="section-desc">
+          From rectangular boundary input to structural dimensional validation, INTALL bridges the gap between initial ideation and construction feasibility.
+        </p>
+      </div>
+
+      <!-- SHOWCASE 1: PARAMETRIC PLOT CALIBRATION (TEXT LEFT, ESTIMATOR RIGHT) -->
+      <div class="demo-showcase-row" id="estimator">
+        <div class="demo-text-col">
+          <div class="demo-step-badge">Demonstration 01 · Calibration</div>
+          <h3 class="demo-heading">Parametric Plot Sizing &amp; Typology Guidance</h3>
+          <p class="demo-paragraph">
+            Every building plot has geometric constraints. Our coordinate engine adapts floor plans to arbitrary rectangular dimensions between 15×15 FT and 100×100 FT, adjusting circulation corridors without crushing living spaces.
+          </p>
+
+          <ul class="demo-feature-list">
+            <li class="demo-feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Instant plot area conversion between Square Feet and Square Meters</span>
+            </li>
+            <li class="demo-feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Smart typology recommendation based on parcel footprint (1 BHK to Duplex)</span>
+            </li>
+            <li class="demo-feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Single-level residence vs G+1 Duplex Villa structural toggling</span>
+            </li>
+          </ul>
+
+          <div style="margin-top: 14px;">
+            <button class="btn btn-primary" onclick="launchWithEstimatorParams()">
+              <span>Generate Plans for this Plot →</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="demo-visual-col">
+          <div class="glass-demo-card">
+            <div class="estimator-grid">
+              
+              <!-- Width Slider -->
+              <div class="control-block">
+                <div class="control-header">
+                  <span class="control-label">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"></rect><line x1="3" y1="12" x2="21" y2="12"></line></svg>
+                    Plot Width
+                  </span>
+                  <span class="control-value-pill" id="sliderWidthVal">35 FT</span>
+                </div>
+                <input type="range" class="hairline-range" id="estWidthInput" min="15" max="100" value="35" oninput="updateEstimator()">
+                <div class="scale-limits">
+                  <span>15 FT (MIN)</span>
+                  <span>100 FT (MAX)</span>
+                </div>
+              </div>
+
+              <!-- Length Slider -->
+              <div class="control-block">
+                <div class="control-header">
+                  <span class="control-label">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line></svg>
+                    Plot Length
+                  </span>
+                  <span class="control-value-pill" id="sliderLengthVal">45 FT</span>
+                </div>
+                <input type="range" class="hairline-range" id="estLengthInput" min="15" max="100" value="45" oninput="updateEstimator()">
+                <div class="scale-limits">
+                  <span>15 FT (MIN)</span>
+                  <span>100 FT (MAX)</span>
+                </div>
+              </div>
+
+              <!-- Typology Selector -->
+              <div>
+                <span style="font-size: 0.74rem; font-family: var(--font-mono); color: var(--text-muted); text-transform: uppercase;">Structure Typology</span>
+                <div class="typology-toggle-group">
+                  <button type="button" class="typology-btn active" id="btnEstNormal" onclick="setEstimatorTypology('normal')">
+                    <span>🏡 Single Level (1F)</span>
+                  </button>
+                  <button type="button" class="typology-btn" id="btnEstDuplex" onclick="setEstimatorTypology('duplex')">
+                    <span>🏛️ Duplex Villa (G+1)</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Live Scaled Canvas & Metrics -->
+              <div class="estimator-preview-box">
+                <canvas id="plotEstimatorCanvas"></canvas>
+
+                <div class="estimator-stats-row">
+                  <div class="stat-chip">
+                    <div class="stat-chip-val" id="estAreaSqft">1,575</div>
+                    <div class="stat-chip-label">Square Feet (SQ.FT)</div>
+                  </div>
+                  <div class="stat-chip">
+                    <div class="stat-chip-val" id="estAreaSqm">146.3</div>
+                    <div class="stat-chip-label">Square Meters (M²)</div>
+                  </div>
+                </div>
+
+                <div class="recommendation-box" id="estRecommendation">
+                  <strong>Recommended Typology:</strong> Contemporary 3 BHK Residence with dedicated vehicle portico and rear balcony.
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SHOWCASE 2: DUAL 2D CAD & 3D WEBGL PERSPECTIVE (VISUAL LEFT, TEXT RIGHT) -->
+      <div class="demo-showcase-row reversed">
+        <div class="demo-text-col">
+          <div class="demo-step-badge">Demonstration 02 · Dual CAD</div>
+          <h3 class="demo-heading">Synchronous 2D Blueprint &amp; 3D WebGL Orbit</h3>
+          <p class="demo-paragraph">
+            Toggle effortlessly between millimeter-accurate engineering blueprints and real-time volumetric 3D models. Experience true-to-scale 9 FT wall extrusions, door swing arcs, and natural sunlight simulation right inside your browser.
+          </p>
+
+          <ul class="demo-feature-list">
+            <li class="demo-feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Auto-dimensioned boundary calipers and room square footage stamps</span>
+            </li>
+            <li class="demo-feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Hardware-accelerated Three.js WebGL orbit, pan, and zoom controls</span>
+            </li>
+            <li class="demo-feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Color-coded zoning for living, culinary, sleeping, and circulation hubs</span>
+            </li>
+          </ul>
+
+          <div style="margin-top: 14px;">
+            <a href="index.html?view=3d" class="btn btn-secondary">
+              <span>Experience Dual CAD Viewports →</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="demo-visual-col">
+          <div class="glass-demo-card dual-viewport-card">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div class="viewport-toggle-tabs">
+                <button type="button" class="viewport-toggle-btn active" id="btnDemo2D" onclick="switchDemoViewport('2d')">2D Blueprint CAD</button>
+                <button type="button" class="viewport-toggle-btn" id="btnDemo3D" onclick="switchDemoViewport('3d')">3D WebGL Spatial</button>
+              </div>
+              <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-cyan);">● Synced Geometry</span>
+            </div>
+
+            <div class="viewport-display-stage">
+              <canvas id="demo2DCanvas"></canvas>
+              <canvas id="demo3DCanvas" style="display: none;"></canvas>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-muted);">
+              <span>Drafting Scale: 1:50 True Scale</span>
+              <span>Ceiling Extrusion: 9.0 FT Wall Height</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- SHOWCASE 3: MUNICIPAL BYLAW AUDIT & BOM TAKEOFF (TEXT LEFT, TABLE RIGHT) -->
+      <div class="demo-showcase-row">
+        <div class="demo-text-col">
+          <div class="demo-step-badge">Demonstration 03 · Engineering Rigor</div>
+          <h3 class="demo-heading">Automated Municipal Bylaw Audit &amp; Material BOM</h3>
+          <p class="demo-paragraph">
+            Avoid costly planning redesigns. INTALL automatically validates setback limits, ground coverage percentages, and minimum room areas against standard residential building codes, while generating an itemized bill of materials.
+          </p>
+
+          <ul class="demo-feature-list">
+            <li class="demo-feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Audits against Model Residential Building Code (R-3 typology)</span>
+            </li>
+            <li class="demo-feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Flags undersized bathrooms (&lt;25 sqft) or bedrooms (&lt;90 sqft)</span>
+            </li>
+            <li class="demo-feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Calculates concrete slab volume, masonry surface area, and flooring rates</span>
+            </li>
+          </ul>
+
+          <div style="margin-top: 14px;">
+            <a href="index.html" class="btn btn-secondary">
+              <span>Run Automated Compliance Check →</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="demo-visual-col">
+          <div class="glass-demo-card compliance-bom-card">
+            
+            <div>
+              <span style="font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Real-Time Municipal Audit</span>
+              <div class="compliance-checklist" style="margin-top: 8px;">
+                <div class="compliance-rule-item">
+                  <div class="rule-title-group">
+                    <span>Front &amp; Rear Setback Clearances</span>
+                  </div>
+                  <span class="rule-status-pill rule-pass">✓ PASSED (5.0' / 3.0')</span>
+                </div>
+                <div class="compliance-rule-item">
+                  <div class="rule-title-group">
+                    <span>Maximum Ground Coverage &lt; 70%</span>
+                  </div>
+                  <span class="rule-status-pill rule-pass">✓ PASSED (64.2%)</span>
+                </div>
+                <div class="compliance-rule-item">
+                  <div class="rule-title-group">
+                    <span>Habitable Bedroom Area &ge; 90 SQ.FT</span>
+                  </div>
+                  <span class="rule-status-pill rule-pass">✓ PASSED (180 &amp; 140 SQFT)</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <span style="font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Material Cost Takeoff Preview</span>
+              <table class="bom-mini-table">
+                <thead>
+                  <tr>
+                    <th>Component</th>
+                    <th>Quantity</th>
+                    <th>Rate</th>
+                    <th style="text-align: right;">Cost</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Foundation Concrete (M20)</td>
+                    <td>42.5 cu.yd</td>
+                    <td>$145 / yd³</td>
+                    <td style="text-align: right; font-family: var(--font-mono);">$6,162</td>
+                  </tr>
+                  <tr>
+                    <td>9" External Masonry Wall</td>
+                    <td>1,840 sqft</td>
+                    <td>$4.65 / sqft</td>
+                    <td style="text-align: right; font-family: var(--font-mono);">$8,556</td>
+                  </tr>
+                  <tr>
+                    <td>Engineered White Oak Flooring</td>
+                    <td>850 sqft</td>
+                    <td>$13.25 / sqft</td>
+                    <td style="text-align: right; font-family: var(--font-mono);">$11,262</td>
+                  </tr>
+                  <tr>
+                    <td>Vitrified Porcelain Tiles</td>
+                    <td>520 sqft</td>
+                    <td>$6.75 / sqft</td>
+                    <td style="text-align: right; font-family: var(--font-mono);">$3,510</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ==========================================================================
+       SECTION 5: FEATURE OVERVIEW (BUILT ON SPATIAL RIGOR — EXACTLY 3 PRIMARY CARDS)
+       - Renders exactly once
+       - Exactly 3 prioritized core pillars
+       - Followed by a concise technical specifications rule (NO repeating 3-card grid)
+       ========================================================================== -->
+  <section class="section" id="features">
+    <div class="container">
+
+      <div class="section-header">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          <span>Core Technology</span>
+        </div>
+        <h2 class="section-title">Built on Mathematical & Spatial Rigor</h2>
+        <p class="section-desc">
+          Mathematical foundations engineered to ensure every generated floor plan is structurally sound, compliant, and cost-predictable.
+        </p>
+      </div>
+
+      <!-- Exactly 3 Primary Pillar Cards -->
+      <div class="pillars-grid-3">
+
+        <div class="pillar-card">
+          <div class="pillar-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+          </div>
+          <h3 class="pillar-title">Parametric Coordinate Solver</h3>
+          <p class="pillar-text">
+            Rooms scale proportionally along independent X and Y axes, preserving mandatory structural circulation corridors and egress pathways.
+          </p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+          </div>
+          <h3 class="pillar-title">Hardware-Accelerated 3D</h3>
+          <p class="pillar-text">
+            Wall geometry extrusion, volumetric door headers, and natural sunlight shadows render instantaneously via client-side Three.js WebGL.
+          </p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <h3 class="pillar-title">Building Code Compliance</h3>
+          <p class="pillar-text">
+            Automated verification audits bedroom areas (&ge;90 sqft), bathrooms (&ge;25 sqft), doorway widths, and boundary clearances, flagging issues before build.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Concise Secondary Architectural Capabilities Strip (Not a 3-card grid) -->
+      <div class="specs-strip-bar">
+        <div class="specs-strip-item">
+          <svg class="specs-strip-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+          </svg>
+          <div>
+            <div class="specs-strip-label">Cardinal Vastu &amp; Solar Matcher</div>
+            <div class="specs-strip-sub">Positions morning sunlight into living hubs</div>
+          </div>
+        </div>
+
+        <div class="specs-strip-item">
+          <svg class="specs-strip-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+          <div>
+            <div class="specs-strip-label">Instant BOM Cost Takeoff</div>
+            <div class="specs-strip-sub">Calculates concrete, masonry &amp; tile finishes</div>
+          </div>
+        </div>
+
+        <div class="specs-strip-item">
+          <svg class="specs-strip-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <div>
+            <div class="specs-strip-label">Vector Blueprint &amp; JSON Export</div>
+            <div class="specs-strip-sub">Contractor-ready PNG &amp; portable state files</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ==========================================================================
+       SECTION 6: TARGET USERS (DISTINCT SPLIT EDITORIAL LAYOUT — NOT A REPETITIVE 3-CARD GRID)
+       ========================================================================== -->
+  <section class="section section-alt" id="usecases">
+    <div class="container">
+
+      <div class="section-header">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          <span>Target Users</span>
+        </div>
+        <h2 class="section-title">Designed for Builders, Architects &amp; Homeowners</h2>
+        <p class="section-desc">
+          See how different professionals and landowners leverage INTALL to make faster, better spatial decisions.
+        </p>
+      </div>
+
+      <div class="user-persona-layout">
+        
+        <!-- Left Editorial Persona Spotlight -->
+        <div class="persona-spotlight-box">
+          <div>
+            <span class="persona-quote-tag">Primary Problem Solved</span>
+            <div class="persona-quote-body" style="margin-top: 14px;">
+              "Eliminating the costly trial-and-error cycle between plot acquisition, layout feasibility, and municipal approvals."
+            </div>
+          </div>
+          <div style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6;">
+            Whether evaluating land parcels before purchase or presenting instant 3D layout options to private clients, INTALL provides instant spatial validation.
+          </div>
+          <div>
+            <a href="index.html" class="btn btn-secondary" style="font-size: 0.82rem; padding: 8px 18px;">
+              <span>Test Your Plot Live →</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Persona Breakdown Rows -->
+        <div class="persona-list-container">
+          
+          <div class="persona-list-item">
+            <div class="persona-num-badge">01</div>
+            <div class="persona-item-content">
+              <h3 class="persona-item-title">Landowners &amp; Self-Builders</h3>
+              <p class="persona-item-desc">
+                "We bought a 30×45 plot but had no idea if a 3 BHK with a car portico would fit comfortably before paying thousands in architect fees." INTALL provides immediate layout clarity in under 60 seconds.
+              </p>
+            </div>
+          </div>
+
+          <div class="persona-list-item">
+            <div class="persona-num-badge">02</div>
+            <div class="persona-item-content">
+              <h3 class="persona-item-title">Practicing Architects &amp; Draftsmen</h3>
+              <p class="persona-item-desc">
+                Accelerates client discovery sessions. Adjust room dimensions live, orbit in real-time 3D WebGL, and resolve spatial disputes before drafting formal submission CAD sheets.
+              </p>
+            </div>
+          </div>
+
+          <div class="persona-list-item">
+            <div class="persona-num-badge">03</div>
+            <div class="persona-item-content">
+              <h3 class="persona-item-title">Real Estate Developers &amp; Contractors</h3>
+              <p class="persona-item-desc">
+                Rapidly evaluate residential subdivision plot yields. Audit municipal setback clearances and generate ball-park construction bill of materials for investor feasibility decks.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ==========================================================================
+       SECTION 7: CURATED ARCHETYPES GALLERY (SMART FILTERING & EXPANSION)
+       ========================================================================== -->
+  <section class="section" id="archetypes">
+    <div class="container">
+
+      <div class="section-header">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          <span>Architectural Library</span>
+        </div>
+        <h2 class="section-title">Floor Plan Archetypes</h2>
+        <p class="section-desc">
+          Browse pre-engineered floor plans designed for standard suburban and urban geometries. Click any archetype to load and calibrate in the 3D Studio.
+        </p>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="catalogue-tabs">
+        <button class="catalogue-tab active" onclick="filterTemplatesGallery('all', this)">All Archetypes</button>
+        <button class="catalogue-tab" onclick="filterTemplatesGallery('normal', this)">🏡 Single Level (1F)</button>
+        <button class="catalogue-tab" onclick="filterTemplatesGallery('duplex', this)">🏛️ Duplex Villa (G+1)</button>
+        <button class="catalogue-tab" onclick="filterTemplatesGallery('1', this)">1 BHK</button>
+        <button class="catalogue-tab" onclick="filterTemplatesGallery('2', this)">2 BHK</button>
+        <button class="catalogue-tab" onclick="filterTemplatesGallery('3', this)">3 BHK</button>
+        <button class="catalogue-tab" onclick="filterTemplatesGallery('4', this)">4+ BHK</button>
+        <button class="catalogue-tab" onclick="filterTemplatesGallery('parking', this)">Garage</button>
+      </div>
+
+      <!-- Dynamic Cards Grid -->
+      <div class="archetypes-grid" id="templateGalleryGrid">
+        <!-- Rendered dynamically by JavaScript from templates.js -->
+      </div>
+
+      <!-- Expand / Show All Button -->
+      <div class="archetypes-expand-bar">
+        <button class="btn btn-secondary" id="btnToggleAllArchetypes" onclick="toggleAllArchetypes()">
+          <span>Show All 20+ Archetypes</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ==========================================================================
+       SECTION 8: TRANSPARENT PRICING & ACCESS TIERS
+       ========================================================================== -->
+  <section class="section section-alt" id="pricing">
+    <div class="container">
+
+      <div class="section-header">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          <span>Transparent Access</span>
+        </div>
+        <h2 class="section-title">Straightforward, Zero-Surprise Tiers</h2>
+        <p class="section-desc">
+          The core INTALL design studio runs 100% in-browser with zero cost. Advanced vector CAD pipelines are available for practicing architectural teams.
+        </p>
+      </div>
+
+      <div class="pricing-grid">
+
+        <!-- Tier 1: Free Community Studio -->
+        <div class="pricing-card">
+          <div>
+            <div class="pricing-tier-name">Community Studio</div>
+            <p class="pricing-desc" style="margin-top: 6px;">For prospective homeowners, land buyers, and spatial enthusiasts.</p>
+          </div>
+
+          <div class="pricing-price-row">
+            <span class="pricing-currency">$</span>
+            <span class="pricing-price">0</span>
+            <span class="pricing-period">/ forever free</span>
+          </div>
+
+          <a href="index.html" class="btn btn-secondary btn-large">
+            <span>Launch Free Studio</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </a>
+
+          <ul class="pricing-features-list">
+            <li class="pricing-feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Unlimited parametric 2D &amp; 3D floor plan generation</span>
+            </li>
+            <li class="pricing-feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Access to all 20+ residential architectural archetypes</span>
+            </li>
+            <li class="pricing-feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Three.js hardware-accelerated 3D WebGL orbit controls</span>
+            </li>
+            <li class="pricing-feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>High-resolution PNG blueprint snapshot export</span>
+            </li>
+            <li class="pricing-feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Portable JSON plan save &amp; import (100% private)</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Tier 2: Studio Pro -->
+        <div class="pricing-card pricing-card-featured">
+          <div class="pricing-featured-badge">Professional Grade</div>
+
+          <div>
+            <div class="pricing-tier-name">Architectural Pro</div>
+            <p class="pricing-desc" style="margin-top: 6px;">For design studios, general contractors, and civil engineers.</p>
+          </div>
+
+          <div class="pricing-price-row">
+            <span class="pricing-currency">$</span>
+            <span class="pricing-price">29</span>
+            <span class="pricing-period">/ month (or $290/yr)</span>
+          </div>
+
+          <a href="index.html?pro=1" class="btn btn-primary btn-large">
+            <span>Get Started with Pro</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </a>
+
+          <ul class="pricing-features-list">
+            <li class="pricing-feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Everything in Community Free Edition</span>
+            </li>
+            <li class="pricing-feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>AutoCAD DXF &amp; DWG vector blueprint file downloads</span>
+            </li>
+            <li class="pricing-feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Multi-story duplex &amp; villa custom layout generator</span>
+            </li>
+            <li class="pricing-feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Custom municipal building code editor (Zoning overrides)</span>
+            </li>
+            <li class="pricing-feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Full CSV &amp; Excel Bill of Materials (BOM) export</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ==========================================================================
+       SECTION 9: FREQUENTLY ASKED QUESTIONS (ACCESSIBLE ACCORDION)
+       ========================================================================== -->
+  <section class="section" id="faq">
+    <div class="container">
+
+      <div class="section-header">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          <span>Technical FAQ</span>
+        </div>
+        <h2 class="section-title">Frequently Asked Questions</h2>
+        <p class="section-desc">
+          Key specifications regarding parametric scaling, offline security, and architectural utility.
+        </p>
+      </div>
+
+      <div class="faq-container">
+
+        <div class="faq-item active">
+          <button type="button" class="faq-trigger" onclick="toggleFAQ(this)" aria-expanded="true">
+            <span>What range of plot dimensions is mathematically supported?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-body">
+            The studio accepts rectangular plots ranging from <strong>15 × 15 ft (225 sqft)</strong> up to <strong>100 × 100 ft (10,000 sqft)</strong>, or metric equivalents (4.5m to 30.5m). Both standard suburban square parcels and long, narrow urban infill lots are mathematically scaled and proportioned.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button type="button" class="faq-trigger" onclick="toggleFAQ(this)" aria-expanded="false">
+            <span>Does this software replace a licensed structural engineer or architect?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-body">
+            No. INTALL is an instant architectural conceptualization and spatial exploration studio. It empowers landowners, builders, and developers to explore room configurations before engaging licensed architects and structural engineers for municipal approval submission drawings.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button type="button" class="faq-trigger" onclick="toggleFAQ(this)" aria-expanded="false">
+            <span>How does the parametric geometric engine adapt rooms to my plot?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-body">
+            Every archetype floor plan is authored against a reference plot dimension. When you input your plot size, independent X and Y scale factors adapt each room while verifying that rooms never fall below habitable building standards (bedroom &ge; 90 sqft, bathroom &ge; 25 sqft).
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button type="button" class="faq-trigger" onclick="toggleFAQ(this)" aria-expanded="false">
+            <span>Can floor plans be exported for CAD and contractor collaboration?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-body">
+            Yes. You can export high-resolution PNG blueprints for visual alignment or download a portable JSON state file. You can import this JSON state file back into the app at any time to resume editing. Pro users can also export CAD vector files.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button type="button" class="faq-trigger" onclick="toggleFAQ(this)" aria-expanded="false">
+            <span>Are my parcel dimensions or floor plans uploaded to an external server?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-body">
+            No. All computations, 2D vector drawing, and 3D Three.js WebGL scenes execute entirely client-side in your browser. Your property dimensions and designs remain completely private.
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ==========================================================================
+       SECTION 10: CONCLUDING CONVERSION HERO (PRESERVED GPU PARTICLES)
+       ========================================================================== -->
+  <section class="section" style="padding-top: 10px; padding-bottom: 64px;">
+    <div class="container">
+      <div class="concluding-banner" id="concludingBanner">
+
+        <!-- Interactive 3D GPU Particle Canvas Stage -->
+        <div class="particles-stage" id="particlesContainer">
+          <canvas id="particlesCanvas" class="particles-canvas"></canvas>
+        </div>
+
+        <!-- Center Architectural Typography -->
+        <div class="concluding-content">
+          <h2 class="concluding-title">Bring Your Plot to Life.</h2>
+          <p class="concluding-desc">
+            Experience the synergy of architectural precision and real-time 3D spatial realization. Instantaneous, private, and running completely in your browser.
+          </p>
+          <div class="concluding-actions">
+            <a href="index.html" class="btn btn-primary btn-large">
+              <span>Open Design Studio Now</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+            <a href="#estimator" class="btn btn-secondary btn-large">
+              <span>Recalibrate Plot</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Presets Bar for Particle Simulation -->
+        <div class="particles-presets-bar">
+          <button type="button" class="preset-chip active" data-src="home-section-img/ezgif-frame-050.jpg">Villa</button>
+          <button type="button" class="preset-chip" data-src="home-section-img/ezgif-frame-025.jpg">Structure</button>
+          <button type="button" class="preset-chip" data-src="home-section-img/ezgif-frame-001.jpg">Plot</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==========================================================================
+       SECTION 11: STRUCTURED FOOTER
+       ========================================================================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+
+        <div class="footer-col">
+          <a href="home.html" class="brand">
+            <div class="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+            </div>
+            <div class="brand-text">
+              <span class="brand-title">INTALL</span>
+              <span class="brand-caption">Architectural Studio</span>
+            </div>
+          </a>
+          <p style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.6; margin-top: 4px;">
+            Next-generation in-browser residential layout generator combining parametric room scaling, building code validation, and Three.js 3D WebGL rendering.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Studio Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="index.html">Launch Design Studio</a></li>
+            <li><a href="#estimator">Plot Boundary Estimator</a></li>
+            <li><a href="#demonstrations">Dual CAD &amp; WebGL</a></li>
+            <li><a href="#features">Built on Spatial Rigor</a></li>
+            <li><a href="#usecases">Target Users</a></li>
+            <li><a href="#archetypes">Archetypes Library</a></li>
+            <li><a href="#pricing">Access &amp; Pricing</a></li>
+            <li><a href="#faq">Frequently Asked Questions</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Standard Scales</h4>
+          <ul class="footer-links">
+            <li><a href="index.html?w=30&l=40&bhk=2">30 × 40 FT · 2 BHK (1,200 SQ.FT)</a></li>
+            <li><a href="index.html?w=35&l=45&bhk=3">35 × 45 FT · 3 BHK (1,575 SQ.FT)</a></li>
+            <li><a href="index.html?w=40&l=60&bhk=4">40 × 60 FT · 4 BHK (2,400 SQ.FT)</a></li>
+            <li><a href="index.html?w=22&l=28&bhk=1">22 × 28 FT · 1 BHK (616 SQ.FT)</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Specifications</h4>
+          <ul class="footer-links" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">
+            <li>Release: v1.0.0 Production</li>
+            <li>Engine: Three.js r128 WebGL</li>
+            <li>Platform: Zero-Dependency Client</li>
+            <li>License: Open Architectural Spec</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Social Flip Connect Bar (Preserved) -->
+      <div class="social-flip-wrapper" id="contact">
+        <div style="font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted);">
+          Connect With Studio
+        </div>
+        <div class="social-flip-box" id="socialFlipBox">
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="social-flip-node" aria-label="GitHub">
+            <div class="social-flip-inner">
+              <div class="social-flip-front">C</div>
+              <div class="social-flip-back">
+                <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              </div>
+            </div>
+          </a>
+          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="social-flip-node" aria-label="Twitter">
+            <div class="social-flip-inner">
+              <div class="social-flip-front">O</div>
+              <div class="social-flip-back">
+                <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              </div>
+            </div>
+          </a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="social-flip-node" aria-label="LinkedIn">
+            <div class="social-flip-inner">
+              <div class="social-flip-front">N</div>
+              <div class="social-flip-back">
+                <svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+              </div>
+            </div>
+          </a>
+          <a href="mailto:contact@intall.io" class="social-flip-node" aria-label="Email">
+            <div class="social-flip-inner">
+              <div class="social-flip-front">T</div>
+              <div class="social-flip-back">
+                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+              </div>
+            </div>
+          </a>
+          <a href="https://discord.gg" target="_blank" rel="noopener noreferrer" class="social-flip-node" aria-label="Discord">
+            <div class="social-flip-inner">
+              <div class="social-flip-front">A</div>
+              <div class="social-flip-back">
+                <svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028z"/></svg>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>&copy; 2026 INTALL ARCHITECTURAL STUDIO. ALL RIGHTS RESERVED.</span>
+        <span>ENGINEERED FOR HIGH-PRECISION IN-BROWSER RESIDENTIAL CONCEPTUALIZATION.</span>
+      </div>
+
+    </div>
+  </footer>
+
+
+  <!-- ==========================================================================
+       INTERACTIVE SCRIPTS (HERO WORKFLOW MODES + ESTIMATOR + 2D/3D + ARCHETYPES + FAQ)
+       ========================================================================== -->
+  <script>
+    /* --------------------------------------------------------------------------
+       1. HERO APPLICATION PREVIEW: THREE.JS 3D VILLA & MULTI-MODE WORKFLOW
+       -------------------------------------------------------------------------- */
+    let heroScene, heroCamera, heroRenderer, heroControls;
+    let hero2DInited = false;
+
+    function initHeroThreeScene() {
+      const container = document.getElementById("heroCanvasContainer");
+      const canvas = document.getElementById("heroThreeCanvas");
+      if (!container || !canvas || typeof THREE === "undefined") return;
+
+      const width = container.clientWidth || 900;
+      const height = container.clientHeight || 520;
+
+      // Scene
+      heroScene = new THREE.Scene();
+      heroScene.background = new THREE.Color(0x060913);
+
+      // Camera
+      heroCamera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
+      heroCamera.position.set(44, 40, 52);
+
+      // Renderer
+      heroRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+      heroRenderer.setSize(width, height);
+      heroRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      heroRenderer.shadowMap.enabled = true;
+      heroRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+      // OrbitControls
+      if (typeof THREE.OrbitControls !== "undefined") {
+        heroControls = new THREE.OrbitControls(heroCamera, heroRenderer.domElement);
+        heroControls.enableDamping = true;
+        heroControls.dampingFactor = 0.06;
+        heroControls.autoRotate = true;
+        heroControls.autoRotateSpeed = 0.7;
+        heroControls.maxPolarAngle = Math.PI / 2.15;
+        heroControls.minDistance = 25;
+        heroControls.maxDistance = 110;
+
+        heroControls.addEventListener("start", () => {
+          const hint = document.getElementById("hudOrbitHint");
+          if (hint) hint.style.opacity = "0";
+        });
+      }
+
+      // Lighting Setup (Restrained Architectural Lighting)
+      const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.7);
+      heroScene.add(ambientLight);
+
+      const sunLight = new THREE.DirectionalLight(0xFFF9E6, 1.2);
+      sunLight.position.set(40, 60, 45);
+      sunLight.castShadow = true;
+      sunLight.shadow.mapSize.width = 1024;
+      sunLight.shadow.mapSize.height = 1024;
+      sunLight.shadow.camera.near = 10;
+      sunLight.shadow.camera.far = 150;
+      const d = 40;
+      sunLight.shadow.camera.left = -d;
+      sunLight.shadow.camera.right = d;
+      sunLight.shadow.camera.top = d;
+      sunLight.shadow.camera.bottom = -d;
+      heroScene.add(sunLight);
+
+      const fillLight = new THREE.DirectionalLight(0x38BDF8, 0.35);
+      fillLight.position.set(-30, 20, -30);
+      heroScene.add(fillLight);
+
+      // Contemporary 35×45 FT Residence Group
+      const houseGroup = new THREE.Group();
+
+      // Foundation Slab
+      const slabGeo = new THREE.BoxGeometry(40, 1.2, 50);
+      const slabMat = new THREE.MeshStandardMaterial({ color: 0x0E172A, roughness: 0.85 });
+      const slabMesh = new THREE.Mesh(slabGeo, slabMat);
+      slabMesh.position.y = -0.6;
+      slabMesh.receiveShadow = true;
+      houseGroup.add(slabMesh);
+
+      // Flooring Tile
+      const floorGeo = new THREE.BoxGeometry(37, 0.2, 47);
+      const floorMat = new THREE.MeshStandardMaterial({ color: 0x1E293B, roughness: 0.45 });
+      const floorMesh = new THREE.Mesh(floorGeo, floorMat);
+      floorMesh.position.y = 0.05;
+      floorMesh.receiveShadow = true;
+      houseGroup.add(floorMesh);
+
+      // Materials
+      const wallWhiteMat = new THREE.MeshStandardMaterial({ color: 0xF8FAFC, roughness: 0.25 });
+      const wallCyanMat = new THREE.MeshStandardMaterial({ color: 0x38BDF8, roughness: 0.35 });
+      const wallDarkMat = new THREE.MeshStandardMaterial({ color: 0x1E293B, roughness: 0.5 });
+      const glassMat = new THREE.MeshStandardMaterial({ color: 0x38BDF8, roughness: 0.1, transparent: true, opacity: 0.45 });
+
+      function addWall(w, h, d, x, y, z, mat = wallWhiteMat) {
+        const geo = new THREE.BoxGeometry(w, h, d);
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(x, y + h / 2, z);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        houseGroup.add(mesh);
+        return mesh;
+      }
+
+      const H = 8.5; // Standard 8.5 FT Wall Height
+
+      // Outer Perimeters
+      addWall(1.0, H, 47, -18, 0, 0); // West wall
+      addWall(1.0, H, 47, 18, 0, 0);  // East wall
+      addWall(37, H, 1.0, 0, 0, -23); // North rear wall
+      addWall(15, H, 1.0, -11, 0, 23); // Front left
+      addWall(11, H, 1.0, 13, 0, 23);  // Front right
+      addWall(11, H, 0.3, 2, 0, 23, glassMat); // Entry glass portal
+
+      // Interior Partitions
+      addWall(1.0, H, 24, 0, 0, -11); // Center spine
+      addWall(18, H, 1.0, 9, 0, 1, wallCyanMat); // Master suite divider
+      addWall(18, H, 1.0, -9, 0, 8, wallDarkMat); // Kitchen & dining partition
+
+      // Furniture Geometry Accents
+      const bedGeo = new THREE.BoxGeometry(9, 2.5, 11);
+      const bedMat = new THREE.MeshStandardMaterial({ color: 0x0F3A2E, roughness: 0.6 });
+      const bed = new THREE.Mesh(bedGeo, bedMat);
+      bed.position.set(9, 1.25, -11);
+      bed.castShadow = true;
+      houseGroup.add(bed);
+
+      const sofaGeo = new THREE.BoxGeometry(11, 2.2, 5);
+      const sofaMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.7 });
+      const sofa = new THREE.Mesh(sofaGeo, sofaMat);
+      sofa.position.set(-8, 1.1, 15);
+      sofa.castShadow = true;
+      houseGroup.add(sofa);
+
+      // Portico Column
+      const colGeo = new THREE.CylinderGeometry(0.5, 0.5, H, 16);
+      const colMat = new THREE.MeshStandardMaterial({ color: 0x38BDF8, roughness: 0.3 });
+      const col1 = new THREE.Mesh(colGeo, colMat);
+      col1.position.set(-16, H / 2, 23);
+      houseGroup.add(col1);
+
+      heroScene.add(houseGroup);
+
+      // Render Loop
+      function renderHeroThree() {
+        requestAnimationFrame(renderHeroThree);
+        if (heroControls) heroControls.update();
+        heroRenderer.render(heroScene, heroCamera);
+      }
+      renderHeroThree();
+
+      // Window Resize Listener
+      window.addEventListener("resize", () => {
+        if (!container || !heroRenderer || !heroCamera) return;
+        const nw = container.clientWidth || 900;
+        const nh = container.clientHeight || 520;
+        heroCamera.aspect = nw / nh;
+        heroCamera.updateProjectionMatrix();
+        heroRenderer.setSize(nw, nh);
+        if (hero2DInited) drawHero2DBlueprint();
+      });
+    }
+
+    // Hero View Mode Switcher
+    function switchHeroView(mode) {
+      const btn3D = document.getElementById("heroTab3D");
+      const btn2D = document.getElementById("heroTab2D");
+      const btnWf = document.getElementById("heroTabWorkflow");
+
+      const cv3D = document.getElementById("heroThreeCanvas");
+      const cv2D = document.getElementById("hero2DCanvas");
+      const wfView = document.getElementById("heroWorkflowView");
+
+      const hudTL = document.getElementById("heroHudTopLeft");
+      const hudTR = document.getElementById("heroHudTopRight");
+      const hudBL = document.getElementById("heroHudBottomLeft");
+      const hudBR = document.getElementById("heroHudBottomRight");
+      const hint = document.getElementById("hudOrbitHint");
+
+      // Reset tabs
+      [btn3D, btn2D, btnWf].forEach(b => b && b.classList.remove("active"));
+
+      if (mode === '3d') {
+        btn3D.classList.add("active");
+        cv3D.style.display = "block";
+        cv2D.style.display = "none";
+        wfView.style.display = "none";
+        if (hudTL) hudTL.style.display = "flex";
+        if (hudTR) hudTR.style.display = "flex";
+        if (hudBL) hudBL.style.display = "flex";
+        if (hudBR) hudBR.style.display = "flex";
+        if (hint) hint.style.display = "inline-flex";
+      } else if (mode === '2d') {
+        btn2D.classList.add("active");
+        cv3D.style.display = "none";
+        cv2D.style.display = "block";
+        wfView.style.display = "none";
+        if (hudTL) hudTL.style.display = "flex";
+        if (hudTR) hudTR.style.display = "flex";
+        if (hudBL) hudBL.style.display = "flex";
+        if (hudBR) hudBR.style.display = "flex";
+        if (hint) hint.style.display = "none";
+        drawHero2DBlueprint();
+      } else if (mode === 'workflow') {
+        btnWf.classList.add("active");
+        cv3D.style.display = "none";
+        cv2D.style.display = "none";
+        wfView.style.display = "grid";
+        if (hudTL) hudTL.style.display = "none";
+        if (hudTR) hudTR.style.display = "none";
+        if (hudBL) hudBL.style.display = "none";
+        if (hudBR) hudBR.style.display = "none";
+        if (hint) hint.style.display = "none";
+      }
+    }
+
+    // Detailed 2D CAD Blueprint in Hero
+    function drawHero2DBlueprint() {
+      const canvas = document.getElementById("hero2DCanvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width || 800;
+      const h = rect.height || 520;
+
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.scale(dpr, dpr);
+
+      // Deep CAD background
+      ctx.fillStyle = "#060913";
+      ctx.fillRect(0, 0, w, h);
+
+      // Grid
+      ctx.strokeStyle = "rgba(56, 189, 248, 0.06)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < w; x += 20) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+      }
+      for (let y = 0; y < h; y += 20) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      }
+
+      // Plot Boundary (35 x 45 FT)
+      const plotW = Math.min(w * 0.65, 480);
+      const plotH = plotW * (45 / 35);
+      const ox = (w - plotW) / 2;
+      const oy = (h - plotH) / 2 + 10;
+
+      // Plot border dashed
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+      ctx.setLineDash([4, 4]);
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(ox, oy, plotW, plotH);
+      ctx.setLineDash([]);
+
+      // Dimension labels
+      ctx.fillStyle = "#38BDF8";
+      ctx.font = "700 12px 'Space Grotesk', monospace";
+      ctx.textAlign = "center";
+      ctx.fillText("35.0 FT WIDTH (NORTH ACCESS)", ox + plotW / 2, oy - 12);
+
+      ctx.save();
+      ctx.translate(ox + plotW + 18, oy + plotH / 2);
+      ctx.rotate(Math.PI / 2);
+      ctx.fillText("45.0 FT LENGTH", 0, 0);
+      ctx.restore();
+
+      // Interior CAD Rooms
+      const rooms = [
+        { name: "LIVING LOUNGE", dim: "18' × 14' (252 SQFT)", rx: ox + 15, ry: oy + 20, rw: plotW * 0.52, rh: plotH * 0.38, fill: "rgba(14, 22, 38, 0.9)" },
+        { name: "CULINARY & DINING", dim: "14' × 10' (140 SQFT)", rx: ox + plotW * 0.52 + 15, ry: oy + 20, rw: plotW * 0.44 - 15, rh: plotH * 0.38, fill: "rgba(14, 22, 38, 0.9)" },
+        { name: "MASTER SUITE", dim: "15' × 12' (180 SQFT)", rx: ox + 15, ry: oy + plotH * 0.38 + 20, rw: plotW * 0.48, rh: plotH * 0.36, fill: "rgba(14, 22, 38, 0.9)" },
+        { name: "GUEST BEDROOM", dim: "12' × 11' (132 SQFT)", rx: ox + plotW * 0.48 + 15, ry: oy + plotH * 0.38 + 20, rw: plotW * 0.48 - 15, rh: plotH * 0.36, fill: "rgba(14, 22, 38, 0.9)" },
+        { name: "CAR PORTICO", dim: "10' × 14' (140 SQFT)", rx: ox + 15, ry: oy + plotH * 0.74 + 20, rw: plotW * 0.48, rh: plotH * 0.22 - 25, fill: "rgba(45, 212, 191, 0.12)" },
+        { name: "BALCONY & SITOUT", dim: "8' × 12' (96 SQFT)", rx: ox + plotW * 0.48 + 15, ry: oy + plotH * 0.74 + 20, rw: plotW * 0.48 - 15, rh: plotH * 0.22 - 25, fill: "rgba(56, 189, 248, 0.1)" }
+      ];
+
+      rooms.forEach(r => {
+        ctx.fillStyle = r.fill;
+        ctx.fillRect(r.rx, r.ry, r.rw, r.rh);
+
+        ctx.strokeStyle = "#38BDF8";
+        ctx.lineWidth = 1.8;
+        ctx.strokeRect(r.rx, r.ry, r.rw, r.rh);
+
+        // Room Labels
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = "700 11px 'Space Grotesk', monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(r.name, r.rx + r.rw / 2, r.ry + r.rh / 2 - 3);
+
+        ctx.fillStyle = "#94A3B8";
+        ctx.font = "600 9px 'Plus Jakarta Sans', sans-serif";
+        ctx.fillText(r.dim, r.rx + r.rw / 2, r.ry + r.rh / 2 + 13);
+      });
+
+      hero2DInited = true;
+    }
+
+
+    /* --------------------------------------------------------------------------
+       2. PLOT BOUNDARY ESTIMATOR STUDIO LOGIC
+       -------------------------------------------------------------------------- */
+    let estimatorTypology = "normal";
+
+    function setEstimatorTypology(type) {
+      estimatorTypology = type;
+      const btnNorm = document.getElementById("btnEstNormal");
+      const btnDup = document.getElementById("btnEstDuplex");
+      if (btnNorm) btnNorm.classList.toggle("active", type === "normal");
+      if (btnDup) btnDup.classList.toggle("active", type === "duplex");
+      updateEstimator();
+    }
+
+    function updateEstimator() {
+      const wInput = document.getElementById("estWidthInput");
+      const lInput = document.getElementById("estLengthInput");
+      if (!wInput || !lInput) return;
+
+      const w = parseInt(wInput.value, 10);
+      const l = parseInt(lInput.value, 10);
+
+      document.getElementById("sliderWidthVal").textContent = `${w} FT`;
+      document.getElementById("sliderLengthVal").textContent = `${l} FT`;
+
+      const plotAreaSqft = w * l;
+      const isDuplex = estimatorTypology === "duplex";
+      const totalBuiltUpSqft = isDuplex ? Math.round(plotAreaSqft * 1.55) : Math.round(plotAreaSqft * 0.82);
+      const areaSqm = (totalBuiltUpSqft * 0.092903).toFixed(1);
+
+      document.getElementById("estAreaSqft").textContent = isDuplex
+        ? `${plotAreaSqft.toLocaleString()} Plot · ${totalBuiltUpSqft.toLocaleString()} Built-up`
+        : `${plotAreaSqft.toLocaleString()}`;
+
+      document.getElementById("estAreaSqm").textContent = isDuplex
+        ? `${(plotAreaSqft * 0.092903).toFixed(1)} Plot · ${areaSqm} Built-up`
+        : (plotAreaSqft * 0.092903).toFixed(1);
+
+      // Typology Guidance Text
+      const recBox = document.getElementById("estRecommendation");
+      let recText = "";
+      if (isDuplex) {
+        if (plotAreaSqft < 900) {
+          recText = "<strong>Recommended Typology:</strong> Urban G+1 Duplex Residence (2 BHK). Ground level living lounge and modern kitchen; upper floor master retreat with private sunrise balcony.";
+        } else if (plotAreaSqft < 1600) {
+          recText = "<strong>Recommended Typology:</strong> Executive Architectural Duplex Villa (3 BHK). Double-height staircase void, covered car portico, ground guest suite, and upper master suite with open sky terrace.";
+        } else {
+          recText = "<strong>Recommended Typology:</strong> Imperial Palatial Duplex Estate (4–5 BHK). Soaring double-height atrium, formal & informal lounges, private upper family gallery, and wrap-around entertainer's terrace.";
+        }
+      } else {
+        if (plotAreaSqft < 750) {
+          recText = "<strong>Recommended Typology:</strong> Urban Studio / 1 BHK Flat. Maximized single bedroom with open culinary zone and integrated bathroom.";
+        } else if (plotAreaSqft < 1300) {
+          recText = "<strong>Recommended Typology:</strong> Balanced 2 BHK Suburban Home. Single-level living hall, dedicated dining, master bedroom with ensuite, and sheltered portico.";
+        } else if (plotAreaSqft < 2200) {
+          recText = "<strong>Recommended Typology:</strong> Contemporary 3 BHK Single-Level Residence. 3 comfortable suites, dedicated pooja niche, car parking, and rear patio.";
+        } else {
+          recText = "<strong>Recommended Typology:</strong> Executive 4 BHK Ground Estate. Sprawling single-floor wing layout, dual-car garage, private study, and garden courtyards.";
+        }
+      }
+      recBox.innerHTML = recText;
+
+      drawEstimatorCanvas(w, l);
+    }
+
+    function drawEstimatorCanvas(w, l) {
+      const canvas = document.getElementById("plotEstimatorCanvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const cw = rect.width;
+      const ch = rect.height;
+
+      // Dark nocturnal blueprint background
+      ctx.fillStyle = "#080C16";
+      ctx.fillRect(0, 0, cw, ch);
+
+      // Architectural grid
+      ctx.strokeStyle = "rgba(56, 189, 248, 0.08)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < cw; x += 14) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, ch); ctx.stroke();
+      }
+      for (let y = 0; y < ch; y += 14) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(cw, y); ctx.stroke();
+      }
+
+      // Scaled rectangle
+      const maxPlot = 100;
+      const maxDrawW = cw - 60;
+      const maxDrawH = ch - 48;
+      const scale = Math.min(maxDrawW / maxPlot, maxDrawH / maxPlot);
+      const drawW = w * scale;
+      const drawH = l * scale;
+      const startX = (cw - drawW) / 2;
+      const startY = (ch - drawH) / 2;
+
+      const isDuplex = estimatorTypology === "duplex";
+      ctx.fillStyle = isDuplex ? "rgba(245, 158, 11, 0.12)" : "rgba(45, 212, 191, 0.12)";
+      ctx.fillRect(startX, startY, drawW, drawH);
+
+      ctx.strokeStyle = isDuplex ? "#F59E0B" : "#2DD4BF";
+      ctx.lineWidth = 1.8;
+      ctx.strokeRect(startX, startY, drawW, drawH);
+
+      // Dimension CAD text
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "700 11px 'Space Grotesk', monospace";
+      ctx.textAlign = "center";
+      ctx.fillText(`${w} FT`, startX + drawW / 2, startY - 6);
+
+      ctx.save();
+      ctx.translate(startX + drawW + 14, startY + drawH / 2);
+      ctx.rotate(Math.PI / 2);
+      ctx.fillText(`${l} FT`, 0, 0);
+      ctx.restore();
+
+      // Interior Layout Lines
+      ctx.strokeStyle = isDuplex ? "rgba(245, 158, 11, 0.4)" : "rgba(56, 189, 248, 0.4)";
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(startX + 4, startY + 4, drawW * 0.45, drawH * 0.5);
+      ctx.strokeRect(startX + drawW * 0.45 + 4, startY + 4, drawW * 0.5 - 8, drawH * 0.5);
+      ctx.strokeRect(startX + 4, startY + drawH * 0.5 + 4, drawW - 8, drawH * 0.5 - 8);
+    }
+
+    function launchWithEstimatorParams() {
+      const w = document.getElementById("estWidthInput").value;
+      const l = document.getElementById("estLengthInput").value;
+      const area = w * l;
+      let bhk = 3;
+      if (area < 800) bhk = 1;
+      else if (area < 1400) bhk = 2;
+      else if (area < 2200) bhk = 3;
+      else bhk = 4;
+      window.location.href = `index.html?w=${w}&l=${l}&bhk=${bhk}&houseType=${estimatorTypology}&view=3d`;
+    }
+
+
+    /* --------------------------------------------------------------------------
+       3. DUAL VIEWPORT DEMO 2 (2D DRAFTING BLUEPRINT & 3D WEBGL)
+       -------------------------------------------------------------------------- */
+    let demo3DScene, demo3DCamera, demo3DRenderer, demo3DControls, demo3DInited = false;
+
+    function draw2DDemoBlueprint() {
+      const canvas = document.getElementById("demo2DCanvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+
+      canvas.width = (rect.width || 480) * dpr;
+      canvas.height = (rect.height || 310) * dpr;
+      ctx.scale(dpr, dpr);
+
+      const w = rect.width || 480;
+      const h = rect.height || 310;
+
+      // Dark blueprint background
+      ctx.fillStyle = "#080C16";
+      ctx.fillRect(0, 0, w, h);
+
+      // Drafting grid
+      ctx.strokeStyle = "rgba(56, 189, 248, 0.08)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < w; x += 16) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+      }
+      for (let y = 0; y < h; y += 16) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      }
+
+      // Rooms Blueprint
+      const rooms = [
+        { name: "LIVING ROOM", sqft: "240 SQ.FT", x: 28, y: 26, rw: 225, rh: 135, fill: "rgba(14, 20, 36, 0.85)" },
+        { name: "KITCHEN & DINING", sqft: "130 SQ.FT", x: 265, y: 26, rw: 180, rh: 135, fill: "rgba(14, 20, 36, 0.85)" },
+        { name: "MASTER SUITE", sqft: "180 SQ.FT", x: 28, y: 172, rw: 225, rh: 110, fill: "rgba(14, 20, 36, 0.85)" },
+        { name: "ATTACHED BATH", sqft: "45 SQ.FT", x: 265, y: 172, rw: 85, rh: 110, fill: "rgba(14, 20, 36, 0.85)" },
+        { name: "VERANDA", sqft: "70 SQ.FT", x: 360, y: 172, rw: 85, rh: 110, fill: "rgba(45, 212, 191, 0.15)" }
+      ];
+
+      rooms.forEach(r => {
+        ctx.fillStyle = r.fill;
+        ctx.fillRect(r.x, r.y, r.rw, r.rh);
+
+        ctx.strokeStyle = "#38BDF8";
+        ctx.lineWidth = 1.8;
+        ctx.strokeRect(r.x, r.y, r.rw, r.rh);
+
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = "bold 11px 'Space Grotesk', monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(r.name, r.x + r.rw / 2, r.y + r.rh / 2 - 2);
+
+        ctx.fillStyle = "#94A3B8";
+        ctx.font = "600 9px 'Plus Jakarta Sans', sans-serif";
+        ctx.fillText(r.sqft, r.x + r.rw / 2, r.y + r.rh / 2 + 12);
+      });
+    }
+
+    function init3DDemoViewport() {
+      if (demo3DInited || typeof THREE === "undefined") return;
+      const canvas = document.getElementById("demo3DCanvas");
+      if (!canvas) return;
+
+      const w = canvas.clientWidth || 480;
+      const h = canvas.clientHeight || 310;
+
+      demo3DScene = new THREE.Scene();
+      demo3DScene.background = new THREE.Color(0x080C16);
+
+      demo3DCamera = new THREE.PerspectiveCamera(38, w / h, 0.1, 1000);
+      demo3DCamera.position.set(40, 36, 48);
+
+      demo3DRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+      demo3DRenderer.setSize(w, h);
+      demo3DRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      demo3DRenderer.shadowMap.enabled = true;
+
+      if (typeof THREE.OrbitControls !== "undefined") {
+        demo3DControls = new THREE.OrbitControls(demo3DCamera, demo3DRenderer.domElement);
+        demo3DControls.enableDamping = true;
+        demo3DControls.dampingFactor = 0.08;
+        demo3DControls.autoRotate = true;
+        demo3DControls.autoRotateSpeed = 0.9;
+        demo3DControls.maxPolarAngle = Math.PI / 2.15;
+      }
+
+      const light = new THREE.DirectionalLight(0xFFFFFF, 1.2);
+      light.position.set(20, 40, 30);
+      demo3DScene.add(light);
+      demo3DScene.add(new THREE.AmbientLight(0xFFFFFF, 0.6));
+
+      // Mini 3D walls
+      const group = new THREE.Group();
+      const slab = new THREE.Mesh(new THREE.BoxGeometry(32, 1, 38), new THREE.MeshStandardMaterial({ color: 0x0F172A }));
+      slab.position.y = -0.5;
+      group.add(slab);
+
+      const wallMat = new THREE.MeshStandardMaterial({ color: 0xF8FAFC, roughness: 0.3 });
+      const wallMatCyan = new THREE.MeshStandardMaterial({ color: 0x38BDF8, roughness: 0.3 });
+
+      function addW(w, h, d, x, z, mat = wallMat) {
+        const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+        m.position.set(x, h / 2, z);
+        group.add(m);
+      }
+      addW(1, 8, 36, -15, 0);
+      addW(1, 8, 36, 15, 0);
+      addW(30, 8, 1, 0, -18);
+      addW(18, 8, 1, -6, 18);
+      addW(1, 8, 18, 0, -9, wallMatCyan);
+
+      demo3DScene.add(group);
+
+      function anim() {
+        requestAnimationFrame(anim);
+        if (demo3DControls) demo3DControls.update();
+        demo3DRenderer.render(demo3DScene, demo3DCamera);
+      }
+      anim();
+      demo3DInited = true;
+    }
+
+    function switchDemoViewport(view) {
+      const btn2D = document.getElementById("btnDemo2D");
+      const btn3D = document.getElementById("btnDemo3D");
+      const cv2D = document.getElementById("demo2DCanvas");
+      const cv3D = document.getElementById("demo3DCanvas");
+
+      if (view === '2d') {
+        btn2D.classList.add("active");
+        btn3D.classList.remove("active");
+        cv2D.style.display = "block";
+        cv3D.style.display = "none";
+        draw2DDemoBlueprint();
+      } else {
+        btn3D.classList.add("active");
+        btn2D.classList.remove("active");
+        cv2D.style.display = "none";
+        cv3D.style.display = "block";
+        if (!demo3DInited) init3DDemoViewport();
+      }
+    }
+
+
+    /* --------------------------------------------------------------------------
+       4. CURATED ARCHETYPES GALLERY (SMART FILTERING & EXPANSION)
+       -------------------------------------------------------------------------- */
+    let isShowingAllArchetypes = false;
+    let currentArchetypesFilter = 'all';
+
+    function renderTemplatesGallery(filter = 'all') {
+      currentArchetypesFilter = filter;
+      const grid = document.getElementById("templateGalleryGrid");
+      if (!grid) return;
+
+      if (typeof TEMPLATES === 'undefined' || !Array.isArray(TEMPLATES)) {
+        grid.innerHTML = `<p style="color: var(--text-muted); grid-column: 1 / -1;">Archetypes loading...</p>`;
+        return;
+      }
+
+      let filtered = TEMPLATES;
+      if (filter === 'normal') filtered = TEMPLATES.filter(t => t.houseType !== 'duplex');
+      else if (filter === 'duplex') filtered = TEMPLATES.filter(t => t.houseType === 'duplex');
+      else if (filter === '1') filtered = TEMPLATES.filter(t => t.bhk === 1);
+      else if (filter === '2') filtered = TEMPLATES.filter(t => t.bhk === 2);
+      else if (filter === '3') filtered = TEMPLATES.filter(t => t.bhk === 3);
+      else if (filter === '4') filtered = TEMPLATES.filter(t => t.bhk >= 4);
+      else if (filter === 'parking') filtered = TEMPLATES.filter(t => t.hasParking);
+
+      const displayCount = isShowingAllArchetypes ? filtered.length : Math.min(6, filtered.length);
+      const itemsToRender = filtered.slice(0, displayCount);
+
+      grid.innerHTML = itemsToRender.map(tpl => {
+        const area = tpl.referencePlot.width * tpl.referencePlot.length;
+        const isDuplex = tpl.houseType === 'duplex';
+        const groundRooms = tpl.rooms.filter(r => (r.floor || 'ground') === 'ground').length;
+        const firstRooms = tpl.rooms.filter(r => r.floor === 'first').length;
+        const roomNames = tpl.rooms.map(r => r.name).slice(0, 3).join(" · ");
+        const facingName = { N: "North", S: "South", E: "East", W: "West" }[tpl.facing] || tpl.facing;
+        const floorDesc = isDuplex ? `G+1 Duplex (${groundRooms} GF + ${firstRooms} 1F)` : `Single Level (${tpl.rooms.length} rooms)`;
+
+        return `
+          <div class="archetype-card ${isDuplex ? 'archetype-card-duplex' : ''}">
+            <div class="archetype-meta-row">
+              <span class="archetype-typology-pill ${isDuplex ? 'duplex' : ''}">
+                ${isDuplex ? '🏛️ G+1 Duplex Villa' : `${tpl.bhk} BHK Residence`}
+              </span>
+              <span style="font-size: 0.76rem; font-family: var(--font-mono); font-weight: 600; color: ${tpl.hasParking ? 'var(--accent-spruce)' : 'var(--text-muted)'};">
+                ${tpl.hasParking ? 'Sheltered Garage' : 'No Garage'}
+              </span>
+            </div>
+
+            <h4 class="archetype-name">${tpl.name}</h4>
+
+            <ul class="archetype-spec-list">
+              <li class="archetype-spec-item">
+                <span class="archetype-spec-label">Reference Scale</span>
+                <span class="archetype-spec-val">${tpl.referencePlot.width} × ${tpl.referencePlot.length} FT (${area} SQ.FT)</span>
+              </li>
+              <li class="archetype-spec-item">
+                <span class="archetype-spec-label">Structure</span>
+                <span class="archetype-spec-val" style="${isDuplex ? 'color: var(--accent-amber);' : ''}">${floorDesc}</span>
+              </li>
+              <li class="archetype-spec-item">
+                <span class="archetype-spec-label">Frontage</span>
+                <span class="archetype-spec-val">${facingName} Facing</span>
+              </li>
+              <li class="archetype-spec-item">
+                <span class="archetype-spec-label">Key Spaces</span>
+                <span class="archetype-spec-val" style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 130px;" title="${roomNames}">${roomNames}</span>
+              </li>
+            </ul>
+
+            <a href="index.html?template=${tpl.id}&view=3d&w=${tpl.referencePlot.width}&l=${tpl.referencePlot.length}&bhk=${tpl.bhk}&parking=${tpl.hasParking ? '1car' : 'none'}&facing=${tpl.facing}&houseType=${isDuplex ? 'duplex' : 'normal'}" class="btn btn-secondary" style="width: 100%; font-size: 0.82rem; padding: 9px 0;">
+              <span>Open in 3D Studio →</span>
+            </a>
+          </div>
+        `;
+      }).join("");
+
+      const btn = document.getElementById("btnToggleAllArchetypes");
+      if (btn) {
+        if (filtered.length <= 6) {
+          btn.style.display = "none";
+        } else {
+          btn.style.display = "inline-flex";
+          btn.querySelector("span").textContent = isShowingAllArchetypes 
+            ? "Show Fewer Archetypes" 
+            : `Show All ${filtered.length} Archetypes (${filter === 'all' ? '20+' : filtered.length})`;
+        }
+      }
+    }
+
+    function toggleAllArchetypes() {
+      isShowingAllArchetypes = !isShowingAllArchetypes;
+      renderTemplatesGallery(currentArchetypesFilter);
+    }
+
+    function filterTemplatesGallery(category, btn) {
+      document.querySelectorAll(".catalogue-tab").forEach(tab => tab.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+      renderTemplatesGallery(category);
+    }
+
+
+    /* --------------------------------------------------------------------------
+       5. ACCESSIBLE FAQ ACCORDION LOGIC
+       -------------------------------------------------------------------------- */
+    function toggleFAQ(button) {
+      const item = button.closest(".faq-item");
+      const isExpanded = item.classList.contains("active");
+
+      document.querySelectorAll(".faq-item").forEach(el => {
+        el.classList.remove("active");
+        const btn = el.querySelector(".faq-trigger");
+        if (btn) btn.setAttribute("aria-expanded", "false");
+      });
+
+      if (!isExpanded) {
+        item.classList.add("active");
+        button.setAttribute("aria-expanded", "true");
+      }
+    }
+
+
+    /* --------------------------------------------------------------------------
+       6. MOBILE MENU TOGGLE
+       -------------------------------------------------------------------------- */
+    function initMobileMenu() {
+      const btn = document.getElementById("mobileMenuBtn");
+      const drawer = document.getElementById("mobileDrawer");
+      if (!btn || !drawer) return;
+
+      btn.addEventListener("click", () => {
+        const isActive = drawer.classList.toggle("active");
+        btn.setAttribute("aria-expanded", isActive ? "true" : "false");
+      });
+    }
+
+    function closeMobileMenu() {
+      const drawer = document.getElementById("mobileDrawer");
+      const btn = document.getElementById("mobileMenuBtn");
+      if (drawer) drawer.classList.remove("active");
+      if (btn) btn.setAttribute("aria-expanded", "false");
+    }
+
+
+    /* --------------------------------------------------------------------------
+       7. GPU PARTICLES ENGINE (PRESERVED IN CONCLUDING HERO)
+       -------------------------------------------------------------------------- */
+    function initInteractiveParticles() {
+      const banner = document.getElementById("concludingBanner");
+      const container = document.getElementById("particlesContainer");
+      const canvas = document.getElementById("particlesCanvas");
+      if (!banner || !container || !canvas || typeof THREE === "undefined") return;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 1, 10000);
+      camera.position.z = 300;
+
+      const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+      const count = 2200;
+      const geo = new THREE.BufferGeometry();
+      const pos = new Float32Array(count * 3);
+      for (let i = 0; i < count * 3; i += 3) {
+        pos[i] = (Math.random() - 0.5) * 600;
+        pos[i + 1] = (Math.random() - 0.5) * 400;
+        pos[i + 2] = (Math.random() - 0.5) * 200;
+      }
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+
+      const mat = new THREE.PointsMaterial({
+        color: 0x38BDF8,
+        size: 2.0,
+        transparent: true,
+        opacity: 0.6,
+        blending: THREE.AdditiveBlending
+      });
+      const points = new THREE.Points(geo, mat);
+      scene.add(points);
+
+      let mouseX = 0, mouseY = 0;
+      banner.addEventListener("pointermove", (e) => {
+        const rect = banner.getBoundingClientRect();
+        mouseX = ((e.clientX - rect.left) / rect.width - 0.5) * 180;
+        mouseY = ((e.clientY - rect.top) / rect.height - 0.5) * 180;
+      });
+
+      function animateParticles() {
+        requestAnimationFrame(animateParticles);
+        points.rotation.y += 0.0012;
+        points.position.x += (mouseX - points.position.x) * 0.04;
+        points.position.y += (-mouseY - points.position.y) * 0.04;
+        renderer.render(scene, camera);
+      }
+      animateParticles();
+
+      window.addEventListener("resize", () => {
+        if (!container || !renderer || !camera) return;
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      });
+    }
+
+
+    /* --------------------------------------------------------------------------
+       8. SOCIAL FLIP BUTTON INTERACTION
+       -------------------------------------------------------------------------- */
+    function initSocialFlipButton() {
+      const box = document.getElementById("socialFlipBox");
+      if (!box) return;
+      box.addEventListener("click", (e) => {
+        if (!e.target.closest(".social-flip-node")) {
+          box.classList.toggle("is-flipped");
+        }
+      });
+    }
+
+
+    /* --------------------------------------------------------------------------
+       PAGE INITIALIZATION
+       -------------------------------------------------------------------------- */
+    window.addEventListener("DOMContentLoaded", () => {
+      initHeroThreeScene();
+      updateEstimator();
+      draw2DDemoBlueprint();
+      renderTemplatesGallery('all');
+      initMobileMenu();
+      initInteractiveParticles();
+      initSocialFlipButton();
+    });
+  </script>
+</body>
+
+</html>

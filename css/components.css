@@ -1,0 +1,396 @@
+/* ==========================================================================
+   CARD & INPUT STYLING (DRAFTING TABLE SPEC)
+   ========================================================================== */
+.card {
+  background: var(--paper-card);
+  border: 1px solid var(--paper-border-solid);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(14, 26, 43, 0.05);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.screen-header {
+  text-align: center;
+  margin-bottom: 24px;
+  background: var(--paper-card);
+  border: 1px solid var(--paper-border-solid);
+  padding: 18px 24px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 6px rgba(14, 26, 43, 0.04);
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.screen-step-tag {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--pencil-accent);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.screen-title {
+  font-family: var(--font-serif);
+  font-size: 1.65rem;
+  font-weight: 600;
+  color: var(--paper-text);
+  letter-spacing: -0.02em;
+}
+
+.screen-subtitle {
+  font-size: 0.90rem;
+  color: var(--paper-text-secondary);
+  margin-top: 4px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--paper-text);
+  margin-bottom: 6px;
+}
+
+.form-hint {
+  font-size: 0.78rem;
+  color: var(--paper-text-secondary);
+  margin-top: 4px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.input-field {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  font-size: 0.92rem;
+  font-family: var(--font-mono);
+  color: var(--paper-text);
+  background: #FFFFFF;
+  border: 1px solid var(--paper-border-solid);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input-field:focus {
+  border-color: var(--pencil-accent);
+  box-shadow: 0 0 0 2px rgba(228, 87, 46, 0.15);
+}
+
+.input-field.invalid {
+  border-color: var(--error);
+  background: rgba(197, 34, 31, 0.04);
+}
+
+.error-msg {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--error);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   BUTTONS (DRAFTING TABLE SPEC)
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  font-weight: 600;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  text-decoration: none;
+  user-select: none;
+  position: relative;
+}
+
+.btn-primary, .btn-stone {
+  background-color: var(--pencil-accent);
+  color: #FFFFFF;
+  border-color: var(--pencil-accent);
+}
+
+.btn-primary:hover:not(:disabled), .btn-stone:hover:not(:disabled) {
+  background-color: var(--pencil-accent-hover);
+  border-color: var(--pencil-accent-hover);
+}
+
+.btn-secondary {
+  background-color: #FFFFFF;
+  color: var(--paper-text);
+  border-color: var(--paper-border-solid);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: rgba(14, 26, 43, 0.04);
+  border-color: var(--pencil-accent);
+  color: var(--pencil-accent);
+}
+
+.btn-accent {
+  background-color: var(--status-pass, #0D7C4D);
+  color: #FFFFFF;
+  border-color: var(--status-pass, #0D7C4D);
+}
+
+.btn-accent:hover:not(:disabled) {
+  background-color: #0b6941;
+  border-color: #0b6941;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.btn-large {
+  height: 46px;
+  padding: 0 24px;
+  font-size: 0.92rem;
+  border-radius: var(--radius-sm);
+}
+
+.btn-pill {
+  border-radius: var(--radius-sm);
+}
+
+.btn-group-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid var(--paper-border-solid);
+}
+
+/* ==========================================================================
+   TOAST NOTIFICATIONS
+   ========================================================================== */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--ink-bg);
+  color: var(--ink-text);
+  border: 1px solid var(--ink-border);
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(14, 26, 43, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: toastIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: auto;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   GUIDED ONBOARDING MODAL & WALKTHROUGH
+   ========================================================================== */
+.guide-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(14, 26, 43, 0.55);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.guide-modal-backdrop.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.guide-modal {
+  background: var(--paper-card);
+  border: 1px solid var(--paper-border-solid);
+  border-radius: var(--radius-md);
+  max-width: 700px;
+  width: 100%;
+  padding: 30px 28px 24px;
+  box-shadow: 0 20px 48px rgba(14, 26, 43, 0.2);
+  position: relative;
+  transform: translateY(8px);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 90vh;
+  overflow-y: auto;
+  color: var(--paper-text);
+}
+
+.guide-modal-backdrop.show .guide-modal {
+  transform: translateY(0);
+}
+
+.guide-modal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(228, 87, 46, 0.08);
+  color: var(--pencil-accent);
+  border: 1px solid rgba(228, 87, 46, 0.25);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+}
+
+.guide-steps-flow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 20px 0 22px;
+}
+
+@media (max-width: 640px) {
+  .guide-steps-flow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.guide-step-card {
+  background: #FFFFFF;
+  border: 1px solid var(--paper-border-solid);
+  border-radius: var(--radius-sm);
+  padding: 12px 10px;
+  text-align: center;
+  transition: border-color 0.15s ease;
+}
+
+.guide-step-card:hover {
+  border-color: var(--pencil-accent);
+}
+
+.guide-step-num {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
+  background: var(--ink-bg);
+  color: var(--ink-text);
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 6px;
+  font-family: var(--font-mono);
+}
+
+.guide-step-title {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--paper-text);
+  margin-bottom: 3px;
+}
+
+.guide-step-sub {
+  font-size: 0.70rem;
+  color: var(--paper-text-secondary);
+  line-height: 1.3;
+}
+
+.guide-presets-title {
+  font-family: var(--font-mono);
+  font-size: 0.80rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--paper-text);
+  margin-bottom: 10px;
+}
+
+.guide-presets-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+@media (max-width: 580px) {
+  .guide-presets-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.guide-preset-btn {
+  background: #FFFFFF;
+  border: 1px solid var(--paper-border-solid);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.guide-preset-btn:hover {
+  border-color: var(--pencil-accent);
+  background: rgba(228, 87, 46, 0.04);
+}
+
+.guide-preset-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.guide-preset-name {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--paper-text);
+}
+
+.guide-preset-meta {
+  font-size: 0.72rem;
+  color: var(--paper-text-secondary);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+}

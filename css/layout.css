@@ -1,0 +1,229 @@
+/* ==========================================================================
+   TOP APP HEADER (INK NAVY DRAFTING BAR)
+   ========================================================================== */
+.app-header {
+  height: var(--header-height);
+  background: var(--ink-bg);
+  border-bottom: 1px solid var(--ink-border);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 2px 10px rgba(14, 26, 43, 0.15);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--pencil-accent);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.brand-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink-text);
+  line-height: 1.1;
+}
+
+.brand-subtitle {
+  font-size: 0.68rem;
+  color: var(--pencil-accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-header .btn-secondary {
+  background: var(--ink-bg-elevated);
+  border: 1px solid var(--ink-border);
+  color: var(--ink-text);
+  font-family: var(--font-mono);
+  font-size: 0.80rem;
+  font-weight: 600;
+}
+
+.app-header .btn-secondary:hover {
+  background: rgba(245, 242, 234, 0.08);
+  border-color: var(--pencil-accent);
+  color: var(--pencil-accent);
+}
+
+/* ==========================================================================
+   WIZARD PROGRESS STEPPER (PAPER DRAFTING RULER)
+   ========================================================================== */
+.wizard-nav-wrap {
+  background: var(--paper-card);
+  border-bottom: 1px solid var(--paper-border-solid);
+  padding: 10px 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.step-stepper {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  max-width: 720px;
+  width: 100%;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--paper-text-secondary);
+  cursor: default;
+  transition: color 0.15s ease;
+}
+
+.step-item.active {
+  color: var(--pencil-accent);
+}
+
+.step-item.completed {
+  color: var(--status-pass, #0D7C4D);
+}
+
+.step-badge {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  background: #FFFFFF;
+  border: 1px solid var(--paper-border-solid);
+  color: var(--paper-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.74rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.step-item.active .step-badge {
+  background: var(--pencil-accent);
+  border-color: var(--pencil-accent);
+  color: #FFFFFF;
+}
+
+.step-item.completed .step-badge {
+  background: rgba(13, 124, 77, 0.12);
+  border-color: #0D7C4D;
+  color: #0D7C4D;
+}
+
+.step-divider {
+  flex: 1;
+  height: 1px;
+  background: var(--paper-border-solid);
+}
+
+/* ==========================================================================
+   MAIN CONTAINER & SCREEN WRAPPERS
+   ========================================================================== */
+#app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px 24px;
+}
+
+.screen {
+  display: none;
+  width: 100%;
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.screen.active {
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   RESPONSIVENESS
+   ========================================================================== */
+@media (max-width: 900px) {
+  .result-workspace {
+    flex-direction: column;
+  }
+  .result-sidebar {
+    width: 100%;
+    max-height: 320px;
+  }
+  .result-screen-layout {
+    height: auto;
+  }
+  .result-viewport-container {
+    height: 520px;
+    min-height: 440px;
+  }
+  .mobile-sidebar-toggle {
+    display: flex;
+  }
+  .result-sidebar {
+    transition: max-height 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease;
+    overflow: hidden;
+  }
+  .result-sidebar.collapsed {
+    max-height: 0 !important;
+    opacity: 0;
+    padding: 0;
+    border: none;
+    margin: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .step-stepper {
+    gap: 10px;
+  }
+  .step-item span:last-child {
+    display: none;
+  }
+  .candidates-grid {
+    grid-template-columns: 1fr;
+  }
+  #app {
+    padding: 14px;
+  }
+}

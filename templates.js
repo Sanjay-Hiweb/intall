@@ -901,6 +901,7 @@ const TEMPLATES = [
         x: 0, y: 0, w: 18, h: 18,
         doors: [{ wall: "south", offset: 2, width: 14 }],
         windows: []
+        
       },
       {
         id: "hall", name: "Grand Formal Living Room", type: "hall",
@@ -1441,6 +1442,1012 @@ const TEMPLATES = [
         x: 15, y: 44, w: 9, h: 8,
         doors: [{ wall: "north", offset: 2, width: 2.5 }],
         windows: []
+      }
+    ]
+  },
+
+  // 21. 1BHK Vastu Sanctum with Pooja Room - East Facing
+  {
+    id: "t21",
+    name: "1BHK Vastu Sanctum with Pooja Room",
+    bhk: 1,
+    hasParking: false,
+    facing: "E",
+    referencePlot: { width: 25, length: 30 }, // 750 sqft
+    rooms: [
+      {
+        id: "hall", name: "Living & Family Lounge", type: "hall",
+        x: 0, y: 0, w: 14, h: 16,
+        doors: [{ wall: "east", offset: 5, width: 3.5 }, { wall: "north", offset: 3, width: 3 }],
+        windows: [{ wall: "south", offset: 3, width: 4 }, { wall: "west", offset: 4, width: 4 }]
+      },
+      {
+        id: "kitchen", name: "Modular Kitchen (SE Agni)", type: "kitchen",
+        x: 14, y: 0, w: 11, h: 8,
+        doors: [{ wall: "north", offset: 3, width: 3 }],
+        windows: [{ wall: "south", offset: 3, width: 3 }, { wall: "east", offset: 2, width: 3 }]
+      },
+      {
+        id: "dining", name: "Dining Hall", type: "dining",
+        x: 14, y: 8, w: 11, h: 8,
+        doors: [{ wall: "west", offset: 2, width: 3 }],
+        windows: [{ wall: "east", offset: 2, width: 3 }]
+      },
+      {
+        id: "bed1", name: "Master Bedroom", type: "bedroom",
+        x: 0, y: 16, w: 14, h: 14,
+        doors: [{ wall: "south", offset: 5, width: 3 }],
+        windows: [{ wall: "north", offset: 4, width: 4 }, { wall: "west", offset: 4, width: 4 }]
+      },
+      {
+        id: "bath1", name: "Family Bathroom", type: "bathroom",
+        x: 14, y: 16, w: 6, h: 6,
+        doors: [{ wall: "south", offset: 1.5, width: 2.5 }],
+        windows: []
+      },
+      {
+        id: "pooja", name: "Pooja Sanctum (NE Corner)", type: "pooja",
+        x: 20, y: 16, w: 5, h: 6,
+        doors: [{ wall: "south", offset: 1, width: 2.5 }],
+        windows: [{ wall: "east", offset: 1.5, width: 2 }]
+      },
+      {
+        id: "balcony", name: "East Garden Veranda", type: "balcony",
+        x: 14, y: 22, w: 11, h: 8,
+        doors: [{ wall: "south", offset: 2, width: 3 }],
+        windows: [{ wall: "north", offset: 3, width: 4 }, { wall: "east", offset: 2, width: 4 }]
+      }
+    ]
+  },
+
+  // 22. 1BHK Executive Suite with Work Studio & Parking - North Facing
+  {
+    id: "t22",
+    name: "1BHK Executive Suite with Work Studio & Parking",
+    bhk: 1,
+    hasParking: true,
+    facing: "N",
+    referencePlot: { width: 26, length: 34 }, // 884 sqft
+    rooms: [
+      {
+        id: "parking", name: "Covered Portico", type: "parking",
+        x: 0, y: 0, w: 11, h: 16,
+        doors: [{ wall: "south", offset: 1, width: 9 }],
+        windows: []
+      },
+      {
+        id: "hall", name: "Executive Great Room", type: "hall",
+        x: 11, y: 0, w: 15, h: 16,
+        doors: [{ wall: "south", offset: 4, width: 3.5 }, { wall: "north", offset: 6, width: 3 }],
+        windows: [{ wall: "south", offset: 9, width: 4 }, { wall: "east", offset: 4, width: 4 }]
+      },
+      {
+        id: "study", name: "Dedicated Home Studio", type: "study",
+        x: 0, y: 16, w: 11, h: 8,
+        doors: [{ wall: "east", offset: 2.5, width: 3 }],
+        windows: [{ wall: "west", offset: 2, width: 3 }]
+      },
+      {
+        id: "kitchen", name: "Modern Open Kitchen", type: "kitchen",
+        x: 11, y: 16, w: 15, h: 8,
+        doors: [{ wall: "south", offset: 3, width: 3 }],
+        windows: [{ wall: "east", offset: 2, width: 4 }]
+      },
+      {
+        id: "bath1", name: "Executive Spa Bath", type: "bathroom",
+        x: 0, y: 24, w: 10, h: 10,
+        doors: [{ wall: "east", offset: 3, width: 2.5 }],
+        windows: [{ wall: "west", offset: 3, width: 2 }]
+      },
+      {
+        id: "bed1", name: "Master Bedroom Suite", type: "bedroom",
+        x: 10, y: 24, w: 16, h: 10,
+        doors: [{ wall: "south", offset: 3, width: 3 }],
+        windows: [{ wall: "north", offset: 5, width: 4 }, { wall: "east", offset: 3, width: 4 }]
+      }
+    ]
+  },
+
+  // 23. 1BHK Sunlit Southern Villa with Veranda & Parking - South Facing
+  {
+    id: "t23",
+    name: "1BHK Sunlit Southern Villa with Veranda",
+    bhk: 1,
+    hasParking: true,
+    facing: "S",
+    referencePlot: { width: 24, length: 36 }, // 864 sqft
+    rooms: [
+      {
+        id: "hall", name: "Sunlit Living Hall", type: "hall",
+        x: 0, y: 0, w: 13, h: 16,
+        doors: [{ wall: "south", offset: 4, width: 3.5 }, { wall: "north", offset: 5, width: 3 }],
+        windows: [{ wall: "south", offset: 1, width: 2.5 }, { wall: "west", offset: 5, width: 4 }]
+      },
+      {
+        id: "parking", name: "Sheltered Car Port", type: "parking",
+        x: 13, y: 0, w: 11, h: 16,
+        doors: [{ wall: "south", offset: 1, width: 9 }],
+        windows: []
+      },
+      {
+        id: "kitchen", name: "Gourmet Kitchen", type: "kitchen",
+        x: 0, y: 16, w: 12, h: 8,
+        doors: [{ wall: "south", offset: 3, width: 3 }],
+        windows: [{ wall: "west", offset: 2, width: 3 }]
+      },
+      {
+        id: "dining", name: "Dining Atrium", type: "dining",
+        x: 12, y: 16, w: 12, h: 8,
+        doors: [{ wall: "west", offset: 2, width: 3 }],
+        windows: [{ wall: "east", offset: 2, width: 3 }]
+      },
+      {
+        id: "bath1", name: "En-Suite Bathroom", type: "bathroom",
+        x: 0, y: 24, w: 8, h: 6,
+        doors: [{ wall: "east", offset: 1.5, width: 2.5 }],
+        windows: [{ wall: "west", offset: 2, width: 2 }]
+      },
+      {
+        id: "balcony", name: "Rear Sun Veranda", type: "balcony",
+        x: 0, y: 30, w: 8, h: 6,
+        doors: [{ wall: "east", offset: 1.5, width: 2.5 }],
+        windows: [{ wall: "north", offset: 2, width: 3 }, { wall: "west", offset: 2, width: 3 }]
+      },
+      {
+        id: "bed1", name: "Master Bedroom", type: "bedroom",
+        x: 8, y: 24, w: 16, h: 12,
+        doors: [{ wall: "south", offset: 3, width: 3 }, { wall: "west", offset: 8, width: 2.5 }],
+        windows: [{ wall: "north", offset: 5, width: 4 }, { wall: "east", offset: 4, width: 4 }]
+      }
+    ]
+  },
+
+  // 24. 1BHK Linear Urban Narrow-Lot Villa - West Facing
+  {
+    id: "t24",
+    name: "1BHK Linear Urban Narrow-Lot Villa",
+    bhk: 1,
+    hasParking: false,
+    facing: "W",
+    referencePlot: { width: 18, length: 40 }, // 720 sqft
+    rooms: [
+      {
+        id: "balcony", name: "Front Entrance Porch", type: "balcony",
+        x: 0, y: 0, w: 18, h: 6,
+        doors: [{ wall: "north", offset: 7, width: 3.5 }],
+        windows: [{ wall: "west", offset: 2, width: 3 }, { wall: "south", offset: 5, width: 4 }]
+      },
+      {
+        id: "hall", name: "Central Living Hall", type: "hall",
+        x: 0, y: 6, w: 18, h: 14,
+        doors: [{ wall: "south", offset: 7, width: 3.5 }, { wall: "north", offset: 6, width: 3 }],
+        windows: [{ wall: "west", offset: 3, width: 4 }, { wall: "east", offset: 3, width: 4 }]
+      },
+      {
+        id: "kitchen", name: "Modular Kitchen", type: "kitchen",
+        x: 0, y: 20, w: 10, h: 8,
+        doors: [{ wall: "south", offset: 3, width: 3 }],
+        windows: [{ wall: "west", offset: 2, width: 3 }]
+      },
+      {
+        id: "bath1", name: "Spacious Bathroom", type: "bathroom",
+        x: 10, y: 20, w: 8, h: 8,
+        doors: [{ wall: "west", offset: 2, width: 2.5 }],
+        windows: [{ wall: "east", offset: 2, width: 2 }]
+      },
+      {
+        id: "bed1", name: "Master Bedroom Suite", type: "bedroom",
+        x: 0, y: 28, w: 18, h: 12,
+        doors: [{ wall: "south", offset: 7, width: 3 }],
+        windows: [{ wall: "north", offset: 6, width: 5 }, { wall: "east", offset: 3, width: 4 }]
+      }
+    ]
+  },
+
+  // 25. 1BHK Wide-Frontage Modern Ranch Bungalow - East Facing
+  {
+    id: "t25",
+    name: "1BHK Wide-Frontage Modern Bungalow",
+    bhk: 1,
+    hasParking: true,
+    facing: "E",
+    referencePlot: { width: 36, length: 24 }, // 864 sqft
+    rooms: [
+      {
+        id: "parking", name: "Sheltered Portico", type: "parking",
+        x: 0, y: 0, w: 12, h: 16,
+        doors: [{ wall: "south", offset: 1.5, width: 9 }],
+        windows: []
+      },
+      {
+        id: "bath1", name: "Master Bath & Powder", type: "bathroom",
+        x: 0, y: 16, w: 12, h: 8,
+        doors: [{ wall: "east", offset: 2.5, width: 2.5 }],
+        windows: [{ wall: "north", offset: 3, width: 3 }]
+      },
+      {
+        id: "hall", name: "Central Grand Living", type: "hall",
+        x: 12, y: 0, w: 12, h: 15,
+        doors: [{ wall: "south", offset: 4, width: 3.5 }, { wall: "north", offset: 4, width: 3 }, { wall: "east", offset: 5, width: 3 }],
+        windows: [{ wall: "south", offset: 1, width: 2.5 }]
+      },
+      {
+        id: "dining", name: "Formal Dining Room", type: "dining",
+        x: 12, y: 15, w: 12, h: 9,
+        doors: [{ wall: "south", offset: 4, width: 3 }, { wall: "east", offset: 2, width: 3 }],
+        windows: [{ wall: "north", offset: 4, width: 3 }]
+      },
+      {
+        id: "kitchen", name: "Modular Kitchen", type: "kitchen",
+        x: 24, y: 0, w: 12, h: 11,
+        doors: [{ wall: "west", offset: 4, width: 3 }],
+        windows: [{ wall: "south", offset: 4, width: 3 }, { wall: "east", offset: 3, width: 3 }]
+      },
+      {
+        id: "bed1", name: "Master Bedroom Retreat", type: "bedroom",
+        x: 24, y: 11, w: 12, h: 13,
+        doors: [{ wall: "west", offset: 3, width: 3 }],
+        windows: [{ wall: "north", offset: 4, width: 4 }, { wall: "east", offset: 4, width: 4 }]
+      }
+    ]
+  },
+
+  // 26. 1BHK Eco-Micro Starter Cottage - North Facing
+  {
+    id: "t26",
+    name: "1BHK Eco-Micro Starter Cottage",
+    bhk: 1,
+    hasParking: false,
+    facing: "N",
+    referencePlot: { width: 20, length: 24 }, // 480 sqft
+    rooms: [
+      {
+        id: "hall", name: "Living Hall", type: "hall",
+        x: 0, y: 0, w: 12, h: 13,
+        doors: [{ wall: "south", offset: 4, width: 3.5 }, { wall: "north", offset: 4, width: 3 }],
+        windows: [{ wall: "south", offset: 1, width: 2.5 }, { wall: "west", offset: 3, width: 4 }]
+      },
+      {
+        id: "kitchen", name: "Open Kitchenette", type: "kitchen",
+        x: 12, y: 0, w: 8, h: 13,
+        doors: [{ wall: "west", offset: 4, width: 3 }],
+        windows: [{ wall: "south", offset: 2, width: 3 }, { wall: "east", offset: 3, width: 3 }]
+      },
+      {
+        id: "bed1", name: "Master Bedroom", type: "bedroom",
+        x: 0, y: 13, w: 13, h: 11,
+        doors: [{ wall: "south", offset: 4, width: 3 }],
+        windows: [{ wall: "north", offset: 4, width: 4 }, { wall: "west", offset: 3, width: 3 }]
+      },
+      {
+        id: "bath1", name: "Compact Bathroom", type: "bathroom",
+        x: 13, y: 13, w: 7, h: 6,
+        doors: [{ wall: "west", offset: 1.5, width: 2.5 }],
+        windows: [{ wall: "east", offset: 2, width: 2 }]
+      },
+      {
+        id: "balcony", name: "Utility Terrace", type: "balcony",
+        x: 13, y: 19, w: 7, h: 5,
+        doors: [{ wall: "west", offset: 1.5, width: 2.5 }],
+        windows: [{ wall: "north", offset: 2, width: 3 }]
+      }
+    ]
+  },
+
+  // 27. 1BHK Courtyard Garden Oasis - West Facing
+  {
+    id: "t27",
+    name: "1BHK Courtyard Garden Oasis",
+    bhk: 1,
+    hasParking: false,
+    facing: "W",
+    referencePlot: { width: 25, length: 28 }, // 700 sqft
+    rooms: [
+      {
+        id: "hall", name: "Courtyard Living Hall", type: "hall",
+        x: 0, y: 0, w: 15, h: 14,
+        doors: [{ wall: "west", offset: 4, width: 3.5 }, { wall: "north", offset: 5, width: 3 }],
+        windows: [{ wall: "south", offset: 4, width: 4 }, { wall: "west", offset: 8, width: 4 }]
+      },
+      {
+        id: "kitchen", name: "Garden Kitchen", type: "kitchen",
+        x: 15, y: 0, w: 10, h: 14,
+        doors: [{ wall: "west", offset: 4, width: 3 }],
+        windows: [{ wall: "south", offset: 3, width: 3 }, { wall: "east", offset: 4, width: 4 }]
+      },
+      {
+        id: "balcony", name: "Green Atrium Courtyard", type: "balcony",
+        x: 0, y: 14, w: 10, h: 14,
+        doors: [{ wall: "south", offset: 3, width: 3 }, { wall: "east", offset: 5, width: 3 }],
+        windows: [{ wall: "west", offset: 4, width: 4 }]
+      },
+      {
+        id: "bath1", name: "En-Suite Bathroom", type: "bathroom",
+        x: 10, y: 14, w: 6, h: 6,
+        doors: [{ wall: "east", offset: 1.5, width: 2.5 }],
+        windows: []
+      },
+      {
+        id: "study", name: "Courtyard Study Nook", type: "study",
+        x: 10, y: 20, w: 6, h: 8,
+        doors: [{ wall: "east", offset: 2.5, width: 2.5 }],
+        windows: [{ wall: "north", offset: 1.5, width: 2.5 }]
+      },
+      {
+        id: "bed1", name: "Master Bedroom Retreat", type: "bedroom",
+        x: 16, y: 14, w: 9, h: 14,
+        doors: [{ wall: "west", offset: 3, width: 3 }],
+        windows: [{ wall: "north", offset: 2, width: 4 }, { wall: "east", offset: 4, width: 4 }]
+      }
+    ]
+  },
+
+  // =========================================================================
+  // DUPLEX ARCHITECTURAL ARCHETYPES (MULTI-STORY: GROUND + FIRST FLOOR)
+  // =========================================================================
+
+  // 21. 2BHK Nordic Modern Duplex (G + 1)
+  {
+    id: "d01",
+    name: "2BHK Nordic Modern Duplex",
+    bhk: 2,
+    hasParking: true,
+    facing: "N",
+    houseType: "duplex",
+    floorsCount: 2,
+    referencePlot: { width: 26, length: 36 }, // 936 sqft footprint, 1,650 sqft built-up
+    rooms: [
+      // Ground Floor
+      {
+        id: "parking_g", name: "Covered Portico", type: "parking", floor: "ground",
+        x: 0, y: 0, w: 12, h: 16,
+        doors: [{ wall: "south", offset: 1, width: 10 }],
+        windows: []
+      },
+      {
+        id: "living_g", name: "Grand Living Room", type: "hall", floor: "ground",
+        x: 12, y: 0, w: 14, h: 18,
+        doors: [{ wall: "south", offset: 5, width: 3.5 }, { wall: "north", offset: 5, width: 3 }],
+        windows: [{ wall: "east", offset: 4, width: 5 }]
+      },
+      {
+        id: "dining_g", name: "Dining Nook", type: "dining", floor: "ground",
+        x: 12, y: 18, w: 14, h: 10,
+        doors: [{ wall: "south", offset: 5, width: 3 }],
+        windows: [{ wall: "east", offset: 3, width: 4 }]
+      },
+      {
+        id: "kitchen_g", name: "Modular Kitchen", type: "kitchen", floor: "ground",
+        x: 0, y: 16, w: 12, h: 12,
+        doors: [{ wall: "east", offset: 4, width: 3 }],
+        windows: [{ wall: "west", offset: 3, width: 4 }]
+      },
+      {
+        id: "bath_g", name: "Powder Bath", type: "bathroom", floor: "ground",
+        x: 0, y: 28, w: 6, h: 8,
+        doors: [{ wall: "east", offset: 2, width: 2.5 }],
+        windows: [{ wall: "west", offset: 2, width: 2 }]
+      },
+      {
+        id: "stairs_g", name: "Staircase (To 1F)", type: "stairs", floor: "ground",
+        x: 6, y: 28, w: 6, h: 8,
+        doors: [{ wall: "south", offset: 1.5, width: 3 }],
+        windows: []
+      },
+      {
+        id: "patio_g", name: "Rear Garden Patio", type: "balcony", floor: "ground",
+        x: 12, y: 28, w: 14, h: 8,
+        doors: [{ wall: "south", offset: 5, width: 4 }],
+        windows: [{ wall: "north", offset: 4, width: 5 }]
+      },
+      // First Floor
+      {
+        id: "stairs_1", name: "Stair Landing & Void", type: "stairs", floor: "first",
+        x: 6, y: 28, w: 6, h: 8,
+        doors: [{ wall: "south", offset: 1.5, width: 3 }],
+        windows: []
+      },
+      {
+        id: "master_1", name: "Master Suite", type: "bedroom", floor: "first",
+        x: 0, y: 14, w: 12, h: 14,
+        doors: [{ wall: "east", offset: 4, width: 3 }],
+        windows: [{ wall: "west", offset: 3, width: 5 }]
+      },
+      {
+        id: "master_bath_1", name: "Master En-Suite", type: "bathroom", floor: "first",
+        x: 0, y: 28, w: 6, h: 8,
+        doors: [{ wall: "south", offset: 1.5, width: 2.5 }],
+        windows: [{ wall: "west", offset: 2, width: 2 }]
+      },
+      {
+        id: "lounge_1", name: "Upper Family Lounge", type: "hall", floor: "first",
+        x: 12, y: 16, w: 14, h: 12,
+        doors: [{ wall: "south", offset: 5, width: 3 }],
+        windows: [{ wall: "east", offset: 3, width: 5 }]
+      },
+      {
+        id: "bed2_1", name: "Bedroom 2", type: "bedroom", floor: "first",
+        x: 12, y: 0, w: 14, h: 16,
+        doors: [{ wall: "north", offset: 5, width: 3 }],
+        windows: [{ wall: "south", offset: 4, width: 5 }, { wall: "east", offset: 4, width: 4 }]
+      },
+      {
+        id: "bath2_1", name: "Upper Guest Bath", type: "bathroom", floor: "first",
+        x: 12, y: 28, w: 14, h: 8,
+        doors: [{ wall: "south", offset: 5, width: 2.5 }],
+        windows: [{ wall: "north", offset: 5, width: 3 }]
+      },
+      {
+        id: "terrace_1", name: "Rooftop Sky Deck", type: "balcony", floor: "first",
+        x: 0, y: 0, w: 12, h: 14,
+        doors: [{ wall: "north", offset: 4, width: 3 }],
+        windows: []
+      }
+    ]
+  },
+
+  // 22. 3BHK Architectural Duplex Villa (G + 1)
+  {
+    id: "d02",
+    name: "3BHK Architectural Duplex Villa",
+    bhk: 3,
+    hasParking: true,
+    facing: "E",
+    houseType: "duplex",
+    floorsCount: 2,
+    referencePlot: { width: 32, length: 45 }, // 1,440 sqft footprint, 2,520 sqft built-up
+    rooms: [
+      // Ground Floor
+      {
+        id: "parking_g", name: "Double Carport", type: "parking", floor: "ground",
+        x: 0, y: 0, w: 13, h: 18,
+        doors: [{ wall: "south", offset: 1.5, width: 10 }],
+        windows: []
+      },
+      {
+        id: "hall_g", name: "Grand Living Foyer", type: "hall", floor: "ground",
+        x: 13, y: 0, w: 19, h: 18,
+        doors: [{ wall: "south", offset: 8, width: 4 }, { wall: "north", offset: 8, width: 3.5 }],
+        windows: [{ wall: "east", offset: 4, width: 6 }]
+      },
+      {
+        id: "dining_g", name: "Formal Dining", type: "dining", floor: "ground",
+        x: 13, y: 18, w: 12, h: 12,
+        doors: [{ wall: "south", offset: 4, width: 3 }],
+        windows: [{ wall: "east", offset: 3, width: 4 }]
+      },
+      {
+        id: "kitchen_g", name: "Island Chef Kitchen", type: "kitchen", floor: "ground",
+        x: 0, y: 18, w: 13, h: 12,
+        doors: [{ wall: "east", offset: 4, width: 3 }],
+        windows: [{ wall: "west", offset: 3, width: 4 }]
+      },
+      {
+        id: "bed1_g", name: "Ground Guest Suite", type: "bedroom", floor: "ground",
+        x: 0, y: 30, w: 15, h: 15,
+        doors: [{ wall: "east", offset: 4, width: 3 }],
+        windows: [{ wall: "west", offset: 4, width: 4 }, { wall: "north", offset: 4, width: 4 }]
+      },
+      {
+        id: "bath1_g", name: "Guest Bath", type: "bathroom", floor: "ground",
+        x: 15, y: 30, w: 7, h: 7,
+        doors: [{ wall: "south", offset: 2, width: 2.5 }],
+        windows: []
+      },
+      {
+        id: "stairs_g", name: "Floating Staircase", type: "stairs", floor: "ground",
+        x: 22, y: 30, w: 10, h: 7,
+        doors: [{ wall: "south", offset: 3, width: 3 }],
+        windows: []
+      },
+      {
+        id: "pooja_g", name: "Pooja Sanctum", type: "pooja", floor: "ground",
+        x: 25, y: 18, w: 7, h: 12,
+        doors: [{ wall: "west", offset: 3, width: 3 }],
+        windows: [{ wall: "east", offset: 3, width: 2 }]
+      },
+      {
+        id: "veranda_g", name: "Rear Veranda", type: "balcony", floor: "ground",
+        x: 15, y: 37, w: 17, h: 8,
+        doors: [{ wall: "south", offset: 6, width: 3.5 }],
+        windows: [{ wall: "north", offset: 5, width: 5 }]
+      },
+      // First Floor
+      {
+        id: "stairs_1", name: "Stair Landing & Void", type: "stairs", floor: "first",
+        x: 22, y: 30, w: 10, h: 7,
+        doors: [{ wall: "south", offset: 3, width: 3 }],
+        windows: []
+      },
+      {
+        id: "lounge_1", name: "Mezzanine Family Lounge", type: "hall", floor: "first",
+        x: 13, y: 14, w: 19, h: 16,
+        doors: [{ wall: "south", offset: 8, width: 3.5 }],
+        windows: [{ wall: "east", offset: 4, width: 6 }]
+      },
+      {
+        id: "master_1", name: "Master Suite", type: "bedroom", floor: "first",
+        x: 0, y: 16, w: 13, h: 14,
+        doors: [{ wall: "east", offset: 4, width: 3 }],
+        windows: [{ wall: "west", offset: 4, width: 5 }]
+      },
+      {
+        id: "master_bath_1", name: "Master Spa Bath", type: "bathroom", floor: "first",
+        x: 0, y: 30, w: 13, h: 8,
+        doors: [{ wall: "south", offset: 4, width: 2.5 }],
+        windows: [{ wall: "west", offset: 2, width: 3 }]
+      },
+      {
+        id: "bed3_1", name: "Bedroom 3 (Junior Suite)", type: "bedroom", floor: "first",
+        x: 0, y: 38, w: 15, h: 7,
+        doors: [{ wall: "south", offset: 5, width: 3 }],
+        windows: [{ wall: "north", offset: 4, width: 4 }]
+      },
+      {
+        id: "bath3_1", name: "Upper En-Suite", type: "bathroom", floor: "first",
+        x: 15, y: 30, w: 7, h: 7,
+        doors: [{ wall: "south", offset: 2, width: 2.5 }],
+        windows: []
+      },
+      {
+        id: "study_1", name: "Executive Study", type: "study", floor: "first",
+        x: 15, y: 37, w: 17, h: 8,
+        doors: [{ wall: "south", offset: 5, width: 3 }],
+        windows: [{ wall: "north", offset: 5, width: 4 }]
+      },
+      {
+        id: "balcony_front_1", name: "Lookout Balcony", type: "balcony", floor: "first",
+        x: 13, y: 0, w: 19, h: 14,
+        doors: [{ wall: "north", offset: 8, width: 4 }],
+        windows: []
+      },
+      {
+        id: "terrace_1", name: "Panoramic Sky Terrace", type: "balcony", floor: "first",
+        x: 0, y: 0, w: 13, h: 16,
+        doors: [{ wall: "north", offset: 4, width: 3.5 }],
+        windows: []
+      }
+    ]
+  },
+
+  // 23. 3BHK Executive Compact Duplex (G + 1)
+  {
+    id: "d03",
+    name: "3BHK Executive Compact Duplex",
+    bhk: 3,
+    hasParking: true,
+    facing: "N",
+    houseType: "duplex",
+    floorsCount: 2,
+    referencePlot: { width: 30, length: 40 }, // 1,200 sqft footprint, 2,100 sqft built-up
+    rooms: [
+      // Ground Floor
+      {
+        id: "parking_g", name: "Carport", type: "parking", floor: "ground",
+        x: 0, y: 0, w: 12, h: 16,
+        doors: [{ wall: "south", offset: 1, width: 10 }],
+        windows: []
+      },
+      {
+        id: "hall_g", name: "Living Hall", type: "hall", floor: "ground",
+        x: 12, y: 0, w: 18, h: 18,
+        doors: [{ wall: "south", offset: 6, width: 3.5 }],
+        windows: [{ wall: "east", offset: 4, width: 5 }]
+      },
+      {
+        id: "kitchen_g", name: "Kitchen", type: "kitchen", floor: "ground",
+        x: 0, y: 16, w: 12, h: 12,
+        doors: [{ wall: "east", offset: 4, width: 3 }],
+        windows: [{ wall: "west", offset: 3, width: 4 }]
+      },
+      {
+        id: "dining_g", name: "Dining Space", type: "dining", floor: "ground",
+        x: 12, y: 18, w: 11, h: 10,
+        doors: [{ wall: "south", offset: 4, width: 3 }],
+        windows: [{ wall: "east", offset: 2, width: 4 }]
+      },
+      {
+        id: "stairs_g", name: "Staircase (To 1F)", type: "stairs", floor: "ground",
+        x: 23, y: 18, w: 7, h: 10,
+        doors: [{ wall: "west", offset: 3, width: 3 }],
+        windows: []
+      },
+      {
+        id: "bed1_g", name: "Ground Bedroom", type: "bedroom", floor: "ground",
+        x: 0, y: 28, w: 15, h: 12,
+        doors: [{ wall: "east", offset: 4, width: 3 }],
+        windows: [{ wall: "north", offset: 4, width: 4 }, { wall: "west", offset: 3, width: 4 }]
+      },
+      {
+        id: "bath1_g", name: "Bathroom", type: "bathroom", floor: "ground",
+        x: 15, y: 28, w: 7, h: 12,
+        doors: [{ wall: "west", offset: 4, width: 2.5 }],
+        windows: [{ wall: "north", offset: 2, width: 2 }]
+      },
+      {
+        id: "patio_g", name: "Utility Garden", type: "balcony", floor: "ground",
+        x: 22, y: 28, w: 8, h: 12,
+        doors: [{ wall: "south", offset: 2, width: 3 }],
+        windows: []
+      },
+      // First Floor
+      {
+        id: "stairs_1", name: "Stair Landing", type: "stairs", floor: "first",
+        x: 23, y: 18, w: 7, h: 10,
+        doors: [{ wall: "west", offset: 3, width: 3 }],
+        windows: []
+      },
+      {
+        id: "lounge_1", name: "Upper Lounge", type: "hall", floor: "first",
+        x: 12, y: 16, w: 11, h: 12,
+        doors: [{ wall: "south", offset: 4, width: 3 }],
+        windows: [{ wall: "east", offset: 3, width: 4 }]
+      },
+      {
+        id: "master_1", name: "Master Bedroom", type: "bedroom", floor: "first",
+        x: 0, y: 16, w: 12, h: 12,
+        doors: [{ wall: "east", offset: 3, width: 3 }],
+        windows: [{ wall: "west", offset: 3, width: 4 }]
+      },
+      {
+        id: "bed3_1", name: "Bedroom 3", type: "bedroom", floor: "first",
+        x: 0, y: 28, w: 15, h: 12,
+        doors: [{ wall: "east", offset: 4, width: 3 }],
+        windows: [{ wall: "north", offset: 4, width: 4 }]
+      },
+      {
+        id: "bath2_1", name: "Upper Master Bath", type: "bathroom", floor: "first",
+        x: 15, y: 28, w: 7, h: 12,
+        doors: [{ wall: "west", offset: 4, width: 2.5 }],
+        windows: [{ wall: "north", offset: 2, width: 2 }]
+      },
+      {
+        id: "bath3_1", name: "Upper Common Bath", type: "bathroom", floor: "first",
+        x: 22, y: 28, w: 8, h: 12,
+        doors: [{ wall: "south", offset: 2, width: 2.5 }],
+        windows: [{ wall: "north", offset: 2, width: 2 }]
+      },
+      {
+        id: "terrace_1", name: "Front Terrace", type: "balcony", floor: "first",
+        x: 0, y: 0, w: 12, h: 16,
+        doors: [{ wall: "north", offset: 4, width: 3 }],
+        windows: []
+      },
+      {
+        id: "balcony_1", name: "East Balcony", type: "balcony", floor: "first",
+        x: 12, y: 0, w: 18, h: 16,
+        doors: [{ wall: "north", offset: 6, width: 3.5 }],
+        windows: []
+      }
+    ]
+  },
+
+  // 24. 4BHK Sovereign Grand Duplex Villa (G + 1)
+  {
+    id: "d04",
+    name: "4BHK Sovereign Grand Duplex",
+    bhk: 4,
+    hasParking: true,
+    facing: "N",
+    houseType: "duplex",
+    floorsCount: 2,
+    referencePlot: { width: 36, length: 50 }, // 1,800 sqft footprint, 3,250 sqft built-up
+    rooms: [
+      // Ground Floor
+      {
+        id: "parking_g", name: "Executive 2-Car Garage", type: "parking", floor: "ground",
+        x: 0, y: 0, w: 15, h: 20,
+        doors: [{ wall: "south", offset: 2, width: 11 }],
+        windows: []
+      },
+      {
+        id: "living_g", name: "Atrium Living Salon", type: "hall", floor: "ground",
+        x: 15, y: 0, w: 21, h: 20,
+        doors: [{ wall: "south", offset: 8, width: 4 }],
+        windows: [{ wall: "east", offset: 5, width: 6 }]
+      },
+      {
+        id: "dining_g", name: "Banquet Dining", type: "dining", floor: "ground",
+        x: 15, y: 20, w: 13, h: 14,
+        doors: [{ wall: "south", offset: 4, width: 3.5 }],
+        windows: [{ wall: "east", offset: 3, width: 4 }]
+      },
+      {
+        id: "kitchen_g", name: "Gourmet Kitchen", type: "kitchen", floor: "ground",
+        x: 0, y: 20, w: 15, h: 14,
+        doors: [{ wall: "east", offset: 4, width: 3 }],
+        windows: [{ wall: "west", offset: 3, width: 4 }]
+      },
+      {
+        id: "stairs_g", name: "Grand Spiral Staircase", type: "stairs", floor: "ground",
+        x: 28, y: 20, w: 8, h: 14,
+        doors: [{ wall: "west", offset: 4, width: 3 }],
+        windows: [{ wall: "east", offset: 4, width: 2 }]
+      },
+      {
+        id: "bed1_g", name: "Ground Elder Suite", type: "bedroom", floor: "ground",
+        x: 0, y: 34, w: 18, h: 16,
+        doors: [{ wall: "east", offset: 5, width: 3.5 }],
+        windows: [{ wall: "west", offset: 4, width: 5 }, { wall: "north", offset: 4, width: 5 }]
+      },
+      {
+        id: "bath1_g", name: "Elder En-Suite Bath", type: "bathroom", floor: "ground",
+        x: 18, y: 34, w: 9, h: 8,
+        doors: [{ wall: "west", offset: 2, width: 2.5 }],
+        windows: []
+      },
+      {
+        id: "powder_g", name: "Powder Room", type: "bathroom", floor: "ground",
+        x: 18, y: 42, w: 9, h: 8,
+        doors: [{ wall: "south", offset: 2, width: 2.5 }],
+        windows: [{ wall: "north", offset: 2, width: 2 }]
+      },
+      {
+        id: "veranda_g", name: "Garden Loggia", type: "balcony", floor: "ground",
+        x: 27, y: 34, w: 9, h: 16,
+        doors: [{ wall: "west", offset: 4, width: 3.5 }],
+        windows: [{ wall: "north", offset: 2, width: 4 }]
+      },
+      // First Floor
+      {
+        id: "stairs_1", name: "Staircase Gallery Void", type: "stairs", floor: "first",
+        x: 28, y: 20, w: 8, h: 14,
+        doors: [{ wall: "west", offset: 4, width: 3 }],
+        windows: [{ wall: "east", offset: 4, width: 2 }]
+      },
+      {
+        id: "lounge_1", name: "Upper Cinema Lounge", type: "hall", floor: "first",
+        x: 15, y: 18, w: 13, h: 16,
+        doors: [{ wall: "south", offset: 4, width: 3.5 }],
+        windows: [{ wall: "east", offset: 4, width: 4 }]
+      },
+      {
+        id: "master_1", name: "Presidential Master Suite", type: "bedroom", floor: "first",
+        x: 0, y: 32, w: 18, h: 18,
+        doors: [{ wall: "east", offset: 6, width: 3.5 }],
+        windows: [{ wall: "west", offset: 5, width: 6 }, { wall: "north", offset: 5, width: 6 }]
+      },
+      {
+        id: "master_bath_1", name: "Master Spa Jacuzzi Bath", type: "bathroom", floor: "first",
+        x: 18, y: 34, w: 9, h: 16,
+        doors: [{ wall: "west", offset: 4, width: 3 }],
+        windows: [{ wall: "north", offset: 3, width: 3 }]
+      },
+      {
+        id: "bed3_1", name: "Junior Suite 3", type: "bedroom", floor: "first",
+        x: 27, y: 34, w: 9, h: 16,
+        doors: [{ wall: "west", offset: 4, width: 3 }],
+        windows: [{ wall: "north", offset: 2, width: 3 }, { wall: "east", offset: 4, width: 4 }]
+      },
+      {
+        id: "bed4_1", name: "Guest Chamber 4", type: "bedroom", floor: "first",
+        x: 0, y: 18, w: 15, h: 14,
+        doors: [{ wall: "east", offset: 4, width: 3 }],
+        windows: [{ wall: "west", offset: 3, width: 4 }]
+      },
+      {
+        id: "terrace_1", name: "Rooftop Solarium", type: "balcony", floor: "first",
+        x: 0, y: 0, w: 15, h: 18,
+        doors: [{ wall: "north", offset: 5, width: 4 }],
+        windows: []
+      },
+      {
+        id: "balcony_1", name: "Grand Promenade Balcony", type: "balcony", floor: "first",
+        x: 15, y: 0, w: 21, h: 18,
+        doors: [{ wall: "north", offset: 8, width: 4 }],
+        windows: []
+      }
+    ]
+  },
+
+  // 25. 5BHK Imperial Palatial Duplex Estate (G + 1)
+  {
+    id: "d05",
+    name: "5BHK Imperial Palatial Duplex",
+    bhk: 5,
+    hasParking: true,
+    facing: "E",
+    houseType: "duplex",
+    floorsCount: 2,
+    referencePlot: { width: 40, length: 55 }, // 2,200 sqft footprint, 3,980 sqft built-up
+    rooms: [
+      // Ground Floor
+      {
+        id: "parking_g", name: "Triple Vehicle Portico", type: "parking", floor: "ground",
+        x: 0, y: 0, w: 18, h: 22,
+        doors: [{ wall: "south", offset: 2, width: 14 }],
+        windows: []
+      },
+      {
+        id: "living_g", name: "Great Cathedral Living", type: "hall", floor: "ground",
+        x: 18, y: 0, w: 22, h: 22,
+        doors: [{ wall: "south", offset: 8, width: 4 }],
+        windows: [{ wall: "east", offset: 6, width: 6 }]
+      },
+      {
+        id: "dining_g", name: "Imperial Dining Room", type: "dining", floor: "ground",
+        x: 18, y: 22, w: 14, h: 16,
+        doors: [{ wall: "south", offset: 4, width: 3.5 }],
+        windows: [{ wall: "east", offset: 4, width: 4 }]
+      },
+      {
+        id: "kitchen_g", name: "Chef Kitchen & Pantry", type: "kitchen", floor: "ground",
+        x: 0, y: 22, w: 18, h: 16,
+        doors: [{ wall: "east", offset: 5, width: 3.5 }],
+        windows: [{ wall: "west", offset: 4, width: 4 }]
+      },
+      {
+        id: "stairs_g", name: "Monumental Dual Staircase", type: "stairs", floor: "ground",
+        x: 32, y: 22, w: 8, h: 16,
+        doors: [{ wall: "west", offset: 5, width: 3.5 }],
+        windows: [{ wall: "east", offset: 5, width: 2 }]
+      },
+      {
+        id: "bed1_g", name: "Ground Suite 1", type: "bedroom", floor: "ground",
+        x: 0, y: 38, w: 18, h: 17,
+        doors: [{ wall: "east", offset: 6, width: 3.5 }],
+        windows: [{ wall: "west", offset: 4, width: 5 }, { wall: "north", offset: 4, width: 5 }]
+      },
+      {
+        id: "bath1_g", name: "Suite 1 En-Suite Bath", type: "bathroom", floor: "ground",
+        x: 18, y: 38, w: 9, h: 9,
+        doors: [{ wall: "west", offset: 2, width: 2.5 }],
+        windows: []
+      },
+      {
+        id: "pooja_g", name: "Pooja Pavilion", type: "pooja", floor: "ground",
+        x: 18, y: 47, w: 9, h: 8,
+        doors: [{ wall: "south", offset: 3, width: 3 }],
+        windows: [{ wall: "north", offset: 2, width: 3 }]
+      },
+      {
+        id: "veranda_g", name: "Rear Garden Veranda", type: "balcony", floor: "ground",
+        x: 27, y: 38, w: 13, h: 17,
+        doors: [{ wall: "west", offset: 5, width: 3.5 }],
+        windows: [{ wall: "north", offset: 4, width: 5 }]
+      },
+      // First Floor
+      {
+        id: "stairs_1", name: "Stair Landing & Gallery", type: "stairs", floor: "first",
+        x: 32, y: 22, w: 8, h: 16,
+        doors: [{ wall: "west", offset: 5, width: 3.5 }],
+        windows: [{ wall: "east", offset: 5, width: 2 }]
+      },
+      {
+        id: "lounge_1", name: "Grand Mezzanine Salon", type: "hall", floor: "first",
+        x: 18, y: 18, w: 14, h: 20,
+        doors: [{ wall: "south", offset: 5, width: 3.5 }],
+        windows: [{ wall: "east", offset: 4, width: 5 }]
+      },
+      {
+        id: "master_1", name: "Imperial Master Suite (Bed 2)", type: "bedroom", floor: "first",
+        x: 0, y: 36, w: 18, h: 19,
+        doors: [{ wall: "east", offset: 6, width: 4 }],
+        windows: [{ wall: "west", offset: 5, width: 6 }, { wall: "north", offset: 5, width: 6 }]
+      },
+      {
+        id: "master_bath_1", name: "Master Spa Retreat Bath", type: "bathroom", floor: "first",
+        x: 18, y: 38, w: 10, h: 17,
+        doors: [{ wall: "west", offset: 4, width: 3 }],
+        windows: [{ wall: "north", offset: 3, width: 3 }]
+      },
+      {
+        id: "bed3_1", name: "Chamber Suite 3", type: "bedroom", floor: "first",
+        x: 28, y: 38, w: 12, h: 17,
+        doors: [{ wall: "west", offset: 4, width: 3 }],
+        windows: [{ wall: "north", offset: 3, width: 4 }, { wall: "east", offset: 4, width: 4 }]
+      },
+      {
+        id: "bed4_1", name: "Chamber Suite 4", type: "bedroom", floor: "first",
+        x: 0, y: 18, w: 18, h: 18,
+        doors: [{ wall: "east", offset: 5, width: 3.5 }],
+        windows: [{ wall: "west", offset: 4, width: 4 }]
+      },
+      {
+        id: "bed5_1", name: "Guest Studio 5", type: "bedroom", floor: "first",
+        x: 28, y: 18, w: 12, h: 16,
+        doors: [{ wall: "west", offset: 4, width: 3 }],
+        windows: [{ wall: "east", offset: 3, width: 4 }]
+      },
+      {
+        id: "terrace_1", name: "Imperial Rooftop Solarium", type: "balcony", floor: "first",
+        x: 0, y: 0, w: 18, h: 18,
+        doors: [{ wall: "north", offset: 6, width: 4 }],
+        windows: []
+      },
+      {
+        id: "balcony_1", name: "Promenade Vista Balcony", type: "balcony", floor: "first",
+        x: 18, y: 0, w: 22, h: 18,
+        doors: [{ wall: "north", offset: 8, width: 4 }],
+        windows: []
+      }
+    ]
+  },
+
+  // 28. 1BHK Modern Loft Duplex (G + 1)
+  {
+    id: "d06",
+    name: "1BHK Modern Loft Duplex with Rooftop Terrace",
+    bhk: 1,
+    hasParking: true,
+    facing: "N",
+    houseType: "duplex",
+    floorsCount: 2,
+    referencePlot: { width: 22, length: 28 }, // 616 sqft footprint, 1,120 sqft built-up
+    rooms: [
+      // Ground Floor
+      {
+        id: "parking_g", name: "Sheltered Garage", type: "parking", floor: "ground",
+        x: 0, y: 0, w: 10, h: 15,
+        doors: [{ wall: "south", offset: 1, width: 8.5 }],
+        windows: []
+      },
+      {
+        id: "hall_g", name: "Open-Plan Great Room", type: "hall", floor: "ground",
+        x: 10, y: 0, w: 12, h: 15,
+        doors: [{ wall: "south", offset: 4, width: 3.5 }, { wall: "north", offset: 4, width: 3 }],
+        windows: [{ wall: "east", offset: 4, width: 4 }]
+      },
+      {
+        id: "kitchen_g", name: "Chef Kitchen", type: "kitchen", floor: "ground",
+        x: 10, y: 15, w: 12, h: 7,
+        doors: [{ wall: "south", offset: 3, width: 3 }],
+        windows: [{ wall: "east", offset: 2, width: 3 }]
+      },
+      {
+        id: "dining_g", name: "Dining Space", type: "dining", floor: "ground",
+        x: 10, y: 22, w: 12, h: 6,
+        doors: [{ wall: "west", offset: 2, width: 3 }],
+        windows: [{ wall: "east", offset: 2, width: 3 }]
+      },
+      {
+        id: "bath_g", name: "Powder Room Bath", type: "bathroom", floor: "ground",
+        x: 0, y: 15, w: 10, h: 5.5,
+        doors: [{ wall: "east", offset: 1.5, width: 2.5 }],
+        windows: [{ wall: "west", offset: 1.5, width: 2 }]
+      },
+      {
+        id: "stairs_g", name: "Floating Staircase", type: "stairs", floor: "ground",
+        x: 0, y: 20.5, w: 10, h: 7.5,
+        doors: [{ wall: "east", offset: 2, width: 3 }],
+        windows: [{ wall: "west", offset: 2, width: 2 }]
+      },
+      // First Floor
+      {
+        id: "bed1_1", name: "Master Penthouse Suite", type: "bedroom", floor: "first",
+        x: 0, y: 0, w: 14, h: 15,
+        doors: [{ wall: "north", offset: 5, width: 3 }],
+        windows: [{ wall: "south", offset: 4, width: 4 }, { wall: "west", offset: 4, width: 4 }]
+      },
+      {
+        id: "terrace_1", name: "Panoramic Sky Deck", type: "balcony", floor: "first",
+        x: 14, y: 0, w: 8, h: 15,
+        doors: [{ wall: "west", offset: 5, width: 3 }],
+        windows: [{ wall: "south", offset: 2, width: 3 }, { wall: "east", offset: 3, width: 4 }]
+      },
+      {
+        id: "study_1", name: "Mezzanine Studio", type: "study", floor: "first",
+        x: 0, y: 15, w: 12, h: 5.5,
+        doors: [{ wall: "south", offset: 4, width: 3 }],
+        windows: [{ wall: "west", offset: 2, width: 3 }]
+      },
+      {
+        id: "bath_1", name: "En-Suite Spa Bath", type: "bathroom", floor: "first",
+        x: 12, y: 15, w: 10, h: 6,
+        doors: [{ wall: "south", offset: 2, width: 2.5 }],
+        windows: [{ wall: "east", offset: 2, width: 2 }]
+      },
+      {
+        id: "stairs_1", name: "Upper Landing", type: "stairs", floor: "first",
+        x: 0, y: 20.5, w: 10, h: 7.5,
+        doors: [{ wall: "east", offset: 2, width: 3 }],
+        windows: [{ wall: "west", offset: 2, width: 2 }]
+      },
+      {
+        id: "balcony_1", name: "Vista Balcony", type: "balcony", floor: "first",
+        x: 10, y: 21, w: 12, h: 7,
+        doors: [{ wall: "west", offset: 2, width: 3 }],
+        windows: [{ wall: "north", offset: 3, width: 4 }]
       }
     ]
   }

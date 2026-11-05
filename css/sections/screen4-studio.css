@@ -1,0 +1,341 @@
+/* ==========================================================================
+   SCREEN 4: STUDIO RESULT VIEW (DRAFTING TABLE SPEC)
+   ========================================================================== */
+.result-screen-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: calc(100vh - var(--header-height) - 48px);
+  min-height: 600px;
+}
+
+/* Unified Studio Command Bar */
+.result-top-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: var(--paper-card);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--paper-border-solid);
+  box-shadow: 0 2px 6px rgba(14, 26, 43, 0.04);
+  position: relative;
+  z-index: 20;
+}
+
+.studio-top-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.studio-nav-btn {
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--paper-border-solid);
+  background: #FFFFFF;
+  color: var(--paper-text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.studio-nav-btn:hover {
+  border-color: var(--pencil-accent);
+  color: var(--pencil-accent);
+  background: rgba(228, 87, 46, 0.04);
+}
+
+.studio-meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: #FFFFFF;
+  border: 1px solid var(--paper-border-solid);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--paper-text);
+}
+
+.studio-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--status-pass, #0D7C4D);
+}
+
+/* 3-Mode Viewport Toggle Segment */
+.view-mode-toggle {
+  display: inline-flex;
+  background: #EAE5D9;
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--paper-border-solid);
+}
+
+.view-mode-btn {
+  padding: 5px 14px;
+  font-size: 0.80rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--paper-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+
+.view-mode-btn:hover {
+  color: var(--paper-text);
+}
+
+.view-mode-btn.active {
+  background: var(--ink-bg);
+  color: var(--ink-text);
+  font-weight: 700;
+}
+
+/* Integrated Floor Level Navigator & Actions */
+.studio-top-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.floor-nav-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.floor-pills-cluster {
+  display: inline-flex;
+  background: #EAE5D9;
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  gap: 2px;
+  border: 1px solid var(--paper-border-solid);
+}
+
+.floor-pill-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--paper-text-secondary);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.floor-pill-tab:hover {
+  color: var(--paper-text);
+}
+
+.floor-pill-tab.active {
+  background: var(--pencil-accent);
+  color: #FFFFFF;
+  font-weight: 700;
+}
+
+.floor-subtag {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  background: rgba(14, 26, 43, 0.08);
+  border-radius: 2px;
+  color: var(--paper-text-secondary);
+}
+
+.floor-pill-tab.active .floor-subtag {
+  background: rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+}
+
+.typology-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: #FFFFFF;
+  border: 1px solid var(--paper-border-solid);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--paper-text);
+}
+
+.typology-badge-pill.duplex {
+  background: rgba(180, 83, 9, 0.08);
+  border-color: #B45309;
+  color: #92400E;
+}
+
+.btn-floor-toggle-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease;
+}
+
+/* Typology Cards on Screen 2 */
+.typology-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.typology-card {
+  background: #FFFFFF;
+  border: 1px solid var(--paper-border-solid);
+  border-radius: var(--radius-sm);
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+.typology-card:hover {
+  border-color: var(--pencil-accent);
+  background: rgba(228, 87, 46, 0.02);
+}
+.typology-card.active {
+  border-color: var(--pencil-accent);
+  background: rgba(228, 87, 46, 0.06);
+}
+.typology-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.typology-icon {
+  font-size: 1.6rem;
+}
+.typology-tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: #EAE5D9;
+  color: var(--paper-text-secondary);
+}
+.typology-tag.highlight {
+  background: rgba(180, 83, 9, 0.1);
+  color: #B45309;
+}
+.typology-title {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--paper-text);
+  margin-bottom: 4px;
+}
+.typology-desc {
+  font-size: 0.80rem;
+  color: var(--paper-text-secondary);
+  line-height: 1.45;
+  margin-bottom: 10px;
+}
+.typology-features {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.74rem;
+  color: var(--paper-text);
+  font-family: var(--font-mono);
+}
+
+/* Candidate Filters Bar */
+.candidate-filters-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.candidate-filter-btn {
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--paper-border-solid);
+  background: #FFFFFF;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--paper-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.candidate-filter-btn:hover {
+  color: var(--paper-text);
+  border-color: var(--pencil-accent);
+}
+.candidate-filter-btn.active {
+  background: var(--ink-bg);
+  color: var(--ink-text);
+  border-color: var(--ink-bg);
+}
+
+.result-workspace {
+  display: flex;
+  flex: 1;
+  gap: 16px;
+  min-height: 0; /* flex child scroll safety */
+}
+
+.result-viewport-container {
+  flex: 1;
+  background: var(--paper-card);
+  border: 1px solid var(--paper-border-solid);
+  border-radius: var(--radius-sm);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(14, 26, 43, 0.05);
+}
+
+#plan2DCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+}
+
+#webgl3DContainer {
+  width: 100%;
+  height: 100%;
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+}

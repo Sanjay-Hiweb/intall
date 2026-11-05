@@ -14,8 +14,8 @@ function getMaterialsConfig() {
       materialsConfig = JSON.parse(raw);
     } catch {
       materialsConfig = {
-        currency: "USD",
-        currencySymbol: "$",
+        currency: "INR",
+        currencySymbol: "₹",
         rateTier: "Standard Premium",
         flooring: {},
         masonryAndWalls: {},
@@ -75,7 +75,7 @@ function calculateBOM(rooms, plot) {
     let floorType = 'vitrified_tile';
     if (['bedroom', 'study'].includes(rType)) floorType = 'hardwood_oak';
     else if (['bathroom', 'balcony'].includes(rType)) floorType = 'anti_skid_tile';
-    else if (['kitchen', 'pooja'].includes(rType)) floorType = 'granite_slab';
+    else if (['kitchen', 'pooja', 'stairs'].includes(rType)) floorType = 'granite_slab';
     else if (rType === 'parking') floorType = 'paved_pavers';
 
     flooringQuantities[floorType] = (flooringQuantities[floorType] || 0) + roomArea;
@@ -113,6 +113,7 @@ function calculateBOM(rooms, plot) {
     roomBreakdowns.push({
       id: room.id,
       name: room.name,
+      floor: room.floor || 'ground',
       type: rType,
       dimensions: `${w} × ${h} ft`,
       areaSqft: roomArea,
@@ -156,7 +157,7 @@ function calculateBOM(rooms, plot) {
         quantity: billableSqft,
         unit: "sq.ft",
         unitRate: unitRate,
-        rateDetails: `Material $${finishInfo.materialRate} + Labor $${finishInfo.laborRate} (+${finishInfo.wastagePct}% cut waste)`,
+        rateDetails: `Material ${config.currencySymbol || "₹"}${finishInfo.materialRate} + Labor ${config.currencySymbol || "₹"}${finishInfo.laborRate} (+${finishInfo.wastagePct}% cut waste)`,
         subtotal: subtotal
       });
     }
@@ -286,7 +287,7 @@ function calculateBOM(rooms, plot) {
   return {
     success: true,
     currency: config.currency || "USD",
-    currencySymbol: config.currencySymbol || "$",
+    currencySymbol: config.currencySymbol || "₹",
     tier: config.rateTier || "Standard Premium",
     metrics: {
       plotAreaSqft: plotArea,

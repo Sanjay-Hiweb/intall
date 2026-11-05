@@ -49,10 +49,13 @@ function auditCompliance(rooms, plot) {
     const area = +(rw * rh).toFixed(1);
     totalBuiltUpArea += area;
 
-    if (rx < minX) minX = rx;
-    if (ry < minY) minY = ry;
-    if (rx + rw > maxX) maxX = rx + rw;
-    if (ry + rh > maxY) maxY = ry + rh;
+    const isGround = !room.floor || room.floor === 'ground';
+    if (isGround) {
+      if (rx < minX) minX = rx;
+      if (ry < minY) minY = ry;
+      if (rx + rw > maxX) maxX = rx + rw;
+      if (ry + rh > maxY) maxY = ry + rh;
+    }
 
     // Room type checks
     const rType = (room.type || 'hall').toLowerCase();

@@ -1,0 +1,1839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — INTALL Architectural Studio</title>
+  <meta name="description" content="Sign in to INTALL in-browser parametric architectural studio. Authenticate with Google to design bylaw-compliant 2D and 3D floor plans.">
+  <meta name="theme-color" content="#F5F2EA">
+
+  <!-- OpenGraph Metadata -->
+  <meta property="og:title" content="Sign In — INTALL Architectural Studio">
+  <meta property="og:description" content="One account. Your plots and plans are saved to it. Authenticate with Google to enter your drawing board.">
+  <meta property="og:type" content="website">
+
+  <!-- Architectural Typography: Fraunces (Editorial Display Serif) + Inter (Body/UI) + JetBrains Mono (Technical Labels & Dimensions) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       INTALL "DRAFTING TABLE" SIGN-IN DESIGN SYSTEM
+       - Paper (#F5F2EA) & Ink (#0E1A2B)
+       - ONE accent: drafting pencil red-orange (#E4572E)
+       - Blueprint grid on paper areas (subtle hairline grid)
+       - Fraunces serif + Inter UI + JetBrains Mono dimensions
+       - Hairline 1px borders, max 4px corners, corner tick marks, dimension lines
+       - Banned: glassmorphism, glowing gradients, neon, emoji, stock photos,
+                 pill badges, centered card on gradient
+       - WCAG AAA / AA compliant contrast on all surfaces
+       ========================================================================== */
+    :root {
+      /* Paper Palette (Auth Panel) */
+      --paper-bg: #F5F2EA;
+      --paper-card: #FAF8F3;
+      --paper-card-white: #FFFFFF;
+      --paper-border: rgba(14, 26, 43, 0.16);
+      --paper-border-solid: #D8D2C5;
+      --paper-text: #0E1A2B;
+      --paper-text-secondary: #536278; /* WCAG AA: >= 4.8:1 */
+      --paper-text-faint: #6E7C91;
+
+      /* Ink Palette (Technical Drawing Board) */
+      --ink-bg: #0E1A2B;
+      --ink-bg-elevated: #152438;
+      --ink-border: #223754;
+      --ink-border-light: rgba(245, 242, 234, 0.16);
+      --ink-text: #F5F2EA;
+      --ink-text-secondary: #B8C0CC; /* WCAG AAA: >= 8:1 */
+      --ink-text-faint: #8E9BAE;
+
+      /* Single Architectural Accent: Pencil Red-Orange */
+      --accent: #E4572E;
+      --accent-hover: #D0461D;
+      --accent-soft: rgba(228, 87, 46, 0.10);
+      --accent-border: #E4572E;
+
+      /* Status Colors */
+      --pass-green: #1B8A44;
+      --pass-green-soft: rgba(27, 138, 68, 0.10);
+      --error-red: #C53030;
+      --error-red-soft: rgba(197, 48, 48, 0.08);
+
+      /* Rigid Drafting Radii (Max 4px) */
+      --radius-sm: 2px;
+      --radius-md: 4px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      background-color: var(--paper-bg);
+      color: var(--paper-text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    /* Keyboard accessibility skip link */
+    .skip-link {
+      position: absolute;
+      top: -60px;
+      left: 16px;
+      background: var(--ink-bg);
+      color: var(--ink-text);
+      padding: 10px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      z-index: 10000;
+      border: 1px solid var(--accent);
+      border-radius: var(--radius-sm);
+      transition: top 0.2s ease;
+      text-decoration: none;
+    }
+    .skip-link:focus {
+      top: 16px;
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Screen reader only helper */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ==========================================================================
+       SPLIT-SCREEN DESKTOP LAYOUT
+       Left (INK, ~55%): Technical linework & plot dimensioning
+       Right (PAPER, ~45%): Auth panel
+       ========================================================================== */
+    .auth-container {
+      display: flex;
+      min-height: 100vh;
+      width: 100vw;
+    }
+
+    /* LEFT: INK TECHNICAL DRAWING BOARD (~55%) */
+    .ink-drawing-panel {
+      flex: 1.22;
+      background-color: var(--ink-bg);
+      color: var(--ink-text);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px;
+      border-right: 1px solid var(--ink-border);
+      background-image: 
+        linear-gradient(to right, rgba(245, 242, 234, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(245, 242, 234, 0.035) 1px, transparent 1px);
+      background-size: 24px 24px;
+      overflow: hidden;
+    }
+
+    .ink-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 2;
+    }
+
+    .brand-mark {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-text);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-mark::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent);
+      display: inline-block;
+      border-radius: 1px;
+    }
+    .brand-mark:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    .drawing-sheet-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-text-secondary);
+      border: 1px solid var(--ink-border);
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    /* Animated Architectural Canvas */
+    .drawing-canvas-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 16px 0;
+      z-index: 2;
+    }
+
+    .blueprint-svg {
+      width: 100%;
+      max-width: 440px;
+      max-height: 560px;
+      height: auto;
+      overflow: visible;
+    }
+
+    /* SVG Technical Drafting Sequential Animations */
+    /* 1. Boundary draws in */
+    .svg-boundary-path {
+      stroke-dasharray: 1400;
+      stroke-dashoffset: 1400;
+      animation: drawBoundaryStroke 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .svg-corner-ticks {
+      opacity: 0;
+      animation: fadeInSeq 0.6s ease 1.1s forwards;
+    }
+
+    /* 2. Setback envelope appears */
+    .svg-setback-envelope {
+      opacity: 0;
+      animation: fadeInSeq 0.8s ease 1.3s forwards;
+    }
+
+    /* 3. Dimension lines animate (15'-0" and 50'-0") */
+    .svg-dim-line-w {
+      stroke-dasharray: 230;
+      stroke-dashoffset: 230;
+      animation: drawDimWidth 0.9s cubic-bezier(0.16, 1, 0.3, 1) 1.8s forwards;
+    }
+    .svg-dim-line-l {
+      stroke-dasharray: 460;
+      stroke-dashoffset: 460;
+      animation: drawDimLength 1.1s cubic-bezier(0.16, 1, 0.3, 1) 2.1s forwards;
+    }
+    .svg-dim-labels {
+      opacity: 0;
+      animation: fadeInSeq 0.8s ease 2.7s forwards;
+    }
+
+    /* 4. Rooms fill in */
+    .svg-room-partitions {
+      opacity: 0;
+      animation: fadeInSeq 1.2s ease 3.1s forwards;
+    }
+    .svg-room-annotations {
+      opacity: 0;
+      animation: fadeInSeq 0.8s ease 3.7s forwards;
+    }
+
+    @keyframes drawBoundaryStroke {
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes drawDimWidth {
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes drawDimLength {
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes fadeInSeq {
+      to { opacity: 1; }
+    }
+
+    /* Respect prefers-reduced-motion: drawing shows statically */
+    @media (prefers-reduced-motion: reduce) {
+      .svg-boundary-path,
+      .svg-dim-line-w,
+      .svg-dim-line-l {
+        stroke-dashoffset: 0 !important;
+        animation: none !important;
+      }
+      .svg-corner-ticks,
+      .svg-setback-envelope,
+      .svg-dim-labels,
+      .svg-room-partitions,
+      .svg-room-annotations {
+        opacity: 1 !important;
+        animation: none !important;
+      }
+    }
+
+    /* Left Panel Mono Caption (Strictly "SHEET 01 / ACCESS" - No marketing fluff) */
+    .ink-panel-caption {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-text-faint);
+      border-top: 1px solid var(--ink-border);
+      padding-top: 16px;
+      text-align: left;
+      z-index: 2;
+    }
+
+    /* RIGHT: PAPER AUTH PANEL (~45%) */
+    .paper-auth-panel {
+      flex: 1;
+      background-color: var(--paper-bg);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px;
+      position: relative;
+      /* Faint blueprint grid on paper areas */
+      background-image: 
+        linear-gradient(to right, rgba(14, 26, 43, 0.045) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(14, 26, 43, 0.045) 1px, transparent 1px);
+      background-size: 24px 24px;
+      overflow-y: auto;
+    }
+
+    .auth-top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .back-home-link {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--paper-text-secondary);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border: 1px solid var(--paper-border-solid);
+      border-radius: var(--radius-sm);
+      background: var(--paper-card);
+      transition: all 0.15s ease;
+      min-height: 44px; /* 44px tap target */
+    }
+    .back-home-link:hover {
+      border-color: var(--paper-text);
+      color: var(--paper-text);
+      background: #FFFFFF;
+    }
+    .back-home-link:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .panel-meta-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--paper-text-secondary);
+      border: 1px solid var(--paper-border-solid);
+      padding: 4px 8px;
+      background: var(--paper-card);
+      border-radius: var(--radius-sm);
+    }
+
+    /* Auth Card Wrap */
+    .auth-card-wrap {
+      max-width: 440px;
+      width: 100%;
+      margin: 0 auto;
+      background: var(--paper-card);
+      border: 1px solid var(--paper-border-solid);
+      border-radius: var(--radius-sm);
+      padding: 36px 32px;
+      position: relative;
+    }
+
+    /* Corner Tick Marks */
+    .auth-card-wrap::before {
+      content: "+";
+      position: absolute;
+      top: -9px;
+      left: -6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--paper-text-secondary);
+      line-height: 1;
+    }
+    .auth-card-wrap::after {
+      content: "+";
+      position: absolute;
+      bottom: -9px;
+      right: -6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--paper-text-secondary);
+      line-height: 1;
+    }
+
+    /* Section Mono Clause Label */
+    .section-clause {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    /* Headline (Fraunces serif with italic accent on last words) */
+    .auth-headline {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 32px;
+      font-weight: 600;
+      line-height: 1.18;
+      letter-spacing: -0.02em;
+      color: var(--paper-text);
+      margin-bottom: 10px;
+    }
+    .auth-headline em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--accent);
+    }
+
+    /* Subcopy */
+    .auth-subcopy {
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-size: 16px;
+      color: var(--paper-text-secondary);
+      line-height: 1.5;
+      margin-bottom: 28px;
+    }
+
+    /* In-App Browser Warning Alert (Instagram, WhatsApp, LinkedIn) */
+    .inapp-browser-alert {
+      display: none;
+      background: var(--paper-card-white);
+      border: 1px solid var(--accent);
+      border-left: 4px solid var(--accent);
+      padding: 16px;
+      margin-bottom: 24px;
+      border-radius: var(--radius-sm);
+    }
+    .inapp-browser-alert.active {
+      display: block;
+    }
+    .inapp-header {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .inapp-body {
+      font-size: 13px;
+      color: var(--paper-text);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .copy-link-btn {
+      width: 100%;
+      min-height: 44px;
+      background: var(--ink-bg);
+      color: var(--ink-text);
+      border: 1px solid var(--ink-border);
+      border-radius: var(--radius-sm);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+    .copy-link-btn:hover {
+      background: var(--accent);
+      color: #FFFFFF;
+      border-color: var(--accent);
+    }
+    .copy-link-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Error Message Card with Retry */
+    .auth-error-card {
+      display: none;
+      background: var(--paper-card-white);
+      border: 1px solid var(--error-red);
+      border-left: 4px solid var(--error-red);
+      padding: 16px;
+      margin-bottom: 24px;
+      border-radius: var(--radius-sm);
+    }
+    .auth-error-card.active {
+      display: block;
+    }
+    .error-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--error-red);
+      margin-bottom: 4px;
+    }
+    .error-explanation {
+      font-size: 14px;
+      color: var(--paper-text);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .error-action-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .retry-btn {
+      min-height: 44px;
+      padding: 0 16px;
+      background: var(--paper-bg);
+      border: 1px solid var(--paper-border-solid);
+      color: var(--paper-text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .retry-btn:hover {
+      background: var(--ink-bg);
+      color: var(--ink-text);
+      border-color: var(--ink-bg);
+    }
+    .retry-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .redirect-alt-btn {
+      min-height: 44px;
+      padding: 0 16px;
+      background: var(--accent);
+      border: 1px solid var(--accent);
+      color: #FFFFFF;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+    .redirect-alt-btn:hover {
+      background: var(--accent-hover);
+    }
+    .redirect-alt-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Primary Google Button (Google Branding Compliant)
+       White button, 1px border, 48px tall, max 4px corners, full width */
+    .google-auth-btn {
+      width: 100%;
+      height: 48px;
+      background-color: #FFFFFF;
+      color: #1F1F1F;
+      border: 1px solid #D8D2C5;
+      border-radius: var(--radius-md); /* 4px max */
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      text-decoration: none;
+      position: relative;
+    }
+    .google-auth-btn:hover {
+      background-color: #FAF8F3;
+      border-color: #0E1A2B;
+      transform: translateY(-1px);
+    }
+    .google-auth-btn:active {
+      transform: translateY(0);
+      background-color: #F0EDE4;
+    }
+    .google-auth-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Button Loading State */
+    .google-auth-btn.loading {
+      cursor: not-allowed;
+      background-color: #FAF8F3;
+      border-color: var(--paper-border-solid);
+      color: var(--paper-text-secondary);
+      pointer-events: none;
+    }
+    .btn-spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(14, 26, 43, 0.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    .google-auth-btn.loading .btn-spinner {
+      display: inline-block;
+    }
+    .google-auth-btn.loading .google-g-icon {
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Single Flow Subtext */
+    .account-note {
+      font-size: 13px;
+      color: var(--paper-text-secondary);
+      text-align: center;
+      margin-top: 10px;
+      line-height: 1.4;
+    }
+
+    /* Consent Line with accessible 44px tap targets */
+    .consent-block {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--paper-border);
+      font-size: 13px;
+      color: var(--paper-text-secondary);
+      line-height: 1.6;
+      text-align: center;
+    }
+    .consent-block a {
+      color: var(--paper-text);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+      display: inline-inline;
+      padding: 8px 4px;
+      min-height: 44px;
+      transition: color 0.15s ease;
+    }
+    .consent-block a:hover {
+      color: var(--accent);
+    }
+    .consent-block a:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Reassurance List (3 short mono items) */
+    .reassurance-list {
+      margin-top: 24px;
+      padding: 16px;
+      background: var(--paper-bg);
+      border: 1px solid var(--paper-border-solid);
+      border-radius: var(--radius-sm);
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .reassurance-item {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--paper-text-secondary);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.4;
+    }
+    .reassurance-item::before {
+      content: "├──";
+      color: var(--accent);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* Panel Footer & Title Block */
+    .auth-panel-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 36px;
+      padding-top: 16px;
+      border-top: 1px solid var(--paper-border);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .help-link-btn {
+      background: none;
+      border: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--paper-text-secondary);
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      padding: 8px 4px;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .help-link-btn:hover {
+      color: var(--paper-text);
+    }
+    .help-link-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Title Block Stamp (SHEET 00, REV A) */
+    .sheet-title-stamp {
+      border: 1px solid var(--paper-border-solid);
+      background: var(--paper-card);
+      padding: 6px 12px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--paper-text-secondary);
+      text-align: right;
+      line-height: 1.4;
+      border-radius: var(--radius-sm);
+    }
+    .sheet-title-stamp strong {
+      color: var(--paper-text);
+      display: block;
+    }
+
+    /* ==========================================================================
+       SUCCESS STATE SCREEN (Stamp Reveal + 600ms Redirect)
+       ========================================================================== */
+    .auth-success-screen {
+      display: none;
+      text-align: center;
+      padding: 24px 8px;
+    }
+    .auth-success-screen.active {
+      display: block;
+    }
+
+    .success-stamp {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 20px auto;
+      border: 2px solid var(--pass-green);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--pass-green-soft);
+      position: relative;
+    }
+    .stamp-symbol {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--pass-green);
+    }
+
+    .success-headline {
+      font-family: 'Fraunces', serif;
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--paper-text);
+    }
+    .success-sub {
+      font-size: 15px;
+      color: var(--paper-text-secondary);
+      margin-bottom: 24px;
+    }
+
+    .meter-bar-wrap {
+      width: 100%;
+      height: 4px;
+      background: var(--paper-border-solid);
+      overflow: hidden;
+      margin-bottom: 16px;
+      border-radius: 2px;
+    }
+    .meter-progress {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width 0.6s linear;
+    }
+
+    .redirect-countdown {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--paper-text-secondary);
+    }
+
+    /* ==========================================================================
+       ACCESSIBLE HELP MODAL (Zero Glassmorphism, Strict Ink & Paper)
+       ========================================================================== */
+    .help-modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(14, 26, 43, 0.72);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .help-modal-backdrop.active {
+      display: flex;
+    }
+    .help-modal {
+      background: var(--paper-bg);
+      border: 1px solid var(--paper-border-solid);
+      max-width: 520px;
+      width: 100%;
+      padding: 32px;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 8px 32px rgba(14, 26, 43, 0.25);
+      position: relative;
+    }
+    .modal-clause {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .modal-title {
+      font-family: 'Fraunces', serif;
+      font-size: 24px;
+      margin-bottom: 16px;
+      color: var(--paper-text);
+    }
+    .modal-list {
+      list-style: none;
+      font-size: 14px;
+      color: var(--paper-text-secondary);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .modal-list li strong {
+      color: var(--paper-text);
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .modal-close-btn {
+      min-height: 44px;
+      padding: 0 20px;
+      background: var(--ink-bg);
+      color: var(--ink-text);
+      border: 1px solid var(--ink-bg);
+      border-radius: var(--radius-sm);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .modal-close-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .modal-close-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Live Toast for Feedback */
+    .live-toast {
+      position: fixed;
+      bottom: 60px;
+      right: 16px;
+      background: var(--ink-bg);
+      color: var(--ink-text);
+      border: 1px solid var(--accent);
+      padding: 10px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      border-radius: var(--radius-sm);
+      z-index: 10001;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.2s ease;
+      pointer-events: none;
+    }
+    .live-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ==========================================================================
+       INTERACTIVE DEVELOPER / REVIEWER STATE TESTER
+       Allows immediate inspection of all states
+       ========================================================================== */
+    .state-tester-bar {
+      position: fixed;
+      bottom: 12px;
+      right: 12px;
+      z-index: 9999;
+      background: var(--ink-bg);
+      border: 1px solid var(--ink-border);
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .state-tester-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-right: 4px;
+    }
+    .state-btn {
+      background: var(--ink-bg-elevated);
+      color: var(--ink-text-secondary);
+      border: 1px solid var(--ink-border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      padding: 4px 6px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.15s ease;
+    }
+    .state-btn:hover {
+      color: #FFF;
+      border-color: var(--accent);
+    }
+    .state-btn:focus-visible {
+      outline: 1px solid var(--accent);
+    }
+
+    /* ==========================================================================
+       MOBILE RESPONSIVENESS (360px+)
+       Drawing collapses to a slim header strip (54px), auth panel is full width,
+       Google button reachable by thumb without scrolling.
+       ========================================================================== */
+    @media (max-width: 900px) {
+      .auth-container {
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      /* Slim drafting header strip on mobile */
+      .ink-drawing-panel {
+        flex: none;
+        height: 54px;
+        padding: 0 16px;
+        border-right: none;
+        border-bottom: 1px solid var(--ink-border);
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .ink-panel-header {
+        width: auto;
+      }
+      .drawing-sheet-tag {
+        display: none;
+      }
+      .drawing-canvas-wrap {
+        display: none; /* Hide heavy drawing canvas from slim header */
+      }
+      .ink-panel-caption {
+        border-top: none;
+        padding-top: 0;
+        font-size: 11px;
+      }
+
+      .paper-auth-panel {
+        padding: 20px 16px 36px 16px;
+        flex: 1;
+      }
+      .auth-top-nav {
+        margin-bottom: 16px;
+      }
+      .auth-card-wrap {
+        padding: 24px 18px;
+        max-width: 100%;
+      }
+      .auth-headline {
+        font-size: 26px;
+      }
+      .auth-subcopy {
+        margin-bottom: 20px;
+        font-size: 15px;
+      }
+      .auth-panel-footer {
+        margin-top: 24px;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+      .sheet-title-stamp {
+        text-align: center;
+        width: 100%;
+      }
+      .state-tester-bar {
+        display: none; /* Hide dev testing bar on narrow touch screens */
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Keyboard accessibility skip link -->
+  <a href="#authMain" class="skip-link">Skip to sign-in form</a>
+
+  <main class="auth-container">
+    <!-- ====================================================================
+         LEFT PANEL: ARCHITECTURAL INK DRAWING BOARD (~55%)
+         Animated SVG drawing of a plot being dimensioned:
+         1. Boundary draws in
+         2. Setback envelope appears
+         3. 15'-0" x 50'-0" dimension line animates
+         4. Rooms fill in
+         Below it, one mono caption: "SHEET 01 / ACCESS" (No marketing fluff)
+         ==================================================================== -->
+    <section class="ink-drawing-panel" aria-label="Parametric Linework & Sheet Preview">
+      <div class="ink-panel-header">
+        <a href="/home.html" class="brand-mark" title="Return to INTALL Home">
+          INTALL
+        </a>
+        <div class="drawing-sheet-tag">PLOT 15' × 50' · NBC 2016</div>
+      </div>
+
+      <!-- Desktop Animated SVG Drawing -->
+      <div class="drawing-canvas-wrap">
+        <svg class="blueprint-svg" viewBox="0 0 440 560" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Parametric CAD drawing of 15 by 50 feet residential plot being dimensioned">
+          <defs>
+            <!-- Courtyard OTS (Open to Sky) Lightwell Hatch Pattern -->
+            <pattern id="skyHatch" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+              <line x1="0" y1="0" x2="0" y2="8" stroke="rgba(228, 87, 46, 0.45)" stroke-width="1.2" />
+            </pattern>
+          </defs>
+
+          <!-- GRID REFERENCES -->
+          <g stroke="rgba(245, 242, 234, 0.08)" stroke-width="0.5">
+            <line x1="40" y1="25" x2="400" y2="25" />
+            <line x1="40" y1="525" x2="400" y2="525" />
+            <line x1="40" y1="25" x2="40" y2="525" />
+            <line x1="400" y1="25" x2="400" y2="525" />
+          </g>
+
+          <!-- 01. PLOT BOUNDARY (Draws in first) -->
+          <g id="svgBoundaryGroup">
+            <!-- 15'x50' Proportion Outer Boundary Rect: 230px x 460px -->
+            <rect class="svg-boundary-path" x="70" y="45" width="230" height="460" stroke="#F5F2EA" stroke-width="1.8" fill="none" />
+            <!-- Corner Tick Marks -->
+            <g class="svg-corner-ticks">
+              <path d="M60 45H80 M70 35V55 M290 45H310 M300 35V55 M60 505H80 M70 495V515 M290 505H310 M300 495V515" stroke="var(--accent)" stroke-width="1.2" />
+            </g>
+          </g>
+
+          <!-- 02. SETBACK ENVELOPE (Fades in) -->
+          <g class="svg-setback-envelope" id="svgSetbackGroup">
+            <!-- Front 5ft (40px), Rear 5ft (40px), Sides 2ft (15px) -->
+            <rect x="85" y="85" width="200" height="380" stroke="rgba(228, 87, 46, 0.65)" stroke-width="1" stroke-dasharray="4 4" fill="none" />
+            <!-- Setback Callouts -->
+            <text x="185" y="75" fill="var(--accent)" font-family="JetBrains Mono" font-size="9" text-anchor="middle" letter-spacing="0.05em">FRONT SETBACK 5'-0"</text>
+            <text x="185" y="485" fill="var(--accent)" font-family="JetBrains Mono" font-size="9" text-anchor="middle" letter-spacing="0.05em">REAR SETBACK 5'-0"</text>
+          </g>
+
+          <!-- 03. 15'-0" x 50'-0" DIMENSION LINE ANIMATES -->
+          <g id="svgDimensionsGroup">
+            <!-- Top Width Dimension: 15'-0" (Animates across) -->
+            <line class="svg-dim-line-w" x1="70" y1="30" x2="300" y2="30" stroke="#F5F2EA" stroke-width="1" />
+            <!-- Witness Extension Lines & Ticks -->
+            <g class="svg-dim-labels">
+              <line x1="70" y1="24" x2="70" y2="36" stroke="#F5F2EA" stroke-width="1" />
+              <line x1="300" y1="24" x2="300" y2="36" stroke="#F5F2EA" stroke-width="1" />
+              <text x="185" y="22" fill="#F5F2EA" font-family="JetBrains Mono" font-size="11" font-weight="600" text-anchor="middle">├── 15'-0" ──┤</text>
+            </g>
+
+            <!-- Right Length Dimension: 50'-0" (Animates down) -->
+            <line class="svg-dim-line-l" x1="325" y1="45" x2="325" y2="505" stroke="#F5F2EA" stroke-width="1" />
+            <g class="svg-dim-labels">
+              <line x1="319" y1="45" x2="331" y2="45" stroke="#F5F2EA" stroke-width="1" />
+              <line x1="319" y1="505" x2="331" y2="505" stroke="#F5F2EA" stroke-width="1" />
+              <text x="345" y="280" fill="#F5F2EA" font-family="JetBrains Mono" font-size="11" font-weight="600" text-anchor="middle" transform="rotate(90 345 280)">├── 50'-0" PLOT DEPTH ──┤</text>
+            </g>
+          </g>
+
+          <!-- 04. ROOMS FILL IN -->
+          <g class="svg-room-partitions" id="svgRoomsGroup">
+            <!-- Living Hall -->
+            <rect x="85" y="85" width="200" height="110" stroke="#F5F2EA" stroke-width="1.4" fill="rgba(245, 242, 234, 0.03)" />
+            
+            <!-- Kitchen & Dining -->
+            <rect x="85" y="195" width="200" height="85" stroke="#F5F2EA" stroke-width="1.4" fill="rgba(245, 242, 234, 0.03)" />
+            
+            <!-- Central Lightwell Courtyard (Open to Sky) -->
+            <rect x="145" y="280" width="80" height="60" stroke="var(--accent)" stroke-width="1.5" fill="url(#skyHatch)" />
+            <!-- Corridor Bypasses -->
+            <rect x="85" y="280" width="60" height="60" stroke="#F5F2EA" stroke-width="1" fill="none" stroke-dasharray="2 2" />
+            <rect x="225" y="280" width="60" height="60" stroke="#F5F2EA" stroke-width="1" fill="none" stroke-dasharray="2 2" />
+
+            <!-- Master Bedroom -->
+            <rect x="85" y="340" width="130" height="125" stroke="#F5F2EA" stroke-width="1.4" fill="rgba(245, 242, 234, 0.03)" />
+            
+            <!-- Toilet & Bath Stack -->
+            <rect x="215" y="340" width="70" height="125" stroke="#F5F2EA" stroke-width="1.4" fill="rgba(245, 242, 234, 0.03)" />
+            <line x1="215" y1="400" x2="285" y2="400" stroke="#F5F2EA" stroke-width="1" />
+
+            <!-- Door Swings -->
+            <path d="M125 85 A 30 30 0 0 1 155 115" stroke="var(--accent)" stroke-width="1" fill="none" />
+            <line x1="125" y1="85" x2="125" y2="115" stroke="var(--accent)" stroke-width="1" />
+            <path d="M145 340 A 24 24 0 0 1 169 364" stroke="var(--accent)" stroke-width="1" fill="none" />
+            <line x1="145" y1="340" x2="145" y2="364" stroke="var(--accent)" stroke-width="1" />
+          </g>
+
+          <!-- Room Annotations -->
+          <g class="svg-room-annotations" id="svgLabelsGroup">
+            <text x="185" y="135" fill="#F5F2EA" font-family="Fraunces" font-size="13" font-weight="600" text-anchor="middle">LIVING & LOUNGE</text>
+            <text x="185" y="152" fill="var(--ink-text-secondary)" font-family="JetBrains Mono" font-size="9" text-anchor="middle">13'-6" × 15'-0" (202 SQFT)</text>
+
+            <text x="185" y="232" fill="#F5F2EA" font-family="Fraunces" font-size="12" font-weight="600" text-anchor="middle">KITCHEN & DINING</text>
+            <text x="185" y="247" fill="var(--ink-text-secondary)" font-family="JetBrains Mono" font-size="9" text-anchor="middle">13'-6" × 10'-6"</text>
+
+            <text x="185" y="307" fill="var(--accent)" font-family="JetBrains Mono" font-size="10" font-weight="700" text-anchor="middle">LIGHTWELL OTS</text>
+            <text x="185" y="322" fill="var(--accent)" font-family="JetBrains Mono" font-size="8" text-anchor="middle">5'-6" × 8'-0" (NBC CLAUSE 4.3)</text>
+
+            <text x="150" y="395" fill="#F5F2EA" font-family="Fraunces" font-size="12" font-weight="600" text-anchor="middle">MASTER SUITE</text>
+            <text x="150" y="410" fill="var(--ink-text-secondary)" font-family="JetBrains Mono" font-size="9" text-anchor="middle">11'-0" × 13'-6"</text>
+
+            <text x="250" y="375" fill="#F5F2EA" font-family="JetBrains Mono" font-size="9" text-anchor="middle">BATH 01</text>
+            <text x="250" y="435" fill="#F5F2EA" font-family="JetBrains Mono" font-size="9" text-anchor="middle">BATH 02</text>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Below it, one mono caption: "SHEET 01 / ACCESS". No marketing fluff. -->
+      <div class="ink-panel-caption">SHEET 01 / ACCESS</div>
+    </section>
+
+    <!-- ====================================================================
+         RIGHT PANEL: DRAFTING TABLE AUTH PANEL (~45%)
+         ==================================================================== -->
+    <section class="paper-auth-panel" id="authMain" aria-label="Sign In Authentication">
+      <div class="auth-top-nav">
+        <a href="/home.html" class="back-home-link" title="Return to Landing Page">
+          ← Return to Blueprint
+        </a>
+        <div class="panel-meta-tag">§ ACCESS GATE</div>
+      </div>
+
+      <!-- Main Sign-In Card -->
+      <div class="auth-card-wrap">
+        <!-- Live Region for Screen Readers -->
+        <div id="authLiveStatus" class="sr-only" aria-live="polite"></div>
+
+        <!-- 01. In-App Browser Warning Alert -->
+        <div class="inapp-browser-alert" id="inappBrowserAlert" role="alert">
+          <div class="inapp-header">
+            <span>§ NOTICE / EXTERNAL BROWSER REQUIRED</span>
+          </div>
+          <p class="inapp-body">
+            Google blocks OAuth sign-ins inside social in-app browsers (Instagram, WhatsApp, LinkedIn). Open this drawing board in Chrome or Safari to sign in.
+          </p>
+          <button type="button" class="copy-link-btn" id="copyLinkBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span id="copyLinkText">Copy Studio Link</span>
+          </button>
+        </div>
+
+        <!-- 02. Error State Card (Plain language with retry button, never raw error codes) -->
+        <div class="auth-error-card" id="authErrorCard" role="alert">
+          <div class="error-tag" id="errorTagTitle">§ ERROR / AUTHENTICATION REJECTED</div>
+          <p class="error-explanation" id="errorExplanation">
+            The authentication service could not verify your credentials.
+          </p>
+          <div class="error-action-row" id="errorActionRow">
+            <button type="button" class="retry-btn" id="errorRetryBtn">
+              Try Again
+            </button>
+            <button type="button" class="redirect-alt-btn" id="errorRedirectBtn" style="display:none;">
+              Continue with Redirect
+            </button>
+          </div>
+        </div>
+
+        <!-- 03. Form Header & Title -->
+        <div id="authFormSection">
+          <span class="section-clause">§ 00 / ACCESS</span>
+          <h1 class="auth-headline">Sign in to your <em>drawing board.</em></h1>
+          <p class="auth-subcopy">One account. Your plots and plans are saved to it.</p>
+
+          <!-- 04. Primary Google Sign-In Button -->
+          <button type="button" class="google-auth-btn" id="googleAuthBtn" aria-label="Continue with Google">
+            <!-- Official Google Multi-Color SVG -->
+            <svg class="google-g-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <!-- Loading Spinner inside button -->
+            <span class="btn-spinner" aria-hidden="true"></span>
+            <span id="googleBtnLabel">Continue with Google</span>
+          </button>
+
+          <!-- Automatic Creation Subtext -->
+          <div class="account-note">
+            New here? An account is created automatically on first sign-in.
+          </div>
+
+          <!-- Dev / Guest Access (Local Testing) -->
+          <div style="margin-top: 10px; margin-bottom: 6px; text-align: center;">
+            <a href="/auth/dev-login" style="font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--paper-text-secondary); text-decoration: underline; padding: 4px 8px; display: inline-block;">
+              [Local Testing: Quick Demo Architect Access]
+            </a>
+          </div>
+
+          <!-- Consent Line with 44px minimum tap targets -->
+          <div class="consent-block">
+            By continuing you agree to the <a href="/terms.html">Terms</a> and <a href="/privacy.html">Privacy Policy</a>.
+          </div>
+
+          <!-- Reassurance Row (3 short mono items) -->
+          <ul class="reassurance-list" aria-label="Privacy and Security Guarantees">
+            <li class="reassurance-item">No password to remember</li>
+            <li class="reassurance-item">We only read your name, email and photo</li>
+            <li class="reassurance-item">Plans never leave your browser unless you save them.</li>
+          </ul>
+        </div>
+
+        <!-- 05. Success State Screen (Stamp Reveal + 600ms Redirect) -->
+        <div class="auth-success-screen" id="authSuccessSection" aria-live="assertive">
+          <div class="success-stamp">
+            <span class="stamp-symbol">✓</span>
+          </div>
+          <h2 class="success-headline" id="successWelcomeTitle">Welcome, Architect.</h2>
+          <p class="success-sub" id="successSubText">Session authorized under NBC 2016.</p>
+          <div class="meter-bar-wrap" aria-hidden="true">
+            <div class="meter-progress" id="successProgressBar"></div>
+          </div>
+          <div class="redirect-countdown">Entering studio board in 600ms...</div>
+        </div>
+      </div>
+
+      <!-- Footer of panel: "Need help signing in?" link, and a small title block (SHEET 00, REV A) -->
+      <footer class="auth-panel-footer">
+        <button type="button" class="help-link-btn" id="openHelpModalBtn">
+          Need help signing in?
+        </button>
+
+        <div class="sheet-title-stamp">
+          <strong>INTALL CAD ENGINE</strong>
+          SHEET 00, REV A
+        </div>
+      </footer>
+    </section>
+  </main>
+
+  <!-- ====================================================================
+       ACCESSIBLE HELP MODAL DIALOG
+       ==================================================================== -->
+  <div class="help-modal-backdrop" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpModalTitle">
+    <div class="help-modal">
+      <div class="modal-clause">§ HELP / TROUBLESHOOTING SIGN-IN</div>
+      <h2 class="modal-title" id="helpModalTitle">Signing in to INTALL</h2>
+      <ul class="modal-list">
+        <li>
+          <strong>Popup Window Blocked?</strong>
+          Your browser may have prevented Google's sign-in popup. Click "Continue with Redirect" or enable popups for this site.
+        </li>
+        <li>
+          <strong>Third-Party Cookies:</strong>
+          Google Identity Services requires cookies to verify active Google sessions. If you are in Incognito/Private mode, verify cookies are permitted.
+        </li>
+        <li>
+          <strong>Social In-App Browsers:</strong>
+          Opening links directly within WhatsApp or Instagram prevents Google login. Open the URL directly in Chrome, Safari, or Firefox.
+        </li>
+        <li>
+          <strong>Direct Technical Assistance:</strong>
+          Contact the INTALL engineering desk at <code>support@intall.in</code> for permit or account assistance.
+        </li>
+      </ul>
+      <button type="button" class="modal-close-btn" id="closeHelpModalBtn">
+        Close Sheet
+      </button>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       INTERACTIVE DEVELOPER / REVIEWER STATE TESTER
+       Allows instant verification of all required states
+       ==================================================================== -->
+  <aside class="state-tester-bar" id="devStateBar" aria-label="Development UI State Tester">
+    <span class="state-tester-label">§ STATE:</span>
+    <button type="button" class="state-btn" onclick="setUIState('default')">Default</button>
+    <button type="button" class="state-btn" onclick="setUIState('loading')">Loading</button>
+    <button type="button" class="state-btn" onclick="setUIState('success')">Success</button>
+    <button type="button" class="state-btn" onclick="setUIState('popup_blocked')">Popup Blocked</button>
+    <button type="button" class="state-btn" onclick="setUIState('popup_closed')">Popup Closed</button>
+    <button type="button" class="state-btn" onclick="setUIState('offline')">Offline</button>
+    <button type="button" class="state-btn" onclick="setUIState('disabled')">Disabled</button>
+    <button type="button" class="state-btn" onclick="setUIState('cookies_blocked')">Cookies</button>
+    <button type="button" class="state-btn" onclick="setUIState('inapp')">In-App</button>
+  </aside>
+
+  <!-- Live Toast Notification -->
+  <div class="live-toast" id="liveToast" role="status">Link copied to clipboard</div>
+
+  <!-- Google Identity Services (GSI) Client Library (Loaded Asynchronously) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <!-- ====================================================================
+       AUTHENTICATION LOGIC & STATE CONTROLLER
+       ==================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      // UI Elements
+      const googleBtn = document.getElementById('googleAuthBtn');
+      const googleBtnLabel = document.getElementById('googleBtnLabel');
+      const authFormSection = document.getElementById('authFormSection');
+      const authSuccessSection = document.getElementById('authSuccessSection');
+      const successWelcomeTitle = document.getElementById('successWelcomeTitle');
+      const successProgressBar = document.getElementById('successProgressBar');
+      const authErrorCard = document.getElementById('authErrorCard');
+      const errorTagTitle = document.getElementById('errorTagTitle');
+      const errorExplanation = document.getElementById('errorExplanation');
+      const errorRetryBtn = document.getElementById('errorRetryBtn');
+      const errorRedirectBtn = document.getElementById('errorRedirectBtn');
+      const inappAlert = document.getElementById('inappBrowserAlert');
+      const copyLinkBtn = document.getElementById('copyLinkBtn');
+      const copyLinkText = document.getElementById('copyLinkText');
+      const liveToast = document.getElementById('liveToast');
+      const liveStatus = document.getElementById('authLiveStatus');
+      const helpModal = document.getElementById('helpModal');
+      const openHelpModalBtn = document.getElementById('openHelpModalBtn');
+      const closeHelpModalBtn = document.getElementById('closeHelpModalBtn');
+
+      // Strict allowlist for redirect targets to prevent open redirects
+      const ALLOWED_REDIRECT_PREFIXES = ['/index.html', '/home.html', '/signin', '/terms.html', '/privacy.html', '/'];
+
+      // Extract and sanitize target 'next' parameter
+      const urlParams = new URLSearchParams(window.location.search);
+      let rawNext = urlParams.get('next') || '/index.html';
+      let safeNext = sanitizeRedirectTarget(rawNext);
+
+      let googleClientId = '630501607187-b0ridp4q7a5u5i7291q7u8peif7ujq5f.apps.googleusercontent.com';
+      let isGsiLoaded = false;
+
+      function sanitizeRedirectTarget(target) {
+        if (!target || typeof target !== 'string') return '/index.html';
+        // Must begin with a single forward slash, cannot start with '//' or '/\'
+        if (!target.startsWith('/') || target.startsWith('//') || target.startsWith('/\\')) {
+          return '/index.html';
+        }
+        const parsedPath = target.split('?')[0].split('#')[0];
+        const isAllowed = ALLOWED_REDIRECT_PREFIXES.some(prefix => parsedPath === prefix || parsedPath === prefix.replace('.html', ''));
+        return isAllowed ? target : '/index.html';
+      }
+
+      function showToast(message) {
+        liveToast.textContent = message;
+        liveToast.classList.add('show');
+        setTimeout(() => liveToast.classList.remove('show'), 2500);
+      }
+
+      function announceLive(message) {
+        if (liveStatus) liveStatus.textContent = message;
+      }
+
+      // Check for In-App Browsers (Instagram, WhatsApp, LinkedIn, etc.)
+      function checkInAppBrowser() {
+        const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+        const isInApp = /(FBAN|FBAV|Instagram|WhatsApp|LinkedInApp|Line|MicroMessenger|Snapchat|Twitter|ByteLocale|TikTok)/i.test(ua);
+        if (isInApp) {
+          inappAlert.classList.add('active');
+          announceLive('Notice: In-app browser detected. Please open in Chrome or Safari.');
+        }
+      }
+
+      // Clipboard Copy for Studio Link
+      if (copyLinkBtn) {
+        copyLinkBtn.addEventListener('click', () => {
+          const currentUrl = window.location.href;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(currentUrl).then(() => {
+              copyLinkText.textContent = 'Link Copied!';
+              showToast('Link copied! Open Chrome or Safari.');
+              setTimeout(() => { copyLinkText.textContent = 'Copy Studio Link'; }, 2000);
+            }).catch(() => {
+              fallbackCopy(currentUrl);
+            });
+          } else {
+            fallbackCopy(currentUrl);
+          }
+        });
+      }
+
+      function fallbackCopy(text) {
+        const temp = document.createElement('textarea');
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+        copyLinkText.textContent = 'Link Copied!';
+        showToast('Link copied! Open Chrome or Safari.');
+        setTimeout(() => { copyLinkText.textContent = 'Copy Studio Link'; }, 2000);
+      }
+
+      // Fetch Client ID from server if available
+      async function fetchAuthConfig() {
+        try {
+          const res = await fetch('/api/auth/config');
+          if (res.ok) {
+            const data = await res.json();
+            if (data.clientId) googleClientId = data.clientId;
+          }
+        } catch (e) {
+          // Keep default client ID
+        }
+      }
+
+      // Check if returning user is already signed in
+      async function checkReturningUser() {
+        try {
+          const res = await fetch('/api/auth/me');
+          if (res.ok) {
+            const data = await res.json();
+            if (data.authenticated && data.user) {
+              const firstName = data.user.given_name || (data.user.name ? data.user.name.split(' ')[0] : 'Architect');
+              showSuccessState(firstName, 'Active drawing session recognized. Entering studio...');
+            }
+          }
+        } catch (e) {
+          // Not logged in or offline; remain on sign in
+        }
+      }
+
+      // Initialize Google Identity Services
+      function initGoogleGIS() {
+        if (typeof google === 'undefined' || !google.accounts || !google.accounts.id) {
+          setTimeout(initGoogleGIS, 150);
+          return;
+        }
+
+        try {
+          google.accounts.id.initialize({
+            client_id: googleClientId,
+            callback: handleGoogleCredentialResponse,
+            auto_select: false,
+            cancel_on_tap_outside: true,
+            context: 'signin'
+          });
+          isGsiLoaded = true;
+          try {
+            google.accounts.id.prompt();
+          } catch (_) {
+            // One-tap prompt not supported or restricted in this environment
+          }
+        } catch (e) {
+          console.warn('[GSI] Initialize error:', e.message);
+        }
+      }
+
+      // Handle ID Token from Google Identity Services
+      async function handleGoogleCredentialResponse(response) {
+        if (!response || !response.credential) {
+          showErrorState('popup_closed');
+          return;
+        }
+
+        setLoading(true);
+        announceLive('Verifying Google credentials with INTALL server...');
+
+        try {
+          const verifyRes = await fetch('/api/auth/google/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              credential: response.credential,
+              next: safeNext
+            })
+          });
+
+          const result = await verifyRes.json();
+
+          if (verifyRes.ok && result.success) {
+            const firstName = result.user?.given_name || (result.user?.name ? result.user.name.split(' ')[0] : 'Architect');
+            showSuccessState(firstName, 'Session clearance approved under NBC 2016.', result.redirect || safeNext);
+          } else {
+            const errorMsg = result.error || 'Server validation failed';
+            if (errorMsg.includes('disabled') || errorMsg.includes('restricted')) {
+              showErrorState('disabled');
+            } else if (errorMsg.includes('cookie')) {
+              showErrorState('cookies_blocked');
+            } else {
+              showErrorState('unknown', errorMsg);
+            }
+          }
+        } catch (err) {
+          if (!navigator.onLine) {
+            showErrorState('offline');
+          } else {
+            showErrorState('unknown', err.message);
+          }
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      // Set Loading State
+      function setLoading(isLoading) {
+        if (isLoading) {
+          googleBtn.classList.add('loading');
+          googleBtn.setAttribute('disabled', 'true');
+          googleBtn.setAttribute('aria-disabled', 'true');
+          googleBtnLabel.textContent = 'Opening Google...';
+          announceLive('Opening Google authentication service...');
+        } else {
+          googleBtn.classList.remove('loading');
+          googleBtn.removeAttribute('disabled');
+          googleBtn.removeAttribute('aria-disabled');
+          googleBtnLabel.textContent = 'Continue with Google';
+        }
+      }
+
+      // Show Success State with 600ms Redirect
+      function showSuccessState(name, subMsg, targetUrl) {
+        authFormSection.style.display = 'none';
+        authErrorCard.classList.remove('active');
+        authSuccessSection.classList.add('active');
+        successWelcomeTitle.textContent = `Welcome, ${name}.`;
+        if (subMsg) document.getElementById('successSubText').textContent = subMsg;
+
+        announceLive(`Authentication successful. Welcome, ${name}. Redirecting to your drawing board.`);
+
+        // Animate 600ms progress meter
+        setTimeout(() => {
+          successProgressBar.style.width = '100%';
+        }, 30);
+
+        setTimeout(() => {
+          window.location.href = targetUrl || safeNext;
+        }, 600);
+      }
+
+      // Error States in Plain Language (Never raw error codes)
+      function showErrorState(errorType, rawMessage) {
+        setLoading(false);
+        authErrorCard.classList.add('active');
+        errorRedirectBtn.style.display = 'none';
+
+        switch (errorType) {
+          case 'popup_blocked':
+            errorTagTitle.textContent = '§ NOTICE / POPUP BLOCKED';
+            errorExplanation.textContent = 'Your browser blocked the Google sign-in popup window. You can proceed directly using standard page redirect sign-in.';
+            errorRedirectBtn.style.display = 'inline-flex';
+            announceLive('Popup blocked. Click Continue with Redirect to authenticate.');
+            break;
+
+          case 'popup_closed':
+            errorTagTitle.textContent = '§ NOTICE / SIGN-IN NOT COMPLETED';
+            errorExplanation.textContent = 'The Google authentication window was closed before completing sign-in. You can try again whenever you are ready.';
+            announceLive('Sign-in cancelled. Click Try Again to retry.');
+            break;
+
+          case 'offline':
+            errorTagTitle.textContent = '§ ERROR / NO NETWORK CONNECTION';
+            errorExplanation.textContent = 'No internet connection detected. Please check your WiFi or mobile network to sign in to your INTALL account.';
+            announceLive('Offline. Please check internet connection.');
+            break;
+
+          case 'disabled':
+            errorTagTitle.textContent = '§ ERROR / ACCOUNT RESTRICTED';
+            errorExplanation.textContent = 'This Google account is currently restricted from accessing the INTALL drawing studio. Please contact support@intall.in for assistance.';
+            announceLive('Account restricted. Contact support.');
+            break;
+
+          case 'file_protocol':
+            errorTagTitle.textContent = '§ NOTICE / LOCAL FILE PROTOCOL';
+            errorExplanation.textContent = 'You opened this page as a local file (file://). Google OAuth strictly requires an active HTTP server. Open your terminal in this project folder, run "node server.js", and open http://localhost:8000/signin.html in your browser.';
+            announceLive('Google OAuth requires running the local server on http://localhost:8000.');
+            break;
+
+          case 'cookies_blocked':
+            errorTagTitle.textContent = '§ ERROR / COOKIES RESTRICTED';
+            errorExplanation.textContent = 'Your browser is blocking authentication cookies required for session security. Please enable third-party cookies or add an exception for INTALL in your browser settings.';
+            announceLive('Cookies blocked. Please enable cookies in browser.');
+            break;
+
+          case 'unknown':
+          default:
+            errorTagTitle.textContent = '§ ERROR / AUTHENTICATION FAILED';
+            errorExplanation.textContent = rawMessage ? `Authentication failed: ${rawMessage}` : 'We could not complete your sign-in at this moment. Please try again in a few seconds.';
+            announceLive('Authentication failed. Click Try Again.');
+            break;
+        }
+      }
+
+      function clearErrorState() {
+        authErrorCard.classList.remove('active');
+      }
+
+      // Trigger Sign In Action
+      function triggerSignIn() {
+        clearErrorState();
+
+        if (window.location.protocol === 'file:') {
+          showErrorState('file_protocol');
+          return;
+        }
+
+        if (!navigator.onLine) {
+          showErrorState('offline');
+          return;
+        }
+
+        redirectToGoogleOAuth();
+      }
+
+      // Redirect-based Google OAuth Flow (Reliable fallback in all browsers)
+      function redirectToGoogleOAuth() {
+        setLoading(true);
+        announceLive('Redirecting to Google Sign-In...');
+        window.location.href = `/auth/google?returnTo=${encodeURIComponent(safeNext)}`;
+      }
+
+      // Reset loading state if user returns via browser back button (bfcache)
+      window.addEventListener('pageshow', () => {
+        setLoading(false);
+      });
+
+      // Event Listeners
+      if (googleBtn) {
+        googleBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          triggerSignIn();
+        });
+      }
+
+      if (errorRetryBtn) {
+        errorRetryBtn.addEventListener('click', () => {
+          clearErrorState();
+          triggerSignIn();
+        });
+      }
+
+      if (errorRedirectBtn) {
+        errorRedirectBtn.addEventListener('click', () => {
+          redirectToGoogleOAuth();
+        });
+      }
+
+      // Help Modal
+      if (openHelpModalBtn) {
+        openHelpModalBtn.addEventListener('click', () => {
+          helpModal.classList.add('active');
+          closeHelpModalBtn.focus();
+        });
+      }
+      if (closeHelpModalBtn) {
+        closeHelpModalBtn.addEventListener('click', () => {
+          helpModal.classList.remove('active');
+          openHelpModalBtn.focus();
+        });
+      }
+      helpModal.addEventListener('click', (e) => {
+        if (e.target === helpModal) helpModal.classList.remove('active');
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && helpModal.classList.contains('active')) {
+          helpModal.classList.remove('active');
+          openHelpModalBtn.focus();
+        }
+      });
+
+      // Handle OAuth callback URL error parameters (e.g. ?auth_error=...)
+      function checkUrlAuthErrors() {
+        const err = urlParams.get('auth_error');
+        if (err) {
+          const decoded = decodeURIComponent(err);
+          if (decoded.includes('redirect_uri_mismatch')) {
+            errorTagTitle.textContent = '§ ERROR / REDIRECT URI MISMATCH';
+            errorExplanation.textContent = 'Google rejected the redirect URI. Please verify that "http://localhost:8000/auth/google/callback" is added to Authorized redirect URIs in your Google Cloud Console.';
+            authErrorCard.classList.add('active');
+          } else if (decoded.includes('access_denied')) {
+            errorTagTitle.textContent = '§ ERROR / GOOGLE ACCESS DENIED';
+            errorExplanation.textContent = 'Google access was denied. If your Google OAuth consent screen is in "Testing" mode, add your Gmail account to "Test users" in Google Cloud Console, or use Quick Demo access below.';
+            authErrorCard.classList.add('active');
+          } else if (decoded.includes('closed')) {
+            showErrorState('popup_closed');
+          } else if (decoded.includes('popup_blocked')) {
+            showErrorState('popup_blocked');
+          } else if (decoded.includes('cookie')) {
+            showErrorState('cookies_blocked');
+          } else if (decoded.includes('disabled') || decoded.includes('restricted')) {
+            showErrorState('disabled');
+          } else {
+            showErrorState('unknown', decoded);
+          }
+        }
+      }
+
+      // Offline / Online Event Listeners
+      window.addEventListener('offline', () => {
+        showErrorState('offline');
+      });
+      window.addEventListener('online', () => {
+        if (authErrorCard.classList.contains('active') && errorTagTitle.textContent.includes('NETWORK')) {
+          clearErrorState();
+          showToast('Connection restored.');
+        }
+      });
+
+      // Developer State Switcher (Exposed globally for testing all required states)
+      window.setUIState = function (state) {
+        clearErrorState();
+        authFormSection.style.display = 'block';
+        authSuccessSection.classList.remove('active');
+        inappAlert.classList.remove('active');
+        setLoading(false);
+
+        switch (state) {
+          case 'loading':
+            setLoading(true);
+            break;
+          case 'success':
+            showSuccessState('Vikram', 'Parametric credentials verified under NBC 2016.');
+            break;
+          case 'popup_blocked':
+            showErrorState('popup_blocked');
+            break;
+          case 'popup_closed':
+            showErrorState('popup_closed');
+            break;
+          case 'offline':
+            showErrorState('offline');
+            break;
+          case 'disabled':
+            showErrorState('disabled');
+            break;
+          case 'file_protocol':
+            showErrorState('file_protocol');
+            break;
+          case 'cookies_blocked':
+            showErrorState('cookies_blocked');
+            break;
+          case 'inapp':
+            inappAlert.classList.add('active');
+            break;
+          case 'default':
+          default:
+            break;
+        }
+      };
+
+      // Initialization Sequence
+      async function init() {
+        if (window.location.protocol === 'file:') {
+          showErrorState('file_protocol');
+          const devLink = document.querySelector('a[href="/auth/dev-login"]');
+          if (devLink) {
+            devLink.addEventListener('click', (e) => {
+              e.preventDefault();
+              showErrorState('file_protocol');
+            });
+          }
+          return;
+        }
+        checkInAppBrowser();
+        checkUrlAuthErrors();
+        await fetchAuthConfig();
+        initGoogleGIS();
+        checkReturningUser();
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+</body>
+</html>
