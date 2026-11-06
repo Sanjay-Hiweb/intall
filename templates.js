@@ -2453,6 +2453,22 @@ const TEMPLATES = [
   }
 ];
 
+// Ensure every blueprint and archetype has the architectural elevation preview image
+TEMPLATES.forEach(t => {
+  if (!t.image) {
+    t.image = "assets/blueprint-elevation.jpg";
+  }
+});
+
+function getBlueprintImage(template) {
+  if (!template) return "assets/blueprint-elevation.jpg";
+  if (typeof template === "string") {
+    const found = TEMPLATES.find(t => t.id === template || t.name === template);
+    return (found && found.image) ? found.image : "assets/blueprint-elevation.jpg";
+  }
+  return template.image || "assets/blueprint-elevation.jpg";
+}
+
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { TEMPLATES };
+  module.exports = { TEMPLATES, getBlueprintImage };
 }

@@ -183,10 +183,14 @@
         const groundCount = t.rooms.filter(r => (r.floor || "ground") === "ground").length;
         const firstCount = t.rooms.filter(r => r.floor === "first").length;
         const floorInfo = isDuplex ? `G+1 Duplex (${groundCount}G + ${firstCount} 1F)` : `Single Level (${t.rooms.length} rms)`;
+        const candImgSrc = (t && t.image) ? t.image : "assets/blueprint-elevation.jpg";
 
         card.innerHTML = `
-          <div class="candidate-thumb-box">
-            <canvas id="candThumb_${t.id}" class="candidate-thumb-canvas"></canvas>
+          <div class="candidate-thumb-box" style="position: relative; overflow: hidden;">
+            <img src="${candImgSrc}" alt="${t.name || 'Architectural Blueprint'}" id="candImg_${t.id}" class="candidate-thumb-img" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+            <canvas id="candThumb_${t.id}" class="candidate-thumb-canvas" style="display: none;"></canvas>
+            <div class="thumb-elevation-tag" style="position: absolute; top: 8px; left: 8px; background: rgba(14, 26, 43, 0.88); color: #F5F2EA; font-family: var(--font-mono); font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 3px; z-index: 2; border: 1px solid rgba(228,87,46,0.5); letter-spacing: 0.5px;">★ ELEVATION</div>
+            <button type="button" class="thumb-toggle-btn" onclick="event.stopPropagation(); window.toggleCandidateThumb('${t.id}')" title="Switch between 3D Elevation and 2D CAD Blueprint" style="position: absolute; top: 8px; right: 8px; background: rgba(14, 26, 43, 0.88); color: #F5F2EA; font-family: var(--font-mono); font-size: 0.62rem; padding: 3px 8px; border-radius: 3px; border: 1px solid rgba(255,255,255,0.25); cursor: pointer; z-index: 3;">📐 CAD / 3D</button>
             <div class="thumb-popover">🔍 ${t.bhk}BHK · ${t.referencePlot.width}×${t.referencePlot.length}ft · ${t.facing} Facing · ${isDuplex ? 'G+1 Duplex' : 'Ground Only'}</div>
           </div>
           <div class="candidate-body">
@@ -222,6 +226,19 @@
       const useBtn = document.getElementById("useLayoutBtn");
       if (useBtn) useBtn.disabled = !state.selectedCandidate;
     }
+
+    window.toggleCandidateThumb = function(tid) {
+      const img = document.getElementById('candImg_' + tid);
+      const canvas = document.getElementById('candThumb_' + tid);
+      if (!img || !canvas) return;
+      if (img.style.display === 'none') {
+        img.style.display = 'block';
+        canvas.style.display = 'none';
+      } else {
+        img.style.display = 'none';
+        canvas.style.display = 'block';
+      }
+    };
 
     function renderCandidateThumbnail(cand, canvasId) {
       const canvas = document.getElementById(canvasId);
