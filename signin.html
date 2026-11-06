@@ -1369,6 +1369,24 @@
         <!-- Live Region for Screen Readers -->
         <div id="authLiveStatus" class="sr-only" aria-live="polite"></div>
 
+        <!-- 00. Dev Server / Live Server Notice Alert -->
+        <div class="inapp-browser-alert" id="devServerNoticeAlert" role="alert" style="display:none; border-color: var(--accent); background: #FAF8F3;">
+          <div class="inapp-header" style="color: var(--accent);">
+            <span>§ NOTICE / LIVE SERVER DETECTED (PORT <span id="currentPortLabel">5500</span>)</span>
+          </div>
+          <p class="inapp-body" style="color: var(--paper-text);">
+            Live Server is a static file viewer. Real login, Gmail verification, and SQLite database storage are hosted by the INTALL Node server on <strong>Port 8000</strong>.
+          </p>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; align-items: center;">
+            <a href="http://localhost:8000/signin" id="switchPortBtn" class="copy-link-btn" style="text-decoration:none; background: var(--accent); color: #FFF; border-color: var(--accent);">
+              Switch to Port 8000 →
+            </a>
+            <span id="backendStatusTag" style="font-family: var(--font-mono); font-size: 11px; display: inline-flex; align-items: center; padding: 4px 8px; border: 1px solid var(--paper-border-solid); color: var(--paper-text-secondary);">
+              Checking Node server...
+            </span>
+          </div>
+        </div>
+
         <!-- 01. In-App Browser Warning Alert -->
         <div class="inapp-browser-alert" id="inappBrowserAlert" role="alert">
           <div class="inapp-header">
@@ -1642,6 +1660,9 @@
       let rawNext = urlParams.get('next') || '/index.html';
       let safeNext = sanitizeRedirectTarget(rawNext);
 
+      const isStaticDev = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') && window.location.port !== '8000';
+      const BACKEND_BASE = isStaticDev ? 'http://localhost:8000' : '';
+
       let googleClientId = '630501607187-b0ridp4q7a5u5i7291q7u8peif7ujq5f.apps.googleusercontent.com';
       let isGsiLoaded = false;
 
@@ -1709,7 +1730,7 @@
       // Fetch Client ID from server if available
       async function fetchAuthConfig() {
         try {
-          const res = await fetch('/api/auth/config');
+          const res = await fetch(`${BACKEND_BASE}/api/auth/config`);
           if (res.ok) {
             const data = await res.json();
             if (data.clientId) googleClientId = data.clientId;
@@ -1722,7 +1743,7 @@
       // Check if returning user is already signed in
       async function checkReturningUser() {
         try {
-          const res = await fetch('/api/auth/me');
+          const res = await fetch(`${BACKEND_BASE}/api/auth/me`, { credentials: 'include' });
           if (res.ok) {
             const data = await res.json();
             if (data.authenticated && data.user) {
@@ -1842,15 +1863,17 @@
         clearErrorState();
 
         try {
-          const res = await fetch('/api/auth/login', {
+          const res = await fetch(`${BACKEND_BASE}/api/auth/login`, {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password, next: safeNext })
           });
           const result = await res.json();
           if (res.ok && result.success) {
             const firstName = result.user?.given_name || (result.user?.name ? result.user.name.split(' ')[0] : 'Architect');
-            showSuccessState(firstName, 'Session authorized under NBC 2016.', result.redirect || safeNext);
+            const target = (isStaticDev ? 'http://localhost:8000' : '') + (result.redirect || safeNext);
+            showSuccessState(firstName, 'Session authorized under NBC 2016.', target);
           } else {
             showErrorState('unknown', result.error || 'Invalid email or password.');
             submitBtn.disabled = false;
@@ -1883,15 +1906,17 @@
         clearErrorState();
 
         try {
-          const res = await fetch('/api/auth/register', {
+          const res = await fetch(`${BACKEND_BASE}/api/auth/register`, {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password, next: safeNext })
           });
           const result = await res.json();
           if (res.ok && result.success) {
             const firstName = result.user?.given_name || (result.user?.name ? result.user.name.split(' ')[0] : 'Architect');
-            showSuccessState(firstName, 'Account registered & saved in SQLite database. Entering studio...', result.redirect || safeNext);
+            const target = (isStaticDev ? 'http://localhost:8000' : '') + (result.redirect || safeNext);
+            showSuccessState(firstName, 'Account registered & saved in SQLite database. Entering studio...', target);
           } else {
             showErrorState('unknown', result.error || 'Registration failed.');
             submitBtn.disabled = false;
@@ -1920,8 +1945,9 @@
         announceLive('Verifying Google credentials with INTALL server...');
 
         try {
-          const verifyRes = await fetch('/api/auth/google/verify', {
+          const verifyRes = await fetch(`${BACKEND_BASE}/api/auth/google/verify`, {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               credential: response.credential,
@@ -1933,7 +1959,8 @@
 
           if (verifyRes.ok && result.success) {
             const firstName = result.user?.given_name || (result.user?.name ? result.user.name.split(' ')[0] : 'Architect');
-            showSuccessState(firstName, 'Session clearance approved under NBC 2016.', result.redirect || safeNext);
+            const target = (isStaticDev ? 'http://localhost:8000' : '') + (result.redirect || safeNext);
+            showSuccessState(firstName, 'Session clearance approved under NBC 2016.', target);
           } else {
             const errorMsg = result.error || 'Server validation failed';
             if (errorMsg.includes('disabled') || errorMsg.includes('restricted')) {
@@ -2069,7 +2096,7 @@
       function redirectToGoogleOAuth() {
         setLoading(true);
         announceLive('Redirecting to Google Sign-In...');
-        window.location.href = `/auth/google?returnTo=${encodeURIComponent(safeNext)}`;
+        window.location.href = `${BACKEND_BASE}/auth/google?returnTo=${encodeURIComponent(safeNext)}`;
       }
 
       // Reset loading state if user returns via browser back button (bfcache)
@@ -2214,6 +2241,42 @@
           }
           return;
         }
+
+        const devLink = document.querySelector('a[href="/auth/dev-login"]');
+        if (devLink && BACKEND_BASE) {
+          devLink.href = `${BACKEND_BASE}/auth/dev-login?returnTo=${encodeURIComponent(safeNext)}`;
+        }
+
+        if (isStaticDev) {
+          const devAlert = document.getElementById('devServerNoticeAlert');
+          if (devAlert) devAlert.style.display = 'block';
+          const portLabel = document.getElementById('currentPortLabel');
+          if (portLabel) portLabel.textContent = window.location.port || '5500';
+
+          // Probe backend port 8000
+          fetch('http://localhost:8000/api/health')
+            .then(res => res.json())
+            .then(data => {
+              if (data && data.status === 'ok') {
+                const tag = document.getElementById('backendStatusTag');
+                if (tag) {
+                  tag.textContent = '✓ Node Server Active (Port 8000)';
+                  tag.style.color = '#2E7D32';
+                }
+                // Transition smoothly to port 8000
+                const targetUrl = 'http://localhost:8000/signin' + window.location.search;
+                window.location.href = targetUrl;
+              }
+            })
+            .catch(() => {
+              const tag = document.getElementById('backendStatusTag');
+              if (tag) {
+                tag.textContent = '[!] Node Server Offline. Start: node server.js';
+                tag.style.color = '#C53030';
+              }
+            });
+        }
+
         checkInAppBrowser();
         checkUrlAuthErrors();
         await fetchAuthConfig();

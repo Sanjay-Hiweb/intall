@@ -5,6 +5,20 @@
 
   let currentUser = null;
 
+  function getBackendBase() {
+    const isDevStatic = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') && window.location.port !== '8000';
+    return isDevStatic ? 'http://localhost:8000' : '';
+  }
+
+  function getSigninUrl(nextTarget) {
+    const isDevStatic = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') && window.location.port !== '8000';
+    const cleanNext = nextTarget || encodeURIComponent(window.location.pathname + window.location.search);
+    if (isDevStatic) {
+      return `http://localhost:8000/signin?next=${cleanNext}`;
+    }
+    return `/signin?next=${cleanNext}`;
+  }
+
   function showToast(message, type = 'info') {
     let container = document.getElementById('toastContainer');
     if (!container) {
@@ -157,8 +171,9 @@
 
       modal.querySelector('#confirmDeleteBtn').addEventListener('click', async () => {
         try {
-          const res = await fetch('/api/auth/delete-account', {
+          const res = await fetch(getBackendBase() + '/api/auth/delete-account', {
             method: 'POST',
+            credentials: 'include',
             headers: {
               'Content-Type': 'application/json',
               'X-CSRF-Token': user.csrfToken || ''
@@ -168,7 +183,7 @@
           if (res.ok && data.success) {
             showToast('Account permanently erased.');
             setTimeout(() => {
-              window.location.href = '/signin';
+              window.location.href = getSigninUrl();
             }, 800);
           } else {
             showToast(data.error || 'Account purge failed', 'error');
@@ -265,7 +280,7 @@
 
               <div style="border-top: 1px solid #D8D2C5; margin: 4px 0;"></div>
 
-              <a href="/auth/logout?returnTo=${returnTo}" style="display: block; padding: 7px 12px; font-size: 11px; text-transform: uppercase; color: #0E1A2B; text-decoration: none; transition: background 0.1s;" onmouseover="this.style.background='#F5F2EA'" onmouseout="this.style.background='transparent'">
+              <a href="${getBackendBase()}/auth/logout?returnTo=${returnTo}" style="display: block; padding: 7px 12px; font-size: 11px; text-transform: uppercase; color: #0E1A2B; text-decoration: none; transition: background 0.1s;" onmouseover="this.style.background='#F5F2EA'" onmouseout="this.style.background='transparent'">
                 Sign Out
               </a>
 
@@ -323,7 +338,7 @@
         // Unauthenticated State (Drafting Table Google Sign-In Link)
         const isFile = window.location.protocol === 'file:';
         container.innerHTML = `
-          <a href="${isFile ? 'javascript:void(0)' : `/auth/google?returnTo=${returnTo}`}" class="intall-google-login-btn" title="Sign in with Google" style="
+          <a href="${isFile ? 'javascript:void(0)' : `${getBackendBase()}/auth/google?returnTo=${returnTo}`}" class="intall-google-login-btn" title="Sign in with Google" style="
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -367,7 +382,7 @@
 
   async function checkAuth() {
     try {
-      const res = await fetch('/api/auth/me');
+      const res = await fetch(getBackendBase() + '/api/auth/me', { credentials: 'include' });
       if (!res.ok) throw new Error('Auth check failed');
       const data = await res.json();
       currentUser = data.authenticated ? data.user : null;
@@ -378,7 +393,7 @@
       // Enforce auth gate: Unauthenticated users cannot view 3D Studio or Home
       if (!currentUser && (window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('home.html') || window.location.pathname === '/')) {
         const nextTarget = encodeURIComponent(window.location.pathname + window.location.search);
-        window.location.href = `/signin?next=${nextTarget}`;
+        window.location.href = getSigninUrl(nextTarget);
       }
     } catch (e) {
       currentUser = null;
@@ -387,7 +402,7 @@
 
       if (window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('home.html') || window.location.pathname === '/') {
         const nextTarget = encodeURIComponent(window.location.pathname + window.location.search);
-        window.location.href = `/signin?next=${nextTarget}`;
+        window.location.href = getSigninUrl(nextTarget);
       }
     }
   }
@@ -412,11 +427,11 @@
         return;
       }
       const target = returnTo || window.location.pathname;
-      window.location.href = `/auth/google?returnTo=${encodeURIComponent(target)}`;
+      window.location.href = `${getBackendBase()}/auth/google?returnTo=${encodeURIComponent(target)}`;
     },
     logout: (returnTo) => {
       const target = returnTo || window.location.pathname;
-      window.location.href = `/auth/logout?returnTo=${encodeURIComponent(target)}`;
+      window.location.href = `${getBackendBase()}/auth/logout?returnTo=${encodeURIComponent(target)}`;
     },
     deleteAccount: () => {
       if (currentUser) {

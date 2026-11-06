@@ -777,21 +777,31 @@
           .replace(/'/g, '&#39;');
       }
 
+      function getBackendBase() {
+        const isStaticDev = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') && window.location.port !== '8000';
+        return isStaticDev ? 'http://localhost:8000' : '';
+      }
+
+      function getSigninUrl(next = '/admin') {
+        const isStaticDev = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') && window.location.port !== '8000';
+        return isStaticDev ? `http://localhost:8000/signin?next=${encodeURIComponent(next)}` : `/signin?next=${encodeURIComponent(next)}`;
+      }
+
       async function checkCurrentAdmin() {
         try {
-          const res = await fetch('/api/auth/me');
+          const res = await fetch(getBackendBase() + '/api/auth/me', { credentials: 'include' });
           if (!res.ok) {
-            window.location.href = '/signin?next=/admin';
+            window.location.href = getSigninUrl('/admin');
             return;
           }
           const data = await res.json();
           if (!data.authenticated || !data.user) {
-            window.location.href = '/signin?next=/admin';
+            window.location.href = getSigninUrl('/admin');
             return;
           }
           document.getElementById('adminUserEmail').textContent = `${data.user.name || 'Architect'} (${data.user.email})`;
         } catch (e) {
-          window.location.href = '/signin?next=/admin';
+          window.location.href = getSigninUrl('/admin');
         }
       }
 
@@ -800,9 +810,9 @@
         if (refreshBtn) refreshBtn.textContent = '↻ Syncing...';
 
         try {
-          const res = await fetch('/api/admin/metrics');
+          const res = await fetch(getBackendBase() + '/api/admin/metrics', { credentials: 'include' });
           if (res.status === 401) {
-            window.location.href = '/signin?next=/admin';
+            window.location.href = getSigninUrl('/admin');
             return;
           }
           const data = await res.json();

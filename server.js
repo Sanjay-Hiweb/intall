@@ -54,6 +54,9 @@ const ALLOWED_REDIRECT_PATHS = [
   '/home.html',
   '/signin',
   '/signin.html',
+  '/login',
+  '/signup',
+  '/register',
   '/terms',
   '/terms.html',
   '/privacy',
@@ -125,12 +128,32 @@ const MIME_TYPES = {
   '.txt': 'text/plain; charset=utf-8'
 };
 
-function sendJson(res, statusCode, data) {
-  res.writeHead(statusCode, {
-    'Content-Type': 'application/json; charset=utf-8',
+function getCorsHeaders(req) {
+  const origin = req?.headers?.origin;
+  if (origin) {
+    return {
+      'Access-Control-Allow-Origin': origin,
+      'Access-Control-Allow-Credentials': 'true',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, X-CSRF-Token, Authorization',
+      'Vary': 'Origin'
+    };
+  }
+  return {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, X-CSRF-Token'
+    'Access-Control-Allow-Headers': 'Content-Type, X-CSRF-Token, Authorization'
+  };
+}
+
+function sendJson(res, statusCode, data, reqOrHeaders = {}) {
+  const req = reqOrHeaders && reqOrHeaders.headers ? reqOrHeaders : null;
+  const explicitHeaders = req ? {} : reqOrHeaders;
+  const cors = getCorsHeaders(req);
+  res.writeHead(statusCode, {
+    'Content-Type': 'application/json; charset=utf-8',
+    ...cors,
+    ...explicitHeaders
   });
   res.end(JSON.stringify(data, null, 2));
 }
@@ -267,18 +290,15 @@ const server = http.createServer(async (req, res) => {
 
   // Handle CORS preflight
   if (method === 'OPTIONS') {
-    res.writeHead(204, {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, X-CSRF-Token'
-    });
+    const cors = getCorsHeaders(req);
+    res.writeHead(204, cors);
     return res.end();
   }
 
   // ===========================================================================
   // 0. TELEMETRY LOGGING (Track views & visits in SQLite)
   // ===========================================================================
-  if (method === 'GET' && (pathname === '/' || pathname === '/index.html' || pathname === '/home.html' || pathname === '/signin' || pathname === '/signin.html' || pathname === '/admin' || pathname === '/admin.html' || pathname === '/terms' || pathname === '/privacy')) {
+  if (method === 'GET' && (pathname === '/' || pathname === '/index.html' || pathname === '/home.html' || pathname === '/signin' || pathname === '/signin.html' || pathname === '/login' || pathname === '/signup' || pathname === '/register' || pathname === '/admin' || pathname === '/admin.html' || pathname === '/terms' || pathname === '/privacy')) {
     const user = getSessionUser(req);
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
     db.logEvent({
@@ -294,7 +314,7 @@ const server = http.createServer(async (req, res) => {
   // ===========================================================================
   // 1. CLEAN URL SHORTCUTS & ROUTE ALIASES
   // ===========================================================================
-  if (pathname === '/signin' || pathname === '/login') {
+  if (pathname === '/signin' || pathname === '/login' || pathname === '/signup' || pathname === '/register') {
     // If user is already authenticated, skip sign-in screen and send straight to app
     const user = getSessionUser(req);
     if (user && method === 'GET') {
@@ -403,7 +423,8 @@ const server = http.createServer(async (req, res) => {
 
       res.writeHead(200, {
         'Content-Type': 'application/json; charset=utf-8',
-        'Set-Cookie': makeSessionCookie(sessionId, isSecure)
+        'Set-Cookie': makeSessionCookie(sessionId, isSecure),
+        ...getCorsHeaders(req)
       });
 
       return res.end(JSON.stringify({
@@ -463,7 +484,8 @@ const server = http.createServer(async (req, res) => {
 
       res.writeHead(200, {
         'Content-Type': 'application/json; charset=utf-8',
-        'Set-Cookie': makeSessionCookie(sessionId, isSecure)
+        'Set-Cookie': makeSessionCookie(sessionId, isSecure),
+        ...getCorsHeaders(req)
       });
 
       return res.end(JSON.stringify({
@@ -520,7 +542,8 @@ const server = http.createServer(async (req, res) => {
 
       res.writeHead(200, {
         'Content-Type': 'application/json; charset=utf-8',
-        'Set-Cookie': makeSessionCookie(sessionId, isSecure)
+        'Set-Cookie': makeSessionCookie(sessionId, isSecure),
+        ...getCorsHeaders(req)
       });
 
       return res.end(JSON.stringify({
@@ -750,17 +773,17 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, 200, {
           authenticated: Boolean(user),
           user: user || null
-        });
+        }, req);
       }
 
       // Admin Telemetry & Metrics (GET /api/admin/metrics)
       if (pathname === '/api/admin/metrics' && method === 'GET') {
         const user = getSessionUser(req);
         if (!user) {
-          return sendJson(res, 401, { error: 'Authentication required for admin telemetry.' });
+          return sendJson(res, 401, { error: 'Authentication required for admin telemetry.' }, req);
         }
         const summary = db.getAnalyticsSummary();
-        return sendJson(res, 200, summary);
+        return sendJson(res, 200, summary, req);
       }
 
       // Public Client Config (GET /api/auth/config)
@@ -768,7 +791,7 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, 200, {
           clientId: GOOGLE_CLIENT_ID,
           redirectUri: GOOGLE_REDIRECT_URI
-        });
+        }, req);
       }
 
       // Save Plan (POST /api/plans)
