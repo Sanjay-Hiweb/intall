@@ -956,9 +956,9 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-start;
       box-sizing: border-box;
-      padding: 92px 32px 28px; /* Clearance for floating top nav */
+      padding: 84px 32px 28px; /* Clearance for floating top nav */
     }
 
     #heroSequenceCanvas {
@@ -971,6 +971,7 @@
       z-index: 1;
       pointer-events: none;
       background-color: #060B12;
+      filter: contrast(1.16) brightness(0.86) saturate(1.12);
     }
 
     .hero-overlay-grid {
@@ -982,10 +983,11 @@
       z-index: 2;
       pointer-events: none;
       background: 
-        radial-gradient(ellipse at center, rgba(6, 11, 18, 0.12) 0%, rgba(6, 11, 18, 0.76) 100%),
-        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-      background-size: auto, 40px 40px, 40px 40px;
+        linear-gradient(180deg, rgba(6, 11, 18, 0.70) 0%, rgba(6, 11, 18, 0.32) 42%, rgba(6, 11, 18, 0.76) 100%),
+        radial-gradient(ellipse at center, rgba(6, 11, 18, 0.30) 0%, rgba(6, 11, 18, 0.88) 100%),
+        linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: auto, auto, 40px 40px, 40px 40px;
     }
 
     .hero-hud-top {
@@ -1000,16 +1002,15 @@
     }
 
     .hud-tag-box {
-      background: rgba(9, 18, 30, 0.8);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(6, 11, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       padding: 6px 14px;
       border-radius: var(--radius-sm);
       color: #F5F2EA;
       display: inline-flex;
       align-items: center;
       gap: 10px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
     }
 
     .hud-pulse-dot {
@@ -1031,11 +1032,14 @@
     .hero-center-content {
       position: relative;
       z-index: 3;
-      max-width: 820px;
-      margin: 0 auto;
+      max-width: 840px;
+      margin: 3.5vh auto 0 auto;
       text-align: center;
       transition: opacity 0.2s ease, transform 0.2s ease;
       pointer-events: auto;
+      padding: 20px 32px;
+      background: radial-gradient(ellipse at center, rgba(6, 11, 18, 0.72) 0%, rgba(6, 11, 18, 0) 80%);
+      border-radius: var(--radius-md);
     }
 
     .hero-clause-pill {
@@ -1055,12 +1059,12 @@
 
     .hero-main-title {
       font-family: var(--font-display);
-      font-size: clamp(2.4rem, 4.8vw, 4.4rem);
-      line-height: 1.08;
+      font-size: clamp(2.3rem, 4.4vw, 4.2rem);
+      line-height: 1.1;
       letter-spacing: -0.025em;
       color: #FFFFFF;
-      margin-bottom: 18px;
-      text-shadow: 0 4px 24px rgba(0,0,0,0.6);
+      margin-bottom: 16px;
+      text-shadow: 0 4px 28px rgba(0, 0, 0, 0.95), 0 2px 8px rgba(0, 0, 0, 0.9);
     }
 
     .hero-main-title em {
@@ -1069,12 +1073,12 @@
     }
 
     .hero-main-desc {
-      font-size: clamp(1rem, 1.3vw, 1.25rem);
-      color: #D6DCE5;
+      font-size: clamp(0.98rem, 1.25vw, 1.2rem);
+      color: #E2E8F0;
       line-height: 1.55;
-      max-width: 680px;
-      margin: 0 auto 28px;
-      text-shadow: 0 2px 16px rgba(0,0,0,0.7);
+      max-width: 660px;
+      margin: 0 auto 24px;
+      text-shadow: 0 3px 20px rgba(0, 0, 0, 0.95), 0 1px 4px rgba(0, 0, 0, 0.95);
     }
 
     .hero-action-row {
@@ -1114,14 +1118,12 @@
       bottom: 32px;
       left: 32px;
       z-index: 3;
-      background: rgba(9, 18, 30, 0.88);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(6, 11, 18, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.22);
       border-left: 4px solid var(--pencil-accent);
       padding: 14px 20px;
       max-width: 420px;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
       pointer-events: none;
       transition: opacity 0.25s ease, transform 0.25s ease;
     }
@@ -3590,6 +3592,8 @@
 
     // High-performance object-fit: cover implementation on HTML5 Canvas
     function drawCoverImage(ctx, img, canvasW, canvasH) {
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
       const imgRatio = img.naturalWidth / img.naturalHeight;
       const canvasRatio = canvasW / canvasH;
       let renderW, renderH, offsetX, offsetY;
