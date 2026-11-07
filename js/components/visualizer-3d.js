@@ -23,13 +23,13 @@
       view: "dollhouse", // "dollhouse" | "roof"
       cutWalls: false,   // false = 9ft, true = 5.8ft
       lighting: "day",   // "day" | "sunset" | "night"
-      showLabels: true,
+      showLabels: false, // Clean by default: prevents text from covering the 3D house
       autoRotate: false,
       layers: {
         walls: true,
         furniture: true,
         slabs: true,
-        labels: true,
+        labels: false,   // Clean by default
         site: true,
         roof: false
       }
@@ -206,6 +206,82 @@
       }
     }
 
+    // 9. Modern Split-Face Ashlar Stone Cladding (Architectural Feature Wall)
+    function drawStoneCladding(ctx, w, h) {
+      ctx.fillStyle = "#A8A296";
+      ctx.fillRect(0, 0, w, h);
+      const tones = ["#B8B2A6", "#9E988D", "#8C867B", "#ABA499", "#C4BEB3", "#7D776D"];
+      const rowH = 26;
+      for (let y = 0; y < h; y += rowH) {
+        let x = 0;
+        while (x < w) {
+          const bW = 55 + Math.random() * 75;
+          ctx.fillStyle = tones[Math.floor(Math.random() * tones.length)];
+          ctx.fillRect(x + 1, y + 1, bW - 2, rowH - 2);
+          // Subtle horizontal cleft lines
+          ctx.fillStyle = "rgba(0,0,0,0.09)";
+          ctx.fillRect(x + 1, y + rowH * 0.48, bW - 2, 1);
+          ctx.fillStyle = "rgba(255,255,255,0.08)";
+          ctx.fillRect(x + 1, y + 1, bW - 2, 1);
+          x += bW;
+        }
+        ctx.fillStyle = "#4A453D";
+        ctx.fillRect(0, y + rowH - 1.5, w, 1.5);
+      }
+    }
+
+    // 10. Warm Teak Wood Architectural Soffit Ceiling
+    function drawWoodSoffit(ctx, w, h) {
+      ctx.fillStyle = "#8D592C";
+      ctx.fillRect(0, 0, w, h);
+      const plankW = 20;
+      const tones = ["#9B6334", "#8D592C", "#7C4C23", "#A86E3C", "#71431C"];
+      for (let x = 0; x < w; x += plankW) {
+        ctx.fillStyle = tones[Math.floor(Math.random() * tones.length)];
+        ctx.fillRect(x, 0, plankW, h);
+        // Wood grain
+        ctx.strokeStyle = "rgba(50, 25, 8, 0.12)";
+        ctx.lineWidth = 1;
+        for (let g = 0; g < 3; g++) {
+          const gx = x + 3 + Math.random() * (plankW - 6);
+          ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx + (Math.random() * 2 - 1), h); ctx.stroke();
+        }
+        // Shadow reveal gap between teak battens
+        ctx.fillStyle = "#361D09";
+        ctx.fillRect(x + plankW - 2, 0, 2, h);
+      }
+    }
+
+    // 11. Architectural Vertical Dark Charcoal Timber Slats
+    function drawWoodSlats(ctx, w, h) {
+      ctx.fillStyle = "#1E2226";
+      ctx.fillRect(0, 0, w, h);
+      const slatW = 16;
+      for (let x = 0; x < w; x += slatW) {
+        ctx.fillStyle = "#2D343A";
+        ctx.fillRect(x + 1, 0, slatW - 3, h);
+        ctx.fillStyle = "#111417";
+        ctx.fillRect(x + slatW - 2, 0, 2, h);
+      }
+    }
+
+    // Dynamic Architectural Sky Gradient Texture Builder
+    function createSkyTexture(zenith, horizon, ground) {
+      const c = document.createElement("canvas");
+      c.width = 512;
+      c.height = 512;
+      const ctx = c.getContext("2d");
+      const grad = ctx.createLinearGradient(0, 0, 0, 512);
+      grad.addColorStop(0.0, zenith);
+      grad.addColorStop(0.55, horizon);
+      grad.addColorStop(0.72, ground);
+      grad.addColorStop(1.0, ground);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 512, 512);
+      const tex = new THREE.CanvasTexture(c);
+      return tex;
+    }
+
     // --- THREE.JS INITIALIZATION ---
     function initThreeScene() {
       const container = document.getElementById("webgl3DContainer");
@@ -216,7 +292,8 @@
       }
 
       threeScene = new THREE.Scene();
-      threeScene.background = new THREE.Color(0xF5F2EA);
+      threeScene.background = createSkyTexture("#A0CBE8", "#EDF3F8", "#DFE6EB");
+      threeScene.fog = new THREE.FogExp2(0xEDF3F8, 0.0032);
 
       threeCamera = new THREE.PerspectiveCamera(40, 1, 1, 1200);
       threeCamera.position.set(50, 60, 60);
@@ -234,7 +311,7 @@
         threeRenderer.outputEncoding = THREE.sRGBEncoding;
       }
       threeRenderer.toneMapping = THREE.ACESFilmicToneMapping;
-      threeRenderer.toneMappingExposure = 1.08;
+      threeRenderer.toneMappingExposure = 1.15;
       container.appendChild(threeRenderer.domElement);
 
       if (typeof THREE.OrbitControls !== "undefined") {
@@ -244,22 +321,34 @@
         threeControls.maxPolarAngle = Math.PI / 2 - 0.04;
         threeControls.minDistance = 8;
         threeControls.maxDistance = 350;
+
+        // Auto-fade instruction hint on first user interaction
+        threeControls.addEventListener("start", () => {
+          const hint = document.getElementById("viewportHint");
+          if (hint && hint.style.display !== "none") {
+            hint.style.transition = "opacity 0.4s ease";
+            hint.style.opacity = "0";
+            setTimeout(() => { hint.style.display = "none"; }, 420);
+          }
+        });
       }
 
       // Lights Setup
-      threeAmbientLight = new THREE.AmbientLight(0xFFFFFF, 0.62);
+      threeAmbientLight = new THREE.AmbientLight(0xFFFAF2, 0.42);
       threeScene.add(threeAmbientLight);
 
-      threeHemiLight = new THREE.HemisphereLight(0x87CEEB, 0x6B7F68, 0.75);
+      threeHemiLight = new THREE.HemisphereLight(0x9BD4F5, 0x6E8566, 0.72);
       threeHemiLight.position.set(0, 100, 0);
       threeScene.add(threeHemiLight);
 
-      threeSunLight = new THREE.DirectionalLight(0xFFF9ED, 1.4);
+      threeSunLight = new THREE.DirectionalLight(0xFFF7EC, 1.55);
       threeSunLight.position.set(65, 95, 50);
       threeSunLight.castShadow = true;
       threeSunLight.shadow.mapSize.width = 2048;
       threeSunLight.shadow.mapSize.height = 2048;
-      threeSunLight.shadow.bias = -0.0003;
+      threeSunLight.shadow.bias = -0.00015;
+      threeSunLight.shadow.normalBias = 0.02;
+      threeSunLight.shadow.radius = 2.5;
       threeSunLight.shadow.camera.near = 10;
       threeSunLight.shadow.camera.far = 400;
       const d = 90;
@@ -279,6 +368,16 @@
       animate();
 
       apply3DAtmosphere("day");
+
+      // Auto fade viewport hint after 3.5s so it never clutters the screen
+      setTimeout(() => {
+        const hint = document.getElementById("viewportHint");
+        if (hint) {
+          hint.style.transition = "opacity 0.5s ease";
+          hint.style.opacity = "0";
+          setTimeout(() => { hint.style.display = "none"; }, 520);
+        }
+      }, 3500);
     }
 
     function resizeThreeRenderer() {
@@ -356,49 +455,53 @@
         return;
       }
 
-      // Standard Lighting (Day / Sunset / Night)
+      // Standard Lighting (Day / Sunset / Night) with Realistic Atmospheric Scattering
       if (mode === "day") {
-        threeScene.background = new THREE.Color(0xF5F2EA);
-        threeAmbientLight.intensity = 0.62;
-        threeAmbientLight.color.setHex(0xFFFFFF);
-        threeHemiLight.intensity = 0.75;
-        threeHemiLight.color.setHex(0x87CEEB);
-        threeHemiLight.groundColor.setHex(0x6B7F68);
+        threeScene.background = createSkyTexture("#9EC8E6", "#EDF3F8", "#DFE6EC");
+        threeScene.fog = new THREE.FogExp2(0xEDF3F8, 0.0030);
+        threeAmbientLight.intensity = 0.42;
+        threeAmbientLight.color.setHex(0xFFFAF2);
+        threeHemiLight.intensity = 0.72;
+        threeHemiLight.color.setHex(0x9BD4F5);
+        threeHemiLight.groundColor.setHex(0x6E8566);
 
-        threeSunLight.intensity = 1.4;
-        threeSunLight.color.setHex(0xFFF9ED);
+        threeSunLight.intensity = 1.55;
+        threeSunLight.color.setHex(0xFFF7EC);
         threeSunLight.position.set(65, 95, 50);
 
-        threeInteriorLights.forEach(pl => { pl.intensity = 0.0; pl.color.setHex(0xFFD899); });
-        if (threePorchLight) { threePorchLight.intensity = 0.0; threePorchLight.color.setHex(0xFFD899); }
+        // Warm cozy interior lights glowing through windows (like real architectural photo)
+        threeInteriorLights.forEach(pl => { pl.intensity = 0.45; pl.color.setHex(0xFFE2AA); });
+        if (threePorchLight) { threePorchLight.intensity = 0.65; threePorchLight.color.setHex(0xFFD180); }
       } else if (mode === "sunset") {
-        threeScene.background = new THREE.Color(0xDF8C65);
-        threeAmbientLight.intensity = 0.45;
+        threeScene.background = createSkyTexture("#382D4F", "#E66F4E", "#F5A760");
+        threeScene.fog = new THREE.FogExp2(0xEB855B, 0.0036);
+        threeAmbientLight.intensity = 0.42;
         threeAmbientLight.color.setHex(0xFFAA77);
         threeHemiLight.intensity = 0.55;
         threeHemiLight.color.setHex(0xFF9E7A);
         threeHemiLight.groundColor.setHex(0x4A3528);
 
-        threeSunLight.intensity = 1.6;
+        threeSunLight.intensity = 1.65;
         threeSunLight.color.setHex(0xFF8830);
         threeSunLight.position.set(85, 26, 55);
 
-        threeInteriorLights.forEach(pl => { pl.intensity = 0.65; pl.color.setHex(0xFFD899); });
-        if (threePorchLight) { threePorchLight.intensity = 0.9; threePorchLight.color.setHex(0xFFD899); }
+        threeInteriorLights.forEach(pl => { pl.intensity = 0.95; pl.color.setHex(0xFFD180); });
+        if (threePorchLight) { threePorchLight.intensity = 1.3; threePorchLight.color.setHex(0xFFD180); }
       } else if (mode === "night") {
-        threeScene.background = new THREE.Color(0x0A111E);
-        threeAmbientLight.intensity = 0.2;
+        threeScene.background = createSkyTexture("#060C14", "#0D1826", "#142234");
+        threeScene.fog = new THREE.FogExp2(0x0D1826, 0.0048);
+        threeAmbientLight.intensity = 0.22;
         threeAmbientLight.color.setHex(0x22334A);
-        threeHemiLight.intensity = 0.22;
+        threeHemiLight.intensity = 0.25;
         threeHemiLight.color.setHex(0x1A2536);
         threeHemiLight.groundColor.setHex(0x0C131D);
 
-        threeSunLight.intensity = 0.25;
+        threeSunLight.intensity = 0.28;
         threeSunLight.color.setHex(0x466585);
         threeSunLight.position.set(-45, 60, -45);
 
-        threeInteriorLights.forEach(pl => { pl.intensity = 1.4; pl.color.setHex(0xFFD899); });
-        if (threePorchLight) { threePorchLight.intensity = 1.6; threePorchLight.color.setHex(0xFFD899); }
+        threeInteriorLights.forEach(pl => { pl.intensity = 1.5; pl.color.setHex(0xFFB84D); });
+        if (threePorchLight) { threePorchLight.intensity = 1.8; threePorchLight.color.setHex(0xFFB84D); }
       }
     }
 
@@ -418,12 +521,12 @@
 
       if (preset === "iso") {
         threeCamera.up.set(0, 1, 0);
-        threeCamera.position.set(maxDim * 0.72, maxDim * 0.85, maxDim * 0.85);
-        threeControls.target.set(0, 2.5, 0);
+        threeCamera.position.set(maxDim * 0.58, maxDim * 0.45, maxDim * 0.82);
+        threeControls.target.set(0, 3.2, 0);
       } else if (preset === "front") {
         threeCamera.up.set(0, 1, 0);
-        threeCamera.position.set(0, maxDim * 0.26, maxDim * 0.95);
-        threeControls.target.set(0, 3.2, 0);
+        threeCamera.position.set(maxDim * 0.04, 4.2, maxDim * 0.90);
+        threeControls.target.set(0, 4.0, 0);
       } else if (preset === "top") {
         // Aligns 1:1 with 2D Blueprint orientation: North (-Z) at top, South (+Z) at bottom, West (-X) left, East (+X) right
         threeCamera.up.set(0, 0, -1);
@@ -657,42 +760,88 @@
       update3DLayerChecklistUI();
     }
 
+    // --- 3D VIEWPORT CLEAN VIEW CONTROLLER (HIDE ALL TEXTS & FLOATING DOCKS) ---
+    window.toggle3DCleanView = function() {
+      const container = document.getElementById("viewportContainer");
+      const restoreBtn = document.getElementById("btnRestoreHUD");
+      const toolbar = document.getElementById("viewport3DToolbar");
+      const hint = document.getElementById("viewportHint");
+
+      if (!container) return;
+      const isClean = container.classList.toggle("clean-view-active");
+      if (isClean) {
+        if (toolbar) toolbar.style.display = "none";
+        if (hint) hint.style.display = "none";
+        if (restoreBtn) restoreBtn.style.display = "inline-flex";
+        if (threeLabelsGroup) threeLabelsGroup.visible = false;
+        showToast("👁️ Clean View: screen cleared. Press 'C' or click Controls to restore.");
+      } else {
+        if (toolbar) toolbar.style.display = "flex";
+        if (restoreBtn) restoreBtn.style.display = "none";
+        if (threeLabelsGroup) threeLabelsGroup.visible = !!(threeMode && threeMode.layers && threeMode.layers.labels);
+      }
+    };
+
+    // Keyboard shortcut: Press 'C' or 'Escape' to toggle Clean View
+    window.addEventListener("keydown", (e) => {
+      if (state.screen === 4 && state.view === "3d") {
+        if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "SELECT")) return;
+        if (e.key === "c" || e.key === "C" || e.key === "Escape") {
+          window.toggle3DCleanView();
+        }
+      }
+    });
+
+    window.toggleModulesDockCollapse = function() {
+      const dock = document.getElementById("viewportModulesDock");
+      const chev = document.getElementById("modulesCollapseChevron");
+      if (!dock) return;
+      const isCollapsed = dock.classList.toggle("collapsed");
+      if (chev) {
+        chev.textContent = isCollapsed ? "▲" : "▼";
+      }
+    };
+
     // --- 3D ROOM LABEL SPRITE BUILDER ---
     function makeRoomLabelSprite(roomName, areaStr) {
       const c = document.createElement("canvas");
       c.width = 256;
-      c.height = 110;
+      c.height = 96;
       const ctx = c.getContext("2d");
 
-      // Translucent glassmorphism pill badge
-      ctx.fillStyle = "rgba(17, 24, 39, 0.82)";
+      // Translucent sleek subtle pill badge
+      ctx.fillStyle = "rgba(14, 26, 43, 0.75)";
       ctx.beginPath();
       if (ctx.roundRect) {
-        ctx.roundRect(10, 10, 236, 90, 20);
+        ctx.roundRect(8, 8, 240, 80, 16);
       } else {
-        ctx.rect(10, 10, 236, 90);
+        ctx.rect(8, 8, 240, 80);
       }
       ctx.fill();
       ctx.strokeStyle = "rgba(255, 255, 255, 0.28)";
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Title
-      ctx.fillStyle = "#FFFFFF";
-      ctx.font = "bold 26px -apple-system, BlinkMacSystemFont, sans-serif";
+      // Room Title
+      ctx.fillStyle = "#F5F2EA";
+      ctx.font = "bold 20px 'JetBrains Mono', -apple-system, sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(roomName.toUpperCase(), 128, 44);
+      ctx.fillText(roomName.toUpperCase(), 128, 38);
 
       // Area Subtitle
-      ctx.fillStyle = "#38BDF8";
-      ctx.font = "600 20px -apple-system, BlinkMacSystemFont, sans-serif";
-      ctx.fillText(areaStr, 128, 76);
+      ctx.fillStyle = "#E4572E";
+      ctx.font = "600 16px 'JetBrains Mono', monospace";
+      ctx.fillText(areaStr, 128, 66);
 
       const tex = new THREE.CanvasTexture(c);
-      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+      // ENABLE depthTest so labels are occluded by walls and roofs instead of floating in front of everything
+      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: true, depthWrite: false });
       const sprite = new THREE.Sprite(mat);
-      sprite.scale.set(7.5, 3.2, 1);
+      // Compact, elegant scale: 2.8ft x 1.1ft instead of 7.5ft x 3.2ft!
+      sprite.scale.set(2.8, 1.1, 1);
+      // Strictly invisible by default so room text never covers the 3D house
+      sprite.visible = !!(threeMode && threeMode.layers && threeMode.layers.labels);
       return sprite;
     }
 
@@ -812,21 +961,26 @@
         });
       });
 
-      // Front Architectural Cantilevered Entrance Steps with LED Floating Under-Glow
-      const stepMesh = new THREE.Mesh(
-        new THREE.BoxGeometry(6.2, 0.22, 3.6),
-        new THREE.MeshStandardMaterial({ color: 0xF4F2EB, roughness: 0.42, metalness: 0.05 })
-      );
-      stepMesh.position.set(0, 0.32, plotFt.length / 2 + 1.8);
-      stepMesh.receiveShadow = true;
-      threeSiteGroup.add(stepMesh);
+      // Front Architectural 3-Tier Floating Entrance Steps with Warm LED Under-Glow (Villa Elevation)
+      const stepMat = new THREE.MeshStandardMaterial({ color: 0xF2EFEB, roughness: 0.38, metalness: 0.04 });
+      const stepLedMat = new THREE.MeshStandardMaterial({ color: 0xFFB84D, emissive: 0xFFB84D, emissiveIntensity: 1.25 });
+      const stepTiers = [
+        { w: 7.6, d: 4.2, h: 0.16, y: 0.10, zOff: 2.1 }, // Bottom Tier
+        { w: 6.8, d: 3.2, h: 0.16, y: 0.26, zOff: 1.6 }, // Middle Tier
+        { w: 6.0, d: 2.2, h: 0.16, y: 0.42, zOff: 1.1 }  // Top Landing Tier
+      ];
+      stepTiers.forEach(st => {
+        const tread = new THREE.Mesh(new THREE.BoxGeometry(st.w, st.h, st.d), stepMat);
+        tread.position.set(0, st.y, plotFt.length / 2 + st.zOff);
+        tread.receiveShadow = true;
+        tread.castShadow = true;
+        threeSiteGroup.add(tread);
 
-      const stepLed = new THREE.Mesh(
-        new THREE.BoxGeometry(6.0, 0.04, 3.4),
-        new THREE.MeshStandardMaterial({ color: 0xF59E0B, emissive: 0xF59E0B, emissiveIntensity: 0.85 })
-      );
-      stepLed.position.set(0, 0.21, plotFt.length / 2 + 1.8);
-      threeSiteGroup.add(stepLed);
+        // LED Strip tucked under front lip
+        const ledStrip = new THREE.Mesh(new THREE.BoxGeometry(st.w - 0.2, 0.03, 0.06), stepLedMat);
+        ledStrip.position.set(0, st.y - st.h / 2 + 0.02, plotFt.length / 2 + st.zOff + st.d / 2);
+        threeSiteGroup.add(ledStrip);
+      });
 
       // Front Porch Welcome Mat
       const matMesh = new THREE.Mesh(
@@ -930,6 +1084,298 @@
       addTree(-(plotFt.width / 2 + 8), plotFt.length / 2 - 4, 0.9);
       addTree(plotFt.width / 2 + 8, plotFt.length / 2 - 2, 1.1);
 
+      // ── CONTEMPORARY VILLA ARCHITECTURAL ELEMENTS ──────────────────────────
+      // 1. Raised Geometric Front Planter Bed with Tropical Foliage & Warm Ground Uplights
+      const planterW = Math.min(15.0, Math.max(8.0, plotFt.width * 0.42));
+      const planterX = -plotFt.width * 0.22;
+      const planterZ = plotFt.length / 2 + 1.25;
+      const planterBox = new THREE.Mesh(
+        new THREE.BoxGeometry(planterW, 1.1, 2.2),
+        new THREE.MeshStandardMaterial({ color: 0xFDFBF7, roughness: 0.65 })
+      );
+      planterBox.position.set(planterX, 0.55, planterZ);
+      planterBox.castShadow = true;
+      planterBox.receiveShadow = true;
+      threeSiteGroup.add(planterBox);
+
+      const planterSoil = new THREE.Mesh(
+        new THREE.BoxGeometry(planterW - 0.35, 0.1, 1.85),
+        new THREE.MeshStandardMaterial({ color: 0x241C15, roughness: 0.95 })
+      );
+      planterSoil.position.set(planterX, 1.05, planterZ);
+      threeSiteGroup.add(planterSoil);
+
+      const plantFol1 = new THREE.MeshStandardMaterial({ color: 0x2A6321, roughness: 0.78 });
+      const plantFol2 = new THREE.MeshStandardMaterial({ color: 0x397A2C, roughness: 0.82 });
+      for (let pi = 0; pi < 6; pi++) {
+        const px = planterX - (planterW - 2.4) / 2 + pi * ((planterW - 2.4) / 5);
+        const bush = new THREE.Mesh(
+          new THREE.DodecahedronGeometry(0.85 + (pi % 3) * 0.18, 1),
+          pi % 2 === 0 ? plantFol1 : plantFol2
+        );
+        bush.position.set(px, 1.75 + (pi % 2) * 0.22, planterZ + (Math.sin(pi * 1.6) * 0.28));
+        bush.castShadow = true;
+        threeSiteGroup.add(bush);
+      }
+
+      // Warm LED Ground Uplights Shining Up on Facade
+      [-planterW * 0.28, planterW * 0.28].forEach(ux => {
+        const upFixt = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.2, 0.24, 0.28, 12),
+          new THREE.MeshStandardMaterial({ color: 0x1E242B, roughness: 0.35, metalness: 0.8 })
+        );
+        upFixt.position.set(planterX + ux, 1.25, planterZ + 0.65);
+        const upLed = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.18, 0.18, 0.05, 12),
+          new THREE.MeshStandardMaterial({ color: 0xFFD180, emissive: 0xFFD180, emissiveIntensity: 1.1 })
+        );
+        upLed.position.set(planterX + ux, 1.4, planterZ + 0.65);
+        threeSiteGroup.add(upFixt);
+        threeSiteGroup.add(upLed);
+
+        const upLight = new THREE.PointLight(0xFFB84D, 0.55, 14, 1.8);
+        upLight.position.set(planterX + ux, 1.65, planterZ + 0.5);
+        threeSiteGroup.add(upLight);
+      });
+
+      // 2. Vertical Architectural Dark Timber Slat Feature Screen Flanking Entrance
+      const slatGroup = new THREE.Group();
+      const slatCount = 8;
+      const slatSpacing = 0.38;
+      const slatH = wallH + 0.6;
+      const slatMat = new THREE.MeshStandardMaterial({ color: 0x1E2228, roughness: 0.35, metalness: 0.7 });
+      for (let si = 0; si < slatCount; si++) {
+        const slat = new THREE.Mesh(new THREE.BoxGeometry(0.18, slatH, 0.24), slatMat);
+        slat.position.set(si * slatSpacing, slatH / 2 + 0.2, 0);
+        slat.castShadow = true;
+        slatGroup.add(slat);
+      }
+      slatGroup.position.set(-2.2, 0, plotFt.length / 2 + 0.45);
+      threeSiteGroup.add(slatGroup);
+
+      // Slender Architectural Feature Tree in Concrete Box Planter (Villa Elevation Feature)
+      const treePlanterX = -1.8;
+      const treePlanterZ = plotFt.length / 2 + 1.8;
+      const treePot = new THREE.Mesh(
+        new THREE.BoxGeometry(2.3, 1.35, 2.3),
+        new THREE.MeshStandardMaterial({ color: 0xD6D2C8, roughness: 0.75 })
+      );
+      treePot.position.set(treePlanterX, 0.68, treePlanterZ);
+      treePot.castShadow = true;
+      treePot.receiveShadow = true;
+      threeSiteGroup.add(treePot);
+
+      const treeSoil = new THREE.Mesh(
+        new THREE.BoxGeometry(2.0, 0.08, 2.0),
+        new THREE.MeshStandardMaterial({ color: 0x241C15, roughness: 0.95 })
+      );
+      treeSoil.position.set(treePlanterX, 1.32, treePlanterZ);
+      threeSiteGroup.add(treeSoil);
+
+      const treeFeatureG = new THREE.Group();
+      const stemMat = new THREE.MeshStandardMaterial({ color: 0x5C4D3E, roughness: 0.8 });
+      const leafMat1 = new THREE.MeshStandardMaterial({ color: 0x487A28, roughness: 0.7 });
+      const leafMat2 = new THREE.MeshStandardMaterial({ color: 0x5D9436, roughness: 0.65 });
+
+      const mainStem = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.16, 5.2, 8), stemMat);
+      mainStem.position.set(0, 2.6, 0);
+      mainStem.rotation.z = -0.06;
+      mainStem.castShadow = true;
+      treeFeatureG.add(mainStem);
+
+      const branch1 = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.09, 2.6, 6), stemMat);
+      branch1.position.set(0.65, 4.0, 0.2);
+      branch1.rotation.z = -0.55;
+      branch1.rotation.y = 0.4;
+      branch1.castShadow = true;
+      treeFeatureG.add(branch1);
+
+      const branch2 = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 2.2, 6), stemMat);
+      branch2.position.set(-0.55, 3.6, -0.2);
+      branch2.rotation.z = 0.52;
+      branch2.rotation.y = -0.3;
+      branch2.castShadow = true;
+      treeFeatureG.add(branch2);
+
+      const padCoords = [
+        [0.1, 5.4, 0, 1.15],
+        [1.2, 4.8, 0.3, 0.95],
+        [-1.0, 4.4, -0.2, 0.88],
+        [0.4, 5.8, -0.3, 0.85]
+      ];
+      padCoords.forEach(([px, py, pz, pScale], idx) => {
+        const pad = new THREE.Mesh(new THREE.DodecahedronGeometry(pScale, 1), idx % 2 === 0 ? leafMat1 : leafMat2);
+        pad.scale.set(1.2, 0.65, 1.1);
+        pad.position.set(px, py, pz);
+        pad.castShadow = true;
+        treeFeatureG.add(pad);
+      });
+
+      treeFeatureG.position.set(treePlanterX, 1.35, treePlanterZ);
+      threeSiteGroup.add(treeFeatureG);
+
+      // Smooth Dark Asphalt Street in Foreground (Matching Cinematic Road View)
+      const streetL = 16.0;
+      const streetW = plotFt.width + 36;
+      const streetMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(streetW, 0.12, streetL),
+        new THREE.MeshStandardMaterial({ color: 0x22262B, roughness: 0.82, metalness: 0.05 })
+      );
+      streetMesh.position.set(0, 0.02, plotFt.length / 2 + 13.0 + streetL / 2);
+      streetMesh.receiveShadow = true;
+      threeSiteGroup.add(streetMesh);
+
+      // Curbside Bevel / Paver Border
+      const curbMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(streetW, 0.18, 0.8),
+        new THREE.MeshStandardMaterial({ color: 0xB0ABB3, roughness: 0.6 })
+      );
+      curbMesh.position.set(0, 0.08, plotFt.length / 2 + 13.0);
+      curbMesh.receiveShadow = true;
+      threeSiteGroup.add(curbMesh);
+
+      // 3. Cantilevered Modern Porch / Carport Canopy with Warm Teak Soffit & Recessed Downlights
+      const canopyW = parkRoomForSite ? Math.max(13.0, parkRoomForSite.w + 2.5) : 13.0;
+      const canopyL = 13.5;
+      const canopyH = 0.55;
+      const canopyY = wallH + 0.35;
+      const canopyX = parkRoomForSite ? ((parkRoomForSite.x + parkRoomForSite.w / 2) - plotFt.width / 2) : 2.0;
+      const canopyZ = plotFt.length / 2 + canopyL / 2 - 1.8;
+
+      const canopyGroup = new THREE.Group();
+      const fasciaCanopy = new THREE.Mesh(
+        new THREE.BoxGeometry(canopyW, canopyH, canopyL),
+        new THREE.MeshStandardMaterial({ color: 0x22272E, roughness: 0.35, metalness: 0.35 })
+      );
+      fasciaCanopy.position.set(0, 0, 0);
+      fasciaCanopy.castShadow = true;
+      canopyGroup.add(fasciaCanopy);
+
+      const teakSoffitTex = getProcTexture("teakSoffit", drawWoodSoffit, canopyW / 4, canopyL / 4);
+      const soffitMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(canopyW - 0.4, canopyL - 0.4),
+        new THREE.MeshStandardMaterial({ map: teakSoffitTex, roughness: 0.42, metalness: 0.05 })
+      );
+      soffitMesh.rotation.x = Math.PI / 2;
+      soffitMesh.position.set(0, -canopyH / 2 - 0.02, 0);
+      canopyGroup.add(soffitMesh);
+
+      const downlightCoords = [
+        [-canopyW * 0.28, -canopyL * 0.25],
+        [canopyW * 0.28, -canopyL * 0.25],
+        [-canopyW * 0.28, canopyL * 0.2],
+        [canopyW * 0.28, canopyL * 0.2]
+      ];
+      downlightCoords.forEach(([dx, dz]) => {
+        const spotRing = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.35, 0.35, 0.06, 16),
+          new THREE.MeshStandardMaterial({ color: 0x1A1D20, roughness: 0.3, metalness: 0.8 })
+        );
+        spotRing.position.set(dx, -canopyH / 2 - 0.03, dz);
+        const spotLed = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.28, 0.28, 0.04, 16),
+          new THREE.MeshStandardMaterial({ color: 0xFFE082, emissive: 0xFFE082, emissiveIntensity: 1.1 })
+        );
+        spotLed.position.set(dx, -canopyH / 2 - 0.05, dz);
+        canopyGroup.add(spotRing);
+        canopyGroup.add(spotLed);
+
+        const downSpot = new THREE.PointLight(0xFFD180, 0.45, 14, 1.8);
+        downSpot.position.set(dx, -canopyH / 2 - 0.4, dz);
+        canopyGroup.add(downSpot);
+      });
+
+      const ledStripMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(canopyW - 0.6, 0.05, 0.08),
+        new THREE.MeshStandardMaterial({ color: 0xFFE082, emissive: 0xFFE082, emissiveIntensity: 1.0 })
+      );
+      ledStripMesh.position.set(0, -canopyH / 2 - 0.02, canopyL / 2 - 0.2);
+      canopyGroup.add(ledStripMesh);
+
+      const pillarH = wallH + 0.15;
+      const pillarMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(1.4, pillarH, 1.4),
+        new THREE.MeshStandardMaterial({ color: 0xFDFBF7, roughness: 0.65 })
+      );
+      pillarMesh.position.set(canopyW / 2 - 1.0, -pillarH / 2 + canopyH / 2, canopyL / 2 - 1.2);
+      pillarMesh.castShadow = true;
+      pillarMesh.receiveShadow = true;
+      canopyGroup.add(pillarMesh);
+
+      canopyGroup.position.set(canopyX, canopyY, canopyZ);
+      threeSiteGroup.add(canopyGroup);
+
+      // 4. Sleek Modern Vehicle in Carport
+      if (parkRoomForSite) {
+        const carG = new THREE.Group();
+        const carPaintMat = new THREE.MeshStandardMaterial({ color: 0x1E242B, roughness: 0.18, metalness: 0.85 });
+        const carGlassMat = new THREE.MeshStandardMaterial({ color: 0x0F141C, roughness: 0.05, metalness: 0.9, transparent: true, opacity: 0.88 });
+        const carWheelMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.8 });
+        const carRimMat = new THREE.MeshStandardMaterial({ color: 0xCBD5E1, roughness: 0.25, metalness: 0.9 });
+        const carHeadlightMat = new THREE.MeshStandardMaterial({ color: 0xE0F2FE, emissive: 0xE0F2FE, emissiveIntensity: 0.9 });
+        const carTaillightMat = new THREE.MeshStandardMaterial({ color: 0xEF4444, emissive: 0xEF4444, emissiveIntensity: 0.85 });
+
+        const carBody = new THREE.Mesh(new THREE.BoxGeometry(6.2, 1.3, 13.5), carPaintMat);
+        carBody.position.set(0, 1.1, 0);
+        carBody.castShadow = true;
+        carG.add(carBody);
+
+        const carCabin = new THREE.Mesh(new THREE.BoxGeometry(5.6, 1.25, 7.8), carGlassMat);
+        carCabin.position.set(0, 2.3, -0.6);
+        carCabin.castShadow = true;
+        carG.add(carCabin);
+
+        const carRoof = new THREE.Mesh(new THREE.BoxGeometry(5.4, 0.1, 7.2), carPaintMat);
+        carRoof.position.set(0, 2.95, -0.6);
+        carG.add(carRoof);
+
+        [[-3.1, 3.8], [3.1, 3.8], [-3.1, -3.8], [3.1, -3.8]].forEach(([wx, wz]) => {
+          const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.9, 0.65, 16), carWheelMat);
+          wheel.rotation.z = Math.PI / 2;
+          wheel.position.set(wx, 0.9, wz);
+          wheel.castShadow = true;
+          const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.65, 0.68, 16), carRimMat);
+          rim.rotation.z = Math.PI / 2;
+          rim.position.set(wx, 0.9, wz);
+          carG.add(wheel);
+          carG.add(rim);
+        });
+
+        [-2.2, 2.2].forEach(hx => {
+          const hl = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.25, 0.1), carHeadlightMat);
+          hl.position.set(hx, 1.3, 6.75);
+          const tl = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.22, 0.1), carTaillightMat);
+          tl.position.set(hx, 1.35, -6.75);
+          carG.add(hl);
+          carG.add(tl);
+        });
+
+        const carX = (parkRoomForSite.x + parkRoomForSite.w / 2) - plotFt.width / 2;
+        const carZ = plotFt.length / 2 + 5.5;
+        carG.position.set(carX, 0, carZ);
+        threeSiteGroup.add(carG);
+      }
+
+      // 5. Architectural Twin-Beam Up-Down Facade Sconces
+      const sconceX = -plotFt.width * 0.36;
+      const sconceZ = plotFt.length / 2 + 0.35;
+      const sconceMat = new THREE.MeshStandardMaterial({ color: 0x1A1E24, roughness: 0.3, metalness: 0.85 });
+      const sconceBody = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.9, 0.3), sconceMat);
+      sconceBody.position.set(sconceX, 4.5, sconceZ);
+      threeSiteGroup.add(sconceBody);
+
+      const lensMat = new THREE.MeshStandardMaterial({ color: 0xFFD180, emissive: 0xFFD180, emissiveIntensity: 1.2 });
+      const lensTop = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.06, 0.24), lensMat);
+      lensTop.position.set(sconceX, 4.95, sconceZ);
+      const lensBottom = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.06, 0.24), lensMat);
+      lensBottom.position.set(sconceX, 4.05, sconceZ);
+      threeSiteGroup.add(lensTop);
+      threeSiteGroup.add(lensBottom);
+
+      const sconceLight = new THREE.PointLight(0xF59E0B, 0.55, 12, 1.6);
+      sconceLight.position.set(sconceX, 4.5, sconceZ + 0.3);
+      threeSiteGroup.add(sconceLight);
+
       // ── 2. ARCHITECTURAL MATERIAL PALETTE (DYNAMIC 3D MOLD MATRIX) ──────────
       const isClay = (threeMode.mold === "clay");
       const isBlueprint = (threeMode.mold === "blueprint");
@@ -937,12 +1383,19 @@
       const isXray = (threeMode.mold === "xray");
 
       const stuccoTex = getProcTexture("stucco", drawStucco, 4, 4);
+      const stoneCladdingTex = getProcTexture("stoneCladding", drawStoneCladding, 3, 3);
 
       const extWallMat = isClay ? new THREE.MeshStandardMaterial({ color: 0xF5F3EC, roughness: 0.95, metalness: 0 })
                        : isBlueprint ? new THREE.MeshStandardMaterial({ color: 0x0C2340, roughness: 0.25, metalness: 0.3, transparent: true, opacity: 0.85 })
                        : isObsidian ? new THREE.MeshStandardMaterial({ color: 0x1A1D22, roughness: 0.42, metalness: 0.15 })
                        : isXray ? new THREE.MeshStandardMaterial({ color: 0xD7E9F7, roughness: 0.12, metalness: 0.08, transparent: true, opacity: 0.32 })
                        : new THREE.MeshStandardMaterial({ map: stuccoTex, color: 0xFDFBF7, roughness: 0.65, metalness: 0.02 });
+
+      const stoneWallMat = isClay ? new THREE.MeshStandardMaterial({ color: 0xF5F3EC, roughness: 0.95 })
+                         : isBlueprint ? new THREE.MeshStandardMaterial({ color: 0x0C2340, roughness: 0.25, metalness: 0.3, transparent: true, opacity: 0.85 })
+                         : isObsidian ? new THREE.MeshStandardMaterial({ color: 0x1A1D22, roughness: 0.42 })
+                         : isXray ? new THREE.MeshStandardMaterial({ color: 0xD7E9F7, roughness: 0.12, transparent: true, opacity: 0.32 })
+                         : new THREE.MeshStandardMaterial({ map: stoneCladdingTex, roughness: 0.76, metalness: 0.04 });
 
       const intWallMat = isClay ? new THREE.MeshStandardMaterial({ color: 0xF0EEE6, roughness: 0.92, metalness: 0 })
                        : isBlueprint ? new THREE.MeshStandardMaterial({ color: 0x13315C, roughness: 0.25, transparent: true, opacity: 0.75 })
@@ -1003,7 +1456,8 @@
 
       // ── 3. ARCHITECTURAL WALLS WITH REAL OPENINGS ───────────────────────────
       function renderWallWithOpenings(group, wallLen, isShared, isHoriz, fixedCoord, startCoord, openings, wallBaseY, wallContext) {
-        const mat = isShared ? intWallMat : extWallMat;
+        const isFrontAccent = !isShared && wallContext && wallContext.wallSide === "south" && (wallContext.room && (wallContext.room.type === "bedroom" || wallContext.room.type === "study"));
+        const mat = isShared ? intWallMat : isFrontAccent ? stoneWallMat : extWallMat;
         const thick = isShared ? partT : wallT;
 
         const sorted = (openings || []).slice().sort((a, b) => a.start - b.start);
@@ -1470,11 +1924,11 @@
           addBaseboard(bT, room.h - 0.6, cx - room.w / 2 + bT / 2 + 0.15, cz);
           addBaseboard(bT, room.h - 0.6, cx + room.w / 2 - bT / 2 - 0.15, cz);
 
-          // Dedicated Room Area Sprite Label
+          // Dedicated Room Area Sprite Label (Subtle, floor-anchored so it never blocks the 3D view)
           const areaSqft = Math.round(room.w * room.h);
           const areaStr  = state.plot.unit === "m" ? `${(areaSqft * 0.0929).toFixed(1)} sqm` : `${areaSqft} sqft`;
           const sprite   = makeRoomLabelSprite(room.name, areaStr);
-          sprite.position.set(cx, baseY + wallH + 1.5, cz);
+          sprite.position.set(cx, baseY + 0.35, cz);
           threeLabelsGroup.add(sprite);
 
           // Ambient Architectural Ceiling Downlight Fixture
@@ -1485,10 +1939,26 @@
           dLightFixture.position.set(cx, baseY + wallH - 0.05, cz);
           threeFurnitureGroup.add(dLightFixture);
 
-          const roomPl = new THREE.PointLight(0xFFECC4, 0.2, Math.max(room.w, room.h) * 1.6, 1.8);
+          const roomPl = new THREE.PointLight(0xFFECC4, 0.35, Math.max(room.w, room.h) * 1.8, 1.8);
           roomPl.position.set(cx, baseY + wallH - 0.4, cz);
           threeFurnitureGroup.add(roomPl);
           threeInteriorLights.push(roomPl);
+
+          // Contemporary Spherical Statement Pendant Light in Living Hall (Visible through panoramic window)
+          if (room.type === "hall" || room.type === "living") {
+            const cord = new THREE.Mesh(
+              new THREE.CylinderGeometry(0.02, 0.02, 2.2, 8),
+              new THREE.MeshStandardMaterial({ color: 0x181818, roughness: 0.8 })
+            );
+            cord.position.set(cx, baseY + wallH - 1.1, cz);
+            const globe = new THREE.Mesh(
+              new THREE.SphereGeometry(0.8, 16, 16),
+              new THREE.MeshStandardMaterial({ color: 0xFFFDF5, emissive: 0xFFE2A8, emissiveIntensity: 1.2, roughness: 0.2 })
+            );
+            globe.position.set(cx, baseY + wallH - 2.2, cz);
+            threeFurnitureGroup.add(cord);
+            threeFurnitureGroup.add(globe);
+          }
 
           // Dedicated 3D Floating Cantilever Staircase Model
           if (room.type === "stairs") {
@@ -1733,55 +2203,114 @@
                       : isObsidian ? new THREE.MeshStandardMaterial({ color: 0xD4AF37, roughness: 0.2, metalness: 0.85 })
                       : new THREE.MeshStandardMaterial({ color: 0x1E242B, roughness: 0.4 });
 
-      const overhang = 1.6;
+      // ── 5. CONTEMPORARY VILLA FLAT PARAPET ROOF SYSTEM (MATCHING VILLA ELEVATION) ─
+      const overhang = 1.2;
       const roofW = plotFt.width + overhang * 2;
       const roofL = plotFt.length + overhang * 2;
-      const roofPeakH = 6.2;
       const roofBaseY = (renderFirst && state.view3DFloor === "both")
         ? (ffBaseY + wallH)
         : (0.45 + wallH);
 
-      const fascia = new THREE.Mesh(new THREE.BoxGeometry(roofW, 0.5, roofL), fasciaMat);
-      fascia.position.set(0, roofBaseY + 0.25, 0);
-      fascia.castShadow = true;
-      threeRoofGroup.add(fascia);
+      const parapetH = 1.35;
+      const parapetT = 0.45;
+      const roofSlabT = 0.5;
 
-      const roofGeo = new THREE.ConeGeometry(Math.max(roofW, roofL) * 0.72, roofPeakH, 4);
-      roofGeo.rotateY(Math.PI / 4);
-      const roofMain = new THREE.Mesh(roofGeo, roofMat);
-      roofMain.scale.set(roofW / Math.max(roofW, roofL), 1, roofL / Math.max(roofW, roofL));
-      roofMain.position.set(0, roofBaseY + roofPeakH / 2 + 0.5, 0);
-      roofMain.castShadow = true;
-      threeRoofGroup.add(roofMain);
-
-      const chimney = new THREE.Mesh(
-        new THREE.BoxGeometry(2.4, 5.0, 2.4),
-        new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.8 })
+      // 1. Structural Roof Slab
+      const roofSlab = new THREE.Mesh(
+        new THREE.BoxGeometry(roofW, roofSlabT, roofL),
+        isClay ? new THREE.MeshStandardMaterial({ color: 0xF5F3EC, roughness: 0.95 })
+               : isBlueprint ? new THREE.MeshStandardMaterial({ color: 0x0C2340, roughness: 0.3 })
+               : new THREE.MeshStandardMaterial({ color: 0xFDFBF7, roughness: 0.65 })
       );
-      chimney.position.set(plotFt.width * 0.25, roofBaseY + roofPeakH * 0.65, -plotFt.length * 0.2);
-      chimney.castShadow = true;
-      threeRoofGroup.add(chimney);
+      roofSlab.position.set(0, roofBaseY + roofSlabT / 2, 0);
+      roofSlab.castShadow = true;
+      roofSlab.receiveShadow = true;
+      threeRoofGroup.add(roofSlab);
 
-      const cap = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.3, 3.0), fasciaMat);
-      cap.position.set(plotFt.width * 0.25, roofBaseY + roofPeakH * 0.65 + 2.6, -plotFt.length * 0.2);
-      threeRoofGroup.add(cap);
+      // 2. Charcoal / Anthracite Architectural Edge Fascia Band
+      const fasciaBand = new THREE.Mesh(
+        new THREE.BoxGeometry(roofW + 0.15, 0.45, roofL + 0.15),
+        fasciaMat
+      );
+      fasciaBand.position.set(0, roofBaseY + roofSlabT / 2, 0);
+      fasciaBand.castShadow = true;
+      threeRoofGroup.add(fasciaBand);
 
-      // Photovoltaic (PV) Solar Panel Array on South Roof Slope
+      // 3. Perimeter Parapet Walls with Architectural Coping Stones
+      const parapetMat = isClay ? extWallMat : new THREE.MeshStandardMaterial({ color: 0xFDFBF7, roughness: 0.65 });
+      const copingMat = isClay ? fasciaMat : new THREE.MeshStandardMaterial({ color: 0x22272E, roughness: 0.35, metalness: 0.5 });
+
+      // North Parapet
+      const pNorth = new THREE.Mesh(new THREE.BoxGeometry(roofW, parapetH, parapetT), parapetMat);
+      pNorth.position.set(0, roofBaseY + roofSlabT + parapetH / 2, -roofL / 2 + parapetT / 2);
+      pNorth.castShadow = true;
+      threeRoofGroup.add(pNorth);
+      const cNorth = new THREE.Mesh(new THREE.BoxGeometry(roofW + 0.2, 0.14, parapetT + 0.2), copingMat);
+      cNorth.position.set(0, roofBaseY + roofSlabT + parapetH + 0.07, -roofL / 2 + parapetT / 2);
+      threeRoofGroup.add(cNorth);
+
+      // South Parapet
+      const pSouth = new THREE.Mesh(new THREE.BoxGeometry(roofW, parapetH, parapetT), parapetMat);
+      pSouth.position.set(0, roofBaseY + roofSlabT + parapetH / 2, roofL / 2 - parapetT / 2);
+      pSouth.castShadow = true;
+      threeRoofGroup.add(pSouth);
+      const cSouth = new THREE.Mesh(new THREE.BoxGeometry(roofW + 0.2, 0.14, parapetT + 0.2), copingMat);
+      cSouth.position.set(0, roofBaseY + roofSlabT + parapetH + 0.07, roofL / 2 - parapetT / 2);
+      threeRoofGroup.add(cSouth);
+
+      // West Parapet
+      const pWest = new THREE.Mesh(new THREE.BoxGeometry(parapetT, parapetH, roofL - parapetT * 2), parapetMat);
+      pWest.position.set(-roofW / 2 + parapetT / 2, roofBaseY + roofSlabT + parapetH / 2, 0);
+      pWest.castShadow = true;
+      threeRoofGroup.add(pWest);
+      const cWest = new THREE.Mesh(new THREE.BoxGeometry(parapetT + 0.2, 0.14, roofL + 0.2), copingMat);
+      cWest.position.set(-roofW / 2 + parapetT / 2, roofBaseY + roofSlabT + parapetH + 0.07, 0);
+      threeRoofGroup.add(cWest);
+
+      // East Parapet
+      const pEast = new THREE.Mesh(new THREE.BoxGeometry(parapetT, parapetH, roofL - parapetT * 2), parapetMat);
+      pEast.position.set(roofW / 2 - parapetT / 2, roofBaseY + roofSlabT + parapetH / 2, 0);
+      pEast.castShadow = true;
+      threeRoofGroup.add(pEast);
+      const cEast = new THREE.Mesh(new THREE.BoxGeometry(parapetT + 0.2, 0.14, roofL + 0.2), copingMat);
+      cEast.position.set(roofW / 2 - parapetT / 2, roofBaseY + roofSlabT + parapetH + 0.07, 0);
+      threeRoofGroup.add(cEast);
+
+      // 4. Recessed Flat Roof Gravel Deck / Terrace
+      const deckMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(roofW - parapetT * 2 - 0.2, 0.05, roofL - parapetT * 2 - 0.2),
+        new THREE.MeshStandardMaterial({ color: 0xD3CFC7, roughness: 0.9 })
+      );
+      deckMesh.position.set(0, roofBaseY + roofSlabT + 0.05, 0);
+      threeRoofGroup.add(deckMesh);
+
+      // 5. Modern Frameless Architectural Roof Skylights
+      const skyFrame = new THREE.Mesh(
+        new THREE.BoxGeometry(5.2, 0.35, 4.2),
+        new THREE.MeshStandardMaterial({ color: 0x1E242B, roughness: 0.3, metalness: 0.85 })
+      );
+      skyFrame.position.set(-roofW * 0.15, roofBaseY + roofSlabT + 0.2, -roofL * 0.1);
+      const skyGlass = new THREE.Mesh(
+        new THREE.BoxGeometry(4.8, 0.38, 3.8),
+        new THREE.MeshStandardMaterial({ color: 0x2563EB, roughness: 0.05, metalness: 0.9, transparent: true, opacity: 0.75 })
+      );
+      skyGlass.position.set(-roofW * 0.15, roofBaseY + roofSlabT + 0.22, -roofL * 0.1);
+      threeRoofGroup.add(skyFrame);
+      threeRoofGroup.add(skyGlass);
+
+      // 6. Flush Architectural Solar PV Panels
       const pvMat = new THREE.MeshStandardMaterial({ color: 0x0A1628, metalness: 0.94, roughness: 0.12 });
       const pvFrameMat = new THREE.MeshStandardMaterial({ color: 0x1E242B, roughness: 0.35, metalness: 0.85 });
       const pvGridMat = new THREE.MeshStandardMaterial({ color: 0x38BDF8, roughness: 0.2, metalness: 0.9 });
       const pvArrayG = new THREE.Group();
-      const pvPanelW = 3.2;
-      const pvPanelL = 5.0;
-      const cols = Math.max(1, Math.min(6, Math.floor((roofW * 0.72) / (pvPanelW + 0.5))));
-      const pvSlope = Math.atan2(roofPeakH, roofL / 2);
-
+      const pvPanelW = 3.4;
+      const pvPanelL = 5.2;
+      const cols = Math.max(1, Math.min(5, Math.floor((roofW * 0.6) / (pvPanelW + 0.4))));
       for (let ci = 0; ci < cols; ci++) {
-        const px = -(cols - 1) * (pvPanelW + 0.5) / 2 + ci * (pvPanelW + 0.5);
+        const px = -(cols - 1) * (pvPanelW + 0.4) / 2 + ci * (pvPanelW + 0.4);
         const panelFrame = new THREE.Mesh(new THREE.BoxGeometry(pvPanelW, 0.1, pvPanelL), pvFrameMat);
-        const panelGlass = new THREE.Mesh(new THREE.BoxGeometry(pvPanelW - 0.16, 0.12, pvPanelL - 0.16), pvMat);
+        const panelGlass = new THREE.Mesh(new THREE.BoxGeometry(pvPanelW - 0.2, 0.12, pvPanelL - 0.2), pvMat);
         panelFrame.add(panelGlass);
-
         for (let bi = -1; bi <= 1; bi++) {
           const busbar = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.13, pvPanelL - 0.2), pvGridMat);
           busbar.position.x = bi * (pvPanelW * 0.26);
@@ -1790,19 +2319,18 @@
         panelFrame.position.set(px, 0, 0);
         pvArrayG.add(panelFrame);
       }
-      pvArrayG.rotation.x = pvSlope;
-      pvArrayG.position.set(0, roofBaseY + roofPeakH * 0.46, roofL * 0.22);
+      pvArrayG.position.set(roofW * 0.18, roofBaseY + roofSlabT + 0.12, roofL * 0.12);
       threeRoofGroup.add(pvArrayG);
 
       threeScene.add(threeBuildingGroup);
 
-      // Framed perspective
+      // Framed perspective: tuned for optimal villa visual impact
       const maxDim = Math.max(plotFt.width, plotFt.length);
       threeCamera.up.set(0, 1, 0);
-      threeCamera.position.set(maxDim * 0.72, maxDim * 0.85, maxDim * 0.85);
-      threeCamera.lookAt(0, 2.5, 0);
+      threeCamera.position.set(maxDim * 0.58, maxDim * 0.45, maxDim * 0.82);
+      threeCamera.lookAt(0, 3.2, 0);
       if (threeControls) {
-        threeControls.target.set(0, 2.5, 0);
+        threeControls.target.set(0, 3.2, 0);
         threeControls.update();
       }
 

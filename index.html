@@ -642,8 +642,11 @@
                     <button class="tbar-btn" id="btnCamTop" onclick="set3DCameraPreset('top')" title="Top-Down Bird's Eye">Top Plan</button>
                     <button class="tbar-btn" id="btnCamLiving" onclick="set3DCameraPreset('interior')" title="Walk Inside Living Room">Walkthrough</button>
                   </div>
-                  <button class="btn btn-primary" id="btnEnterHouseWalkthrough" onclick="startWalkthroughMode()" title="Enter house in first-person walkthrough mode" style="background:#E4572E; color:#FFFFFF; border:none; font-weight:700; font-size:0.80rem; padding:5px 14px; border-radius:4px; box-shadow:0 2px 8px rgba(228,87,46,0.35); display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+                  <button class="btn btn-primary" id="btnEnterHouseWalkthrough" onclick="startWalkthroughMode()" title="Enter house in first-person walkthrough mode" style="background:#E4572E; color:#FFFFFF; border:none; font-weight:700; font-size:0.80rem; padding:5px 12px; border-radius:4px; box-shadow:0 2px 8px rgba(228,87,46,0.35); display:inline-flex; align-items:center; gap:5px; cursor:pointer;">
                     🚪 Enter house
+                  </button>
+                  <button class="tbar-btn" id="btnToggleCleanView" onclick="toggle3DCleanView()" title="Clean View (Shortcut 'C'): Hide all floating toolbars, text and HUD overlays for an unobstructed, pristine 3D view" style="border-color: rgba(228,87,46,0.4); background: rgba(228,87,46,0.08); color: var(--pencil-accent); font-weight: 700; padding: 5px 10px;">
+                    👁️ Clean View
                   </button>
                 </div>
 
@@ -676,7 +679,7 @@
               </div>
 
               <!-- Right HUD Island: Architectural Style & Display Modules Checklist (Checkbox15) -->
-              <div class="viewport-dock modules-checklist-dock" id="viewportModulesDock">
+              <div class="viewport-dock modules-checklist-dock collapsed" id="viewportModulesDock">
                 <!-- Architectural Style Presentation -->
                 <div class="dock-row" style="margin-bottom: 2px;">
                   <span class="dock-label">Style</span>
@@ -690,10 +693,13 @@
                   </select>
                 </div>
 
-                <!-- Modules Checklist Header -->
-                <div class="modules-dock-header">
+                <!-- Modules Checklist Header (Collapsible) -->
+                <div class="modules-dock-header" onclick="toggleModulesDockCollapse()" title="Click to collapse / expand display modules">
                   <span class="dock-label">Display Modules</span>
-                  <span class="modules-count-badge" id="modulesCountBadge">5/6</span>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span class="modules-count-badge" id="modulesCountBadge">4/6</span>
+                    <span id="modulesCollapseChevron" style="font-size: 0.68rem; color: var(--paper-text-secondary); transition: transform 0.2s;">▲</span>
+                  </div>
                 </div>
 
                 <!-- Checkbox15 Hierarchical Modules List -->
@@ -743,7 +749,7 @@
                     </div>
 
                     <div class="chk-item">
-                      <button type="button" class="chk-box is-checked" id="cbModule_labels" role="checkbox" aria-checked="true" onclick="toggleChildModuleCheckbox('labels')" aria-label="Room Tags and Dimensions">
+                      <button type="button" class="chk-box" id="cbModule_labels" role="checkbox" aria-checked="false" onclick="toggleChildModuleCheckbox('labels')" aria-label="Room Tags and Dimensions">
                         <svg class="chk-icon-check" viewBox="0 0 16 16" fill="none" stroke="currentColor">
                           <polyline points="3.5 8.5 6.5 11.5 12.5 4.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
@@ -772,6 +778,11 @@
                 </div>
               </div>
             </div>
+
+            <!-- Floating Restore HUD Button when Clean View is Active -->
+            <button class="btn-restore-hud" id="btnRestoreHUD" onclick="toggle3DCleanView()" title="Restore 3D Controls">
+              <span>👁️ Show Controls</span>
+            </button>
 
             <div class="viewport-floating-hint" id="viewportHint">
               Orbit: Left Drag · Zoom: Scroll · Pan: Right Drag
